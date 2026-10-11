@@ -1,8 +1,8 @@
 import { useId, useState } from 'react'
 import type { DrawingResult } from './types'
 
-interface Props { readonly drawing: DrawingResult; readonly title: string; readonly selectedIds?: readonly string[]; readonly replacementIds?: readonly string[]; readonly affectedNodeIds?: readonly string[] }
-export function CircuitDiagram({ drawing, title, selectedIds = [], replacementIds = [], affectedNodeIds = [] }: Props) {
+interface Props { readonly drawing: DrawingResult; readonly title: string; readonly selectedIds?: readonly string[]; readonly replacementIds?: readonly string[]; readonly affectedNodeIds?: readonly string[]; readonly createdNodeIds?: readonly string[]; readonly removedNodeIds?: readonly string[]; readonly boundaryNodeIds?: readonly string[] }
+export function CircuitDiagram({ drawing, title, selectedIds = [], replacementIds = [], affectedNodeIds = [], createdNodeIds = [], removedNodeIds = [], boundaryNodeIds = [] }: Props) {
   const titleId = useId()
   const [inspected, setInspected] = useState<{ kind: 'element' | 'point'; id: string } | null>(null)
   if (drawing.kind === 'unsupported') return <p role="alert">{drawing.message}</p>
@@ -36,12 +36,14 @@ export function CircuitDiagram({ drawing, title, selectedIds = [], replacementId
         if (!position) return null
         const nodeId = model.topology.pointToNode[point.id] ?? ''
         const terminals = model.network.terminals.filter(t => t.pointId === point.id)
-        return <g key={point.id} data-point-id={point.id} data-node-id={nodeId} data-affected={affectedNodeIds.includes(nodeId)} className={`circuit-node ${affectedNodeIds.includes(nodeId) ? 'affected' : ''}`}
+        const state = createdNodeIds.includes(nodeId) ? 'created' : removedNodeIds.includes(nodeId) ? 'removed' : boundaryNodeIds.includes(nodeId) ? 'boundary' : 'unaffected'
+        return <g key={point.id} data-point-id={point.id} data-node-id={nodeId} data-node-state={state} data-affected={affectedNodeIds.includes(nodeId)} className={`circuit-node ${affectedNodeIds.includes(nodeId) ? 'affected' : ''} ${state}`}
           role="button" tabIndex={0} aria-label={`连接点 ${point.id}；电气节点 ${nodeId}${terminals.length ? `；端子 ${terminals.map(t => t.label).join('、')}` : ''}`}
           aria-pressed={inspected?.kind === 'point' && inspected.id === point.id}
           onClick={() => setInspected({ kind: 'point', id: point.id })} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setInspected({ kind: 'point', id: point.id }) } }}>
           <title>{point.id}；电气节点 {nodeId}{terminals.length ? `；端子 ${terminals.map(t => t.label).join('、')}` : ''}</title>
           <circle className="node-hit-target" cx={position.x} cy={position.y} r="16" />
+          {state !== 'unaffected' && <circle className="lesson-node-ring" cx={position.x} cy={position.y} r="12" />}
           <circle cx={position.x} cy={position.y} r={terminals.length ? 7 : 4} className={terminals.length ? 'terminal-dot' : 'junction-dot'} />
           <text className="node-label" x={position.x} y={position.y + 25} textAnchor="middle">{point.id}</text>
           {terminals.map((terminal, i) => <text key={terminal.id} data-terminal-id={terminal.id} className="terminal-label" x={position.x + 16} y={position.y - 16 - i * 23}>{terminal.label}</text>)}

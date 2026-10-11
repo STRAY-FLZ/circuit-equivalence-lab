@@ -89,3 +89,44 @@ th, td { border-bottom:1px solid var(--line); padding:8px 5px; }
 .circuit-node { cursor:pointer; }
 .circuit-node:focus { outline:none; }
 .circuit-node:focus .node-hit-target, .circuit-node:hover .node-hit-target { fill:var(--subtle); stroke:var(--accent); stroke-width:2; }
+/* M5 panels reuse the M4 theme; local scrolling keeps long formulas readable. */
+.lesson-panel { margin-bottom:24px; border:1px solid var(--line); border-radius:12px; background:var(--surface); padding:20px; min-width:0; }
+.lesson-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.lesson-heading h2 { margin:0; font-size:19px; line-height:1.6; }
+.lesson-heading .eyebrow { margin-bottom:6px; }
+.lesson-button { border:1px solid var(--line); border-radius:6px; color:inherit; background:var(--surface); padding:10px 14px; font-size:12px; }
+.lesson-button:hover:not(:disabled) { background:var(--subtle); }
+.lesson-progress { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); list-style:none; padding:0; margin:20px 0; gap:8px; }
+.lesson-progress li { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); padding:9px 6px; border-bottom:2px solid var(--line); line-height:1.5; }
+.lesson-progress li span { font-size:13px; font-weight:700; }
+.lesson-progress li.current { border-color:var(--accent); color:var(--accent); background:var(--subtle); }
+.lesson-explanation { font-size:13px; line-height:1.9; overflow-wrap:anywhere; }
+.lesson-explanation p { margin:10px 0; }
+.lesson-explanation h3 { font-size:13px; margin:16px 0 6px; }
+.lesson-explanation ul { padding-left:22px; }
+.lesson-explanation li { margin-bottom:8px; }
+.lesson-equations { display:grid; gap:10px; margin:18px 0; min-width:0; }
+.equation-row { max-width:100%; overflow-x:auto; padding:14px; border:1px solid var(--line); background:var(--subtle); border-radius:6px; }
+.math-expression { font-family:'Cambria Math', 'STIX Two Math', serif; font-size:17px; white-space:nowrap; }
+.lesson-mappings { border:1px solid var(--line); padding:12px; border-radius:6px; }
+.lesson-mappings .math-expression { font-size:15px; }
+.lesson-mappings td { overflow-wrap:anywhere; }
+.lesson-mistake { border-left:3px solid var(--selected); padding:0 14px; margin:18px 0; color:var(--muted); }
+.lesson-mistake h3 { color:var(--selected); }
+.lesson-conclusion { color:var(--accent); }
+.lesson-changes { padding:10px 14px; background:var(--subtle); border-radius:6px; }
+.lesson-navigation { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; border-top:1px solid var(--line); padding-top:16px; }
+.lesson-next { background:var(--accent); color:var(--surface); border-color:var(--accent); }
+.lesson-verification { border:1px solid var(--line); border-left-width:4px; padding:10px 14px; border-radius:6px; margin-top:16px; }
+.lesson-verification.equivalent { border-left-color:var(--replacement); }
+.lesson-verification.equivalent strong { color:var(--replacement); }
+.lesson-verification.inconclusive { border-left-color:var(--muted); }
+.lesson-verification.different { border-left-color:var(--selected); }
+.lesson-verification.different strong { color:var(--selected); }
+.lesson-node-ring { fill:none; stroke:currentColor; stroke-width:2; }
+.circuit-node.created { color:var(--replacement); }
+.circuit-node.created .lesson-node-ring { stroke-width:3; }
+.circuit-node.removed .lesson-node-ring { stroke-dasharray:3 3; }
+.circuit-node.boundary { color:var(--accent); }
+@media (max-width:1100px) { .lesson-progress { grid-template-columns:1fr; gap:4px; } .lesson-progress li { padding:5px 8px; border-bottom:none; border-left:2px solid var(--line); } }
+@media (max-width:700px) { .lesson-panel { padding:16px; } .lesson-heading { flex-direction:column; } .lesson-heading h2 { font-size:17px; } .math-expression { font-size:16px; } .lesson-navigation .lesson-button { padding:10px; } }

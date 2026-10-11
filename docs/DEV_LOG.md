@@ -1,5 +1,44 @@
 # 开发记录
 
+## 2026-10-11 · M5 Interactive Educational System
+
+### Git preparation and scope
+
+- Committed the completed M4 changes locally as `b251c9b` (`feat(visualization): implement interactive circuit diagrams`), then created `feat/06-education`. Staged only the known 15 M4 files; no unrelated changes were found. Reused reported M4 acceptance rather than repeating historical audits.
+- M5 changes remain uncommitted. No push, merge, deployment, personal website change, dependency/configuration change, M6 work or existing domain/topology/solver/transformation/layout algorithm modification.
+
+### Implementation and files
+
+- Added `src/education/types.ts`, `format.ts`, and `lesson.ts`; updated its barrel. Pure lesson construction adapts actual candidates, M1 topology, M3 original/replacement records and verification evidence to five Chinese teaching stages. Formula strings are presentation templates, not a second arithmetic engine.
+- Added `src/lesson-session.ts` for one discriminated idle/preview/lesson reducer and bounded step index. Updated App to cache transformation/verification snapshots, memoize layout/discovery, reuse M4 previews, navigate/restart without recalculation, and initialize new selections correctly. Exit keeps the preview; selecting an example with no candidate exits learning.
+- Added `src/GuidedLesson.tsx` for application-level educational composition, variable/node correspondence, metadata changes and three-state all-pairs verification presentation. Added generic `src/components/MathExpression.tsx` and its barrel export for native MathML subscript notation; no math dependency or general symbolic engine.
+- Added `src/learning-examples.ts` with a real immutable symmetric 3-ohm delta. Kept all eight original M4 examples unchanged. M3 supplies its 1-ohm replacement arms and 2-ohm port-pair verification results.
+- Extended CircuitDiagram only with optional created/removed/boundary node-ring styling props; preserved its electrical and layout logic. Added local educational styles to existing styles.css using M4 theme variables, native keyboard controls and bounded equation-row scrolling. No visual redesign or animation.
+- Added `src/education/lesson.test.ts` (15 tests) and `src/learning.test.tsx` (16 tests). Existing M1–M4 tests are unchanged. Updated only current M5 architecture/status sections, roadmap handoff stages and this new log entry; historical records are preserved.
+
+### Actual verification
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck` | Passed with unchanged strict settings |
+| `npm run lint` | Passed; zero errors/warnings |
+| `npm run test` | Passed: 17 files, 304 tests, none skipped |
+| `npm run build` | Passed: typecheck and Vite production build |
+| Focused Playwright / local Chrome | Completed delta-to-star and series guided lessons and the interactions below |
+
+Focused tests cover all four lesson types and five stages, series/parallel/delta/star formulas, numerical substitutions, symmetric/asymmetric delta values, electrical-endpoint mapping independent of ID order/orientation, opposite star-arm denominators, unrounded authoritative values, actual bridge labels, retained center wires, mismatched metadata feedback, progression/highlights, preview reuse and existing M4 compatibility. Real M3 verification results cover verified, genuine resistance mismatch, missing-terminal-pair inconclusive and numerical-solver-error inconclusive states. Spies confirm navigation/restart/exit/re-entry does not repeat transform or numerical verification calls. No separate historical module acceptance workflow was rerun.
+
+The initial focused run exposed that jest-dom's toBeInTheDocument matcher accepts HTMLElement/SVGElement but rejects native MathML Element objects in jsdom. Used isConnected plus an explicit MathML namespace assertion instead. A new test helper's unused import was also caught and removed. No type/lint/test rule was disabled. All final checks used the project commands; loopback access and ignored workspace-local TEMP/TMP (.artifacts/m5/temp) supported the unchanged real Vite startup regression.
+
+The browser smoke used the existing Playwright skill/CLI wrapper, local Chrome and a Vite service on port 5175. Actually completed all five steps for a symmetric delta (three 1-ohm arms, three verified 2-ohm terminal pairs) and series (100+220=320 ohms, one verified pair). Checked Previous, restart to stage one, selection changes, Exit preserving two preview diagrams, created/removed node highlights and identical before/after viewBoxes. At 390px the page width stayed 390px; native MathML rendered actual substitutions in dark theme. Theme switching worked, and the inspected browser console reported no errors/warnings. Only two screenshot files were retained for this focused smoke: output/playwright/m5-mobile-substitution.png and m5-delta-verified.png, both visually inspected and ignored by Git.
+
+### Limitations and M6 handoff
+
+- Fixed five-stage, single-operation lessons; no chained transformation history, interactive algebra, persistent progress or animation. M3 eligibility/results remain authoritative, with M2 numerical and M4 drawing limits unchanged.
+- Formatted teaching numbers use ten significant digits; this can hide sub-display differences, but mappings and verification retain unrounded values. S/P substitutions remain unevaluated presentation expressions. Unsupported drawing still reports an explicit message and full inventory.
+- Verification is tolerance-dependent numerical evidence, not a symbolic proof. Inconclusive and failed outcomes remain distinct. No solver error is promoted to success.
+- Native MathML and the focused workflows were tested in local Chrome/viewport emulation; M6 should broaden browser/screen-reader coverage, cross-module state/failure integration and overall documentation consistency. M7 will align the design system with the owner's website; M8 will handle deployment/navigation separately. No later stage was started.
+
 ## 2026-10-11 · M4 SVG Circuit Visualization
 
 ### Git and scope

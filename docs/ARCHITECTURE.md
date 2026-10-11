@@ -2,7 +2,7 @@
 
 ## Current scope
 
-M0 provides the React/TypeScript/Vite project, domain types and validation, module contracts, and a presentation shell with theme switching. M1 adds a deterministic, UI-independent topology engine. M2 adds a component-aware DC nodal solver with explicit physical states and numerical diagnostics. M3 adds explicit series, parallel, delta-to-star and star-to-delta rewrites with independent terminal-equivalence verification. M4 adds real SVG circuit diagrams and single-operation transformation previews. Interactive derivations remain future work.
+M0 provides the React/TypeScript/Vite project, domain types and validation, module contracts, and a presentation shell with theme switching. M1 adds a deterministic, UI-independent topology engine. M2 adds a component-aware DC nodal solver with explicit physical states and numerical diagnostics. M3 adds explicit series, parallel, delta-to-star and star-to-delta rewrites with independent terminal-equivalence verification. M4 adds real SVG circuit diagrams and single-operation transformation previews. M5 adds five-stage guided lessons, grounded numerical substitutions and cached port-verification evidence.
 
 The topology engine lives in `src/topology/`. It imports only `domain` and its own internal helpers, uses standard JavaScript data structures, and has no React, DOM, SVG, coordinate, browser, or graph-library dependency. The M4 UI consumes M1 topology through the visualization layer and composes M3 discovery, application and verification in App.
 
@@ -164,7 +164,7 @@ M2 can resolve query terminals with `terminalToNode`, identify their components 
 
 M2 must decide reference-node selection, excitation, numerical tolerances, matrix assembly, conditioning/error behavior, and interpretation of query states. M1 performs none of these operations. It assigns no voltage, current, power, ground node, or equivalent resistance, and does not invent open/short resistor values.
 
-The existing `ResistanceSolver` result contract still distinguishes finite resistance, short-circuit, open-circuit, and error states. M3 transformation contracts are implemented below; visualization is implemented in M4; education remains a future interface.
+The existing `ResistanceSolver` result contract still distinguishes finite resistance, short-circuit, open-circuit, and error states. M3 transformation contracts are implemented below; visualization is implemented in M4; education lesson content is implemented in M5.
 
 ## M2 solver API and module boundaries
 
@@ -369,3 +369,33 @@ Applied results provide the transformed network, original/replacement IDs, affec
 The layout supports at most 16 points and 24 elements, with validated finite template coordinates. Crowded branches, insufficient label space and ambiguous point/path overlap return explicit unsupported results. This is a bounded educational schematic MVP, not arbitrary automatic routing, collision-free general graph layout or a drag editor. Complex networks and long identifiers may require new presentation templates. Residual sections can make drawings tall, and small panels scroll rather than shrinking labels indefinitely.
 
 M5 may reuse `CircuitDiagram` highlighting props (`selectedIds`, `replacementIds`, `affectedNodeIds`), pure `buildDrawing` output, the `LayoutTransition` adapter and existing M3 metadata/equivalence evidence. There is no teaching animation, mathematical derivation engine or multi-step editor/undo implementation in M4.
+
+## M5 guided education
+
+### Presentation-only educational data
+
+`education/index.ts` exports `buildLesson`, `lessonHighlights`, `formatNumber`, and readonly lesson types. Education remains React-free and imports only existing domain, topology and transform contracts. `buildLesson(source, candidate, applied, verification)` consumes an actual M3 candidate, successful result/metadata and verification snapshot. It checks matching candidate/type metadata and reports unavailable content if required mapping records are absent. It does not rediscover eligibility, evaluate formulas, calculate replacement resistances or duplicate solver logic.
+
+Five stages organize concept/conditions, mathematical principle, numerical substitution, structural comparison, and external-terminal verification. Chinese explanations cover same-current series conditions, same-voltage parallel conditions, delta vertex/arm correspondence, removable star centers, wire-equivalent nodes, shorted branches, protected boundaries, and common mistakes. The M3 two-resistor series candidate is distinguished from the general n-resistor series principle.
+
+Variable mappings use M1 electrical endpoints rather than array order, screen position or resistor-ID order. Delta variables represent actual boundary edges; star variables represent arms incident to the protected boundary. Boundary aliases use unique simple terminal/point labels, otherwise explicit A/B/C roles with node/terminal correspondence. Multi-character edge aliases include separators to prevent ambiguous concatenation. M3 replacement records supply all displayed results and full-precision numeric mappings. S and P appear as unevaluated expressions; no educational arithmetic engine is introduced. Display formatting uses ten significant digits without modifying the stored resistance.
+
+### React composition and progression
+
+`lesson-session.ts` defines one discriminated reducer state: idle, preview snapshot, or lesson with snapshot and a single 0–4 step index. Previous/Next enforce endpoints; restart resets only the index; exit preserves the existing M4 preview. Navigation reuses operation/evidence/content references. App memoizes discovery and before/after layouts, and creates a transform plus all-terminal-pairs verification snapshot only for an explicit preview or a new lesson selection. Starting from an existing preview reuses that snapshot.
+
+App retains the selected example and candidate identities. Candidate changes during learning rebuild the corresponding lesson at step zero. Example changes choose the first actual M3 candidate and start at zero; an example with no candidates clears learning and disables entry. Ordinary M4 preview/reset behavior remains available. `learning-examples.ts` adds an immutable symmetric three-ohm delta to the unchanged eight M4 examples, using the domain factory and existing presentation coordinates.
+
+`GuidedLesson.tsx` is an application-level composition view rather than a React dependency inside education. It renders stage text, native Previous/Next/Restart/Exit controls, an aria-current step indicator, variable/node mappings, metadata changes and `EquivalenceSummary`. Generic `components/MathExpression.tsx` uses native MathML subscripts for fixed lesson notation through React.createElement; the installed React type declarations do not list MathML intrinsic JSX tags. No dependency, type-check relaxation, symbolic parser or expression evaluation was added.
+
+### SVG and verification behavior
+
+Stages one through three highlight selected originals while withholding the transformed drawing. Stage four renders both M4 diagrams with identical viewBoxes, selected/replacement elements, explicit created/removed/boundary node rings, and retained internal/unselected element lists. Stage five emphasizes preserved boundary nodes without continuing to highlight replaced branches. `CircuitDiagram` receives optional createdNodeIds, removedNodeIds and boundaryNodeIds props; its existing geometry/electrical algorithms remain unchanged.
+
+The authoritative `verifyTerminalEquivalence` result is cached during lesson preparation and displayed at stage five. Equivalent/different/inconclusive remain distinct, with text plus themed visual treatments. A compact all-pairs table shows original/new finite resistances, shorts, opens or unavailable numerical solutions. Solver errors are never successful evidence; missing terminal pairs are inconclusive. Rounding affects only text. The UI explains that equivalence concerns preserved external behavior, not identical internal structures, and does not expose raw solver diagnostics.
+
+### Styling, limits and next stages
+
+New panels reuse M4 theme variables, native controls and visible focus styling. Math expressions scroll inside bounded rows, and long content cannot enlarge the page. No animation was added. The application-level views and local style classes can be restyled during M7 without replacing lesson data. The personal website and its repository are untouched.
+
+M5 remains a single-operation lesson with fixed formula templates, not a symbolic algebra system, chained editor, persistent learning analytics or proof animation. It inherits M3 numerical limits and M4 layout bounds. Native MathML was smoke-tested in local Chrome; broader browser/screen-reader checks, state integration and delivery documentation are M6 quality-assurance considerations. M7 will align the design with the personal website; M8 will handle deployment/navigation only after separate authorization.
