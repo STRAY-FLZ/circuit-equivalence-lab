@@ -1,5 +1,54 @@
 # 开发记录
 
+## 2026-10-11 · M2 Nodal Analysis and Resistive Network Solver
+
+### Baseline, resumption and scope
+
+- Verified clean `feat/02-topology` at `93743c8ed35db0d18d145cc6336e9d4e9c28ff42`, containing M0 commit `594e814` and M1. Created `feat/03-solver` from that state; main was not assumed to contain either module.
+- On the user's resume request, rechecked branch/status/history and retained all six in-progress solver files. Core implementation had passed typecheck/lint; tests, documentation and complete verification were unfinished. Continued those requirements without resetting or recreating existing work.
+- Changes are confined to solver and project documentation. M1/domain contracts, all existing tests, UI, dependencies and tool configuration remain unchanged. No final commit, push, merge, deployment, or M3 implementation was performed.
+
+### Implemented behavior and numerical decisions
+
+- Public `solveEquivalentResistance(topology, terminalAId, terminalBId)` consumes the existing M1 result. It checks terminals, classifies identical nodes and disconnected components, and assembles only the selected connected component.
+- Evolved the unused M0 solver placeholder to accept normalized topology. Preserved the four result kinds; added explicit zero for shorts, contextual error codes, node voltages, branch currents/drops, and residual/conditioning diagnostics. All results are frozen, without mutating caller input.
+- Ground terminal B and inject +1 A at A. Stamp every non-short resistor independently; exclude self-loops numerically but retain their IDs with zero diagnostics. Unrelated floating networks receive no invented potentials/currents.
+- Scale resistances globally using the minimum non-short branch value, then symmetrically equilibrate the reduced matrix. Use Cholesky and triangular solves; no matrix inversion, graph reduction, or numerical dependency.
+- Estimate the equilibrated infinity condition number using the nonnegative-inverse property of grounded SPD M-matrices and one additional solve against all ones. Dimension-aware pivot/condition thresholds use 64*n*epsilon.
+- Check componentwise nodal residuals, branch KCL including the reference, positive finite resistance, passive voltage bounds, non-finite arithmetic, and physical-unit conversion accuracy. This is a conservative double-precision solver, not a certified forward-error algorithm.
+- Added a regression for subnormal physical-unit rounding: two parallel resistors of 3*Number.MIN_VALUE have a mathematical result of 1.5*Number.MIN_VALUE; rounding to 2*Number.MIN_VALUE is a 33% relative error and now returns numerical-failure. Ordinary scaling tests include 1e-300 through 1e300; exact single-resistor extremes can also succeed.
+- Dense factorization costs O(n^3) time/O(n^2) storage. Limit the selected component to 512 unknown nodes before allocation; resource failures are separate from numerical failures and physical open circuits.
+
+### Files
+
+- Updated `src/solver/index.ts`; added `types.ts`, `numerics.ts`, `nodal-system.ts`, `linear-system.ts`, and `solve-equivalent-resistance.ts` inside solver.
+- Added `solve-equivalent-resistance.test.ts`, `nodal-system.test.ts`, `linear-system.test.ts`, and `reference.test.ts` inside solver.
+- Updated README, ARCHITECTURE, ROADMAP, and this development log. Architecture documentation and new technical comments are English; existing Chinese project documentation conventions are retained where applicable.
+
+### Actual verification
+
+| Command | Result |
+| --- | --- |
+| `npm run typecheck` | Passed with strict checks; no configuration relaxation |
+| `npm run lint` | Passed; zero errors and warnings |
+| `npm run test` | Passed: 10 files, 154 tests, none skipped |
+| `npm run build` | Passed: typecheck followed by Vite production build |
+
+The 64 M2 tests consist of 51 public solver cases, one matrix-assembly case, 11 linear-system cases, and one exact-reference case. All original 90 M0/M1 tests remain unchanged and pass, including App and actual Vite HTTP startup tests. No new browser/UI acceptance is claimed because the UI was not changed.
+
+The suite covers A1–A6, B1–B3, C1–C7 and D1–D9. Analytical references include the unbalanced bridge result 106/33 ohms and K5 result 4/5 ohm. One independent BigInt cofactor test checks 32 generated connected multigraphs in both terminal directions using Cramer's rule; these are not counted as extra Vitest cases. Additional checks include a 100-edge chain, signed currents, power conservation, output freezing, missing normalized component data, resource limits and JSON serialization.
+
+The initial test run caught a missing closing brace in a new test helper and an incorrectly selected condition-threshold fixture. The fixture was corrected analytically: for coupling c, rcond=(1-c)/(1+c), while the final Cholesky pivot is 1-c^2. No circuit reference value, tolerance, type rule, or test was weakened to obtain passing results.
+
+### Limitations and M3 integration
+
+- No unresolved M2 acceptance blocker. All requested checks were actually run after the completed implementation.
+- Only passive linear DC resistors and ideal-wire-normalized graphs are supported. No sources beyond the internal 1 A test, SPICE device models, AC, or circuit transformations.
+- Input is trusted typed M1 output, not arbitrary JSON. Small selected-component guards do not duplicate the full topology validator.
+- Extreme resistance ratios, nearly equal potentials, subnormal rounding, and ill-conditioning can produce numerical-failure even for a physically valid connected graph. Residuals/condition estimates are diagnostics, not guaranteed significant digits. No arbitrary precision, sparse backend, iterative refinement, factorization cache, or large-scale benchmark.
+- Diagnostics describe only the excited component; branch direction follows the original normalized endpoint tuple. Short/open results intentionally omit finite-solution diagnostics.
+- M3 should independently analyze original and transformed circuits, preserve terminal correspondence, compare result kinds and finite values with explicit tolerances, and treat solver errors as inconclusive. Test all relevant port pairs for multi-terminal equivalence. M3 remains unimplemented and requires explicit authorization.
+
 ## 2026-10-11 · M1 Circuit Topology Modeling and Node Identification
 
 ### Baseline and scope

@@ -2,7 +2,7 @@
 
 ## Current scope
 
-M0 provides the React/TypeScript/Vite project, domain types and validation, module contracts, and a presentation shell with theme switching. M1 adds a deterministic, UI-independent topology engine. Numerical solving, equivalent transformations, circuit drawing, and interactive teaching remain future work.
+M0 provides the React/TypeScript/Vite project, domain types and validation, module contracts, and a presentation shell with theme switching. M1 adds a deterministic, UI-independent topology engine. M2 adds a component-aware DC nodal solver with explicit physical states and numerical diagnostics. Equivalent transformations, circuit drawing, and interactive teaching remain future work.
 
 The topology engine lives in `src/topology/`. It imports only `domain` and its own internal helpers, uses standard JavaScript data structures, and has no React, DOM, SVG, coordinate, browser, or graph-library dependency. The existing UI remains the M0 presentation shell; M1 is consumed through the TypeScript API.
 
@@ -14,7 +14,7 @@ Dependencies point from consumers to providers. These are permitted directions, 
 | --- | --- | --- |
 | domain | Stable IDs, connection points, wires, positive resistors, terminals, data integrity | None; no React |
 | topology | Wire equivalence, normalized branches, terminal mappings, resistive components | domain |
-| solver | Future numerical resistance-network solver and explicit result states | domain, topology |
+| solver | DC nodal analysis, equivalent resistance, explicit physical states and numerical failures | domain, topology |
 | transforms | Future equivalent transformations and applicability checks | domain, topology, solver |
 | visualization | Separate layout data and future SVG views | domain, topology; React allowed |
 | education | Formula, explanation, and derivation data | domain, topology, solver, transforms; no React |
@@ -165,6 +165,91 @@ M2 can resolve query terminals with `terminalToNode`, identify their components 
 M2 must decide reference-node selection, excitation, numerical tolerances, matrix assembly, conditioning/error behavior, and interpretation of query states. M1 performs none of these operations. It assigns no voltage, current, power, ground node, or equivalent resistance, and does not invent open/short resistor values.
 
 The existing `ResistanceSolver` result contract still distinguishes finite resistance, short-circuit, open-circuit, and error states. Transform, visualization, and education contracts remain future interfaces.
+
+## M2 solver API and module boundaries
+
+~~~ts
+import { solveEquivalentResistance } from './src/solver'
+
+const result = solveEquivalentResistance(topology, 'terminal-a', 'terminal-b')
+~~~
+
+The input must be a validated M1 `TopologyResult`. The solver never invokes `analyzeTopology`, rebuilds wire equivalence, or parses unknown/JSON data. It checks terminal existence and selected-component consistency, but does not promise comprehensive diagnostics for forged topology objects. Neither domain nor M1 contracts were changed.
+
+The unused M0 solver placeholder has evolved: `ResistanceQuery` carries `topology` instead of `network`; `ResistanceSolver` now matches the three-argument entry function. There were no consumers of the placeholder. Result discriminants are preserved and extended:
+
+| kind | Data and meaning |
+| --- | --- |
+| finite | Positive finite branded `resistance` in ohms, `nodeVoltages`, `branches`, `diagnostics` |
+| short-circuit | `resistance: 0`; both existing terminals resolve to one electrical node |
+| open-circuit | Different resistive components; no Infinity-valued JSON field |
+| error | `code` and contextual `message`; never a substitute for physical open/short classification |
+
+Error codes are `unknown-terminal`, `invalid-topology`, `numerical-failure`, and `size-limit`. Unknown terminals are checked before same-node classification. A query of one existing isolated terminal against itself is a short; two different isolated nodes are open. Classification precedes matrix construction. Short/open results intentionally contain no inferred voltage/current diagnostics.
+
+Only the function and public types are exported by `solver/index.ts`. Internal files are:
+
+- `nodal-system.ts`: selected-component extraction and deterministic matrix assembly.
+- `linear-system.ts`: symmetric diagonal equilibration, Cholesky factorization, triangular solves, condition estimate, and residual checks.
+- `numerics.ts`: dense storage and finite/positive/unit-conversion guards.
+- `solve-equivalent-resistance.ts`: classification, orchestration, physical diagnostics and KCL acceptance.
+- `types.ts`: immutable public result contracts.
+
+The implementation uses standard JavaScript typed arrays, has no new dependencies, and imports no UI, geometry, or browser APIs. It does not perform circuit transformations.
+
+## Nodal equations and units
+
+For a branch from i to j, `g = 1/R` siemens and `Iij = g(Vi - Vj)` amperes. KCL at each unknown node gives `sum_j g_ij(Vi - Vj) = Ii`, hence `G V = I`.
+
+Terminal B's node is the reference (`VB = 0 V`). Inject `+1 A` at A and withdraw `1 A` at B. Removing B's equation leaves one nonzero RHS entry at A. Consequently `Req = (VA - VB) / 1 A`, whose numerical value in ohms equals VA in volts.
+
+Each non-short resistor contributes +g to both endpoint diagonals and -g to the two off-diagonal positions. A reference endpoint has no unknown index, so only the other diagonal is stamped. Parallel branches are stamped separately; original resistor IDs are never merged. Shorted self-loops are excluded from stamping, including scale selection, but retained in diagnostics with exactly zero drop and current.
+
+Only the component containing both terminals is assembled. All its nodes participate, including dangling trees/cycles. Unrelated floating networks and isolated nodes are excluded. No absolute potentials or currents are reported for those unrelated components.
+
+## Scaling and linear solution
+
+Let `s` be the smallest non-short resistance in the selected component. Rather than computing possibly overflowing raw reciprocals, stamp `H = s G` using weights `s/R <= 1` and solve `H x = I`, where `x = V/s`. A uniformly tiny or large network thus has the same normalized system. Canonical node IDs and resistor IDs determine assembly order.
+
+Set `Dii = sqrt(Hii)`, `A = D^-1 H D^-1`, `b = D^-1 I`, and `y = D x`. Solve `A y = b` using `A = L L^T` and forward/back substitution, then recover x and physical V. A connected positive resistor network yields an SPD grounded Laplacian in exact arithmetic, making Cholesky appropriate without row pivoting or explicit matrix inversion. The internal linear routine requires symmetric nonpositive off-diagonals; it is not a general-purpose linear solver.
+
+The design uses the established SPD equilibration/factorization/condition-check approach described in [LAPACK DPOSVX](https://www.netlib.org/lapack/explore-html/d6/d44/group__posvx_gae23dac18e7ec69c36fd2a2648a470dc3.html). This implementation is smaller: it does not implement LAPACK iterative refinement or certified forward-error bounds.
+
+For the equilibrated SPD M-matrix, the inverse is entrywise nonnegative. Solving `A z = 1` therefore gives its inverse row sums; `max(z)` estimates `||A^-1||inf`. The returned reciprocal condition estimate is `1 / (||A||inf * max(z))`. This requires one additional triangular solve, not an inverse matrix. The condition estimate describes the equilibrated system, not a rigorous error bound on every diagnostic.
+
+## Numerical acceptance and limitations
+
+Let n be the number of unknown nodes, m the number of selected resistor branches, and eps = Number.EPSILON.
+
+| Check | Acceptance rule |
+| --- | --- |
+| Cholesky pivots on unit-diagonal A | Each pre-square-root pivot > `64 * eps * max(1,n)` |
+| Reciprocal condition estimate | Greater than the same dimension-aware threshold |
+| Reduced equation residual | `max_i abs((H x - I)i) / (abs(Ii) + sum_j abs(Hij*xj)) <= 512 * eps * max(1,n)`; a zero denominator uses absolute residual |
+| Physical KCL, including reference | `abs(sum signed branch currents - injection) <= tau * max(1 A, sum abs(branch currents))`, with `tau = max(1e-9, 512*eps*(n+m))` |
+| Passive voltage bounds | Normalized voltages within `[-1e-9*xA, (1+1e-9)*xA]`; no clamping |
+| Physical unit conversion | Nonzero values must survive conversion; conversion round-trip relative discrepancy <= `1e-9` |
+| Equivalent resistance | Strictly positive and finite |
+
+Non-finite arithmetic, lost pivots, excessive condition/residual estimates, conductance underflow, current underflow, and unrepresentable physical results produce `numerical-failure`. In particular, a positive subnormal resistance that rounds with substantial relative error is rejected even if it remains nonzero. Numerical failures never return physical open/short states. Marginal networks may fail for one reference choice and succeed for another; failure is explicit and does not change connectivity.
+
+Successful finite diagnostics contain:
+
+- `nodeVoltages`: volts relative to B, only for the solved component; a frozen null-prototype dictionary.
+- `branches`: every selected resistor ID, voltage drop and current directed from original `nodeIds[0]` to `nodeIds[1]`. Currents are computed as `(xi-xj)*(s/R)` to avoid unstable raw reciprocals. Reversing the query reverses physical branch currents.
+- `diagnostics`: reference node, 1 A excitation, resistance scale, reciprocal condition estimate, componentwise equation residual, maximum absolute KCL residual in amperes, and the dimensionless KCL tolerance factor.
+
+Outputs are deeply frozen; input topology is neither mutated nor frozen by the solver. Small negative roundoff in a nominally zero diagnostic is not silently clamped. Global scaling and residual checks improve reliability but cannot guarantee accurate results for every finite positive IEEE-754 input. High dynamic range, subtraction of nearly equal potentials, subnormal quantization, and ill-conditioning remain finite-precision limits. No arbitrary-precision fallback is included.
+
+Dense assembly/storage costs O(n^2 + m), Cholesky O(n^3), subsequent solves and residuals O(n^2). Component selection scans the M1 component/resistor collections; canonical sorting adds O(n log n + m log m). Total auxiliary space is O(n^2 + m). The implementation explicitly limits the selected component to 512 unknown nodes before allocation; this is a documented resource bound, not a physical circuit limitation. Sparse solving, factorization caching, and incremental updates are future work. The test suite exercises a 100-edge chain; it is not a large-scale performance benchmark.
+
+## M2 tests and M3 integration
+
+M2 adds 64 tests: 51 public solver cases, one matrix-stamping case, 11 linear-algebra cases, and one independent exact reference test. The latter checks 32 connected integer-conductance multigraphs using BigInt Laplacian cofactor determinants and Cramer's rule, in both terminal directions; it shares no numerical solver code. These generated graphs are not separate Vitest test counts.
+
+References include 7 ohm single, 2+3 series, 6||3 parallel, mixed networks, all delta/star terminal pairs, balanced bridge, and an unbalanced bridge with hand-derived `Req=106/33`, `VX=21/11`, `VY=20/11`, and central current `1/66 A`. K5 symmetry provides a non-series-parallel graph reference. Tests also verify current signs, KCL, power balance, matrix symmetry, scale changes, ordering, input immutability, explicit failures, prototype-like IDs, and JSON-safe physical states. The original 90 tests remain unchanged.
+
+M3 can independently normalize the original and transformed networks through M1, then call M2 for corresponding external-terminal pairs. Compare physical states first; compare finite resistances using absolute plus relative tolerance. An error result makes the comparison inconclusive, not equivalent or open. For multi-terminal transformations, preserve terminal correspondence and verify all relevant port pairs; one matching pair alone does not establish general multi-port equivalence. M2 provides verification only, with no transformation algorithm or teaching UI.
 
 ## Verification
 

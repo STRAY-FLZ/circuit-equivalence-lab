@@ -2,7 +2,7 @@
 
 Circuit Equivalence Lab 是面向大学本科《电路》课程的交互式学习项目。后续将逐步支持拓扑识别、节点电压法、串并联与 Y–Δ 等效变换、惠斯通电桥，以及 SVG 电路图和教学推导。
 
-**当前已完成 M0 基础架构与 M1 拓扑分析引擎。** M1 通过独立 TypeScript API 提供电气节点识别、电阻支路归一化和连通分量分析。页面仍为 M0 介绍与主题切换界面；尚无数值求解、等效变换、绘图或拖拽编辑功能。
+**当前已完成 M0 基础架构、M1 拓扑分析与 M2 电阻网络求解。** 独立 TypeScript API 提供拓扑识别、节点电压法、两端等效电阻及数值诊断。页面仍为 M0 介绍与主题切换界面，尚未接入这些引擎；等效变换、绘图和拖拽编辑尚未实现。
 
 ## 本地运行
 
@@ -36,7 +36,7 @@ npm run preview
 src/
   domain/          电路类型、有限正电阻与网络完整性校验
   topology/        DSU、电气节点识别、支路与连通分量归一化
-  solver/          等效电阻查询与结果契约
+  solver/          节点电压法、等效电阻、数值检查与诊断
   transforms/      等效变换输入与结果契约
   visualization/  独立坐标和未来视图输入契约
   education/      教学内容与推导步骤契约
@@ -83,4 +83,17 @@ const topology = analyzeTopology(network)
 
 节点 ID 为 `node:` 加组内按 UTF-16 码元字典序排列的最小连接点 ID；结果不受输入集合顺序影响。输入不被修改，输出深层冻结。详细 ID 稳定性、校验规则、复杂度与 M2 接口见架构文档。本模块不计算电压、电流、功率或等效电阻。
 
-详见 [模块架构](docs/ARCHITECTURE.md)、[开发记录](docs/DEV_LOG.md) 与 [M0～M6 路线图](docs/ROADMAP.md)。工具配置参考 [Vite](https://vite.dev/guide/)、[Vitest](https://vitest.dev/guide/) 和 [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files) 官方文档。
+## M2 求解 API
+
+```ts
+import { solveEquivalentResistance } from './src/solver'
+
+const result = solveEquivalentResistance(topology, 'terminal-a', 'terminal-b')
+if (result.kind === 'finite') {
+  console.log(result.resistance) // Ω; this example gives approximately 100
+}
+```
+
+结果区分 `finite`、`short-circuit`（明确为 0Ω）、`open-circuit` 和带错误代码的 `error`。有限结果含所选分量的节点电压、各电阻支路的电流/压降及残差诊断；以第二端子为参考，在第一端子注入 1 A。极端尺度、病态矩阵或结果溢出会返回数值失败，不会伪装为物理开路。稠密求解限制为最多 512 个未知节点。
+
+完整测试共 154 个，包括既有 90 个回归测试和 64 个 M2 测试。详见 [模块架构](docs/ARCHITECTURE.md)、[开发记录](docs/DEV_LOG.md) 与 [M0～M6 路线图](docs/ROADMAP.md)。工具配置参考 [Vite](https://vite.dev/guide/)、[Vitest](https://vitest.dev/guide/) 和 [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files) 官方文档。
