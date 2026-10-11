@@ -61,9 +61,9 @@ live site in the existing Playwright CLI session before invoking the replay.
 For example, from the repository root with the CLI installed:
 
 ```powershell
-npx playwright-cli open https://stray-flz.github.io/circuit-equivalence-lab/
-npx playwright-cli run-code --filename=tests/browser/production-release.js
-npx playwright-cli run-code --filename=tests/browser/website-integration.js
+npx --package @playwright/cli playwright-cli open https://stray-flz.github.io/circuit-equivalence-lab/
+npx --package @playwright/cli playwright-cli run-code --filename=tests/browser/production-release.js
+npx --package @playwright/cli playwright-cli run-code --filename=tests/browser/website-integration.js
 ```
 
 Use the locally available Chrome/Chromium configuration and create the ignored
