@@ -2,7 +2,7 @@
 
 ## Current scope
 
-M0 provides the React/TypeScript/Vite project, domain types and validation, module contracts, and a presentation shell with theme switching. M1 adds a deterministic, UI-independent topology engine. M2 adds a component-aware DC nodal solver with explicit physical states and numerical diagnostics. Equivalent transformations, circuit drawing, and interactive teaching remain future work.
+M0 provides the React/TypeScript/Vite project, domain types and validation, module contracts, and a presentation shell with theme switching. M1 adds a deterministic, UI-independent topology engine. M2 adds a component-aware DC nodal solver with explicit physical states and numerical diagnostics. M3 adds explicit series, parallel, delta-to-star and star-to-delta rewrites with independent terminal-equivalence verification. Circuit drawing and interactive teaching remain future work.
 
 The topology engine lives in `src/topology/`. It imports only `domain` and its own internal helpers, uses standard JavaScript data structures, and has no React, DOM, SVG, coordinate, browser, or graph-library dependency. The existing UI remains the M0 presentation shell; M1 is consumed through the TypeScript API.
 
@@ -15,7 +15,7 @@ Dependencies point from consumers to providers. These are permitted directions, 
 | domain | Stable IDs, connection points, wires, positive resistors, terminals, data integrity | None; no React |
 | topology | Wire equivalence, normalized branches, terminal mappings, resistive components | domain |
 | solver | DC nodal analysis, equivalent resistance, explicit physical states and numerical failures | domain, topology |
-| transforms | Future equivalent transformations and applicability checks | domain, topology, solver |
+| transforms | Candidate eligibility, immutable graph rewrites, operation metadata and optional equivalence verification | domain, topology, solver |
 | visualization | Separate layout data and future SVG views | domain, topology; React allowed |
 | education | Formula, explanation, and derivation data | domain, topology, solver, transforms; no React |
 | components | Generic React UI without circuit knowledge | None; React allowed |
@@ -164,7 +164,7 @@ M2 can resolve query terminals with `terminalToNode`, identify their components 
 
 M2 must decide reference-node selection, excitation, numerical tolerances, matrix assembly, conditioning/error behavior, and interpretation of query states. M1 performs none of these operations. It assigns no voltage, current, power, ground node, or equivalent resistance, and does not invent open/short resistor values.
 
-The existing `ResistanceSolver` result contract still distinguishes finite resistance, short-circuit, open-circuit, and error states. Transform, visualization, and education contracts remain future interfaces.
+The existing `ResistanceSolver` result contract still distinguishes finite resistance, short-circuit, open-circuit, and error states. M3 transformation contracts are implemented below; visualization and education remain future interfaces.
 
 ## M2 solver API and module boundaries
 
@@ -250,6 +250,87 @@ M2 adds 64 tests: 51 public solver cases, one matrix-stamping case, 11 linear-al
 References include 7 ohm single, 2+3 series, 6||3 parallel, mixed networks, all delta/star terminal pairs, balanced bridge, and an unbalanced bridge with hand-derived `Req=106/33`, `VX=21/11`, `VY=20/11`, and central current `1/66 A`. K5 symmetry provides a non-series-parallel graph reference. Tests also verify current signs, KCL, power balance, matrix symmetry, scale changes, ordering, input immutability, explicit failures, prototype-like IDs, and JSON-safe physical states. The original 90 tests remain unchanged.
 
 M3 can independently normalize the original and transformed networks through M1, then call M2 for corresponding external-terminal pairs. Compare physical states first; compare finite resistances using absolute plus relative tolerance. An error result makes the comparison inconclusive, not equivalent or open. For multi-terminal transformations, preserve terminal correspondence and verify all relevant port pairs; one matching pair alone does not establish general multi-port equivalence. M2 provides verification only, with no transformation algorithm or teaching UI.
+
+## M3 transformation API
+
+~~~ts
+import {
+  discoverTransformations, applyTransformation, verifyTerminalEquivalence,
+} from './src/transforms'
+
+const options = { protectedPointIds: ['boundary-point'] }
+const discovery = discoverTransformations(network, options)
+if (discovery.kind === 'candidates') {
+  const chosen = discovery.candidates[0] // The caller selects one operation.
+  if (chosen) {
+    const result = applyTransformation({
+      network, type: chosen.type, elementIds: chosen.elementIds, ...options,
+    })
+    if (result.kind === 'applied') {
+      const evidence = verifyTerminalEquivalence(network, result.network)
+    }
+  }
+}
+~~~
+
+Only supply protected point IDs that actually exist. `protectedPointIds` protects the whole M1 electrical node containing each point; all external-terminal nodes are always protected. Discovery and application must receive the same caller protection policy. Protection prevents elimination of series/star centers; boundary vertices remain eligible because those nodes and their external relationships are preserved.
+
+`TransformType` is `series | parallel | delta-to-star | star-to-delta`. The M0 request placeholder now also requires a type; the network and explicit element selection remain. Discovery returns frozen candidates or `error/invalid-input`. Application returns `applied` with network/metadata, `not-applicable` with a reason, or `error` with `invalid-input` / `numerical-failure`. Discovery describes structural eligibility, not guaranteed numerical representability.
+
+Each candidate identifies exact resistor IDs, sorted boundary node IDs, and an optional internal node. Its ID is an unambiguous JSON encoding of `[type, sortedElementIds]`. Candidates and their IDs use UTF-16 code-unit ordering, independent of input collection order. Application revalidates the selection against the current graph and uses current resistance values; candidate IDs are not revision hashes or concurrency locks. No automatic reduction loop or Y–delta iteration is implemented.
+
+### Eligibility and formulas
+
+An active branch is an M1 normalized resistor whose `isShortCircuited` flag is false. Distinct parallel resistors count as distinct incident branches. Shorted branches never become selected transformation edges, but remain in the network.
+
+| Operation | Eligibility | Formula |
+| --- | --- | --- |
+| Series | Two selected branches share one unprotected internal node with exactly two active incident branches and two distinct neighbors | `Req = R1 + R2` |
+| Parallel | At least two selected branches connect the same unordered pair of distinct electrical nodes | `1/Req = sum(1/Ri)` |
+| Delta to star | Exactly three selected branches form all three sides between three distinct nodes | `S=RAB+RBC+RCA; RA=RAB*RCA/S; RB=RAB*RBC/S; RC=RBC*RCA/S` |
+| Star to delta | Three selected branches share one unprotected center with exactly three active incident branches and three distinct neighbors | `P=RA*RB+RB*RC+RC*RA; RAB=P/RC; RBC=P/RA; RCA=P/RB` |
+
+Delta boundary vertices may have additional branches or terminals. A star/series center may not have additional active branches or terminals, including through a wire-connected alias. Parallel discovery reports each maximal group; application also accepts a selected subset of at least two branches. Delta discovery enumerates each exact combination of parallel edges, once for each sorted vertex triple. Extra center self-loops are retained and do not invalidate an otherwise eligible series/star rewrite.
+
+### Rewriting wire-connected nodes and traceability
+
+Normalization uses M1; no geometry, React, SVG, or browser APIs participate. New branch endpoints use the smallest original point ID in each unchanged boundary node. All unselected resistors and all ideal wires are preserved with their IDs, endpoints, and values. External terminal records are preserved exactly.
+
+After series/star removal, only unreferenced points belonging to that former internal node are deleted. A singleton orphan center disappears. A center represented by ideal wires or retaining shorted resistors stays as an isolated internal component, preserving those original elements. No unrelated orphan point is pruned. Metadata explicitly distinguishes removed nodes from retained internal nodes; a retained node is not claimed to have been deleted. M2 ignores these unrelated floating components in port queries.
+
+Delta-to-star adds one new internal point. Generated point and element IDs share `m3:<integer>`, allocated above every matching ID in the input's network, point, element and terminal namespaces, including elements about to be removed. BigInt counters avoid integer overflow. Each rewrite introduces a replacement with a larger counter, so sequential rewrites of returned snapshots keep advancing without reusing earlier generated IDs. Identical inputs and requests produce identical IDs. This guarantee is scoped to a sequential network history, not independently forked circuits or caller-deleted history.
+
+`TransformMetadata` supplies the operation type/candidate ID, original and replacement resistor IDs, complete immutable original/replacement resistor records (including resistance and endpoints), affected/boundary node IDs, created/removed point and node IDs, retained internal node IDs, and the mathematical formula expression. The original network ID is retained as an identity label. Each operation's metadata links inputs to replacements; callers should retain the operation records for multi-step provenance or undo. The engine does not embed a global history ledger in the domain model.
+
+The domain factory creates the output snapshot. Input objects are neither modified nor frozen. Output networks, candidates, and metadata are frozen. Invalid or numerically failed operations return no partially rewritten network.
+
+### Formula evaluation and numerical boundaries
+
+Series uses a maximum-resistance scale. Parallel uses a minimum-resistance scale and sums bounded `Rmin/Ri` terms, avoiding raw conductance overflow. Delta-to-star uses a normalized sum and multiplies the smaller adjacent resistance by a bounded ratio, avoiding `Ra*Rb` and raw sum overflow.
+
+Star-to-delta evaluates `Ra + Rb + Ra*Rb/Ropposite`. The product ratio uses binary mantissas and integer exponents so representable outputs can survive overflow/underflow in naive intermediate products or ratios. An underflowed product term is omitted only if its relative contribution to the positive sum is bounded below `2^-43`; otherwise it causes a numerical failure. Restoring physical units checks round-trip relative discrepancy against `1e-12`, catching significant subnormal quantization. All replacement resistances must be finite and strictly positive.
+
+These are floating-point evaluations, not arbitrary-precision or certified-error algorithms. Extremely unequal scales can be rejected conservatively; structurally valid candidates may fail numerically. Analytical extreme-value tests are separate from M2 cross-validation because M2 may itself reject such networks. No numerical failure is treated as evidence of circuit equivalence.
+
+### Independent terminal-equivalence verification
+
+`verifyTerminalEquivalence(before, after, options?)` normalizes both networks and invokes M2 for every unordered pair of existing terminal IDs. Terminal ID sets must match; labels are not used to invent correspondence. Fewer than two terminals yields `inconclusive` rather than vacuous success.
+
+Finite pairs use `abs(Rbefore-Rafter) <= absoluteToleranceOhms + relativeTolerance*max(Rbefore,Rafter)`, evaluated in scaled form to avoid overflow. Defaults are relative `1e-8` and absolute `0 ohms`, so tiny but proportionally different resistances are not accepted through an absolute floor. Options require finite nonnegative tolerances with relative tolerance < 1.
+
+Shorts must match shorts, and opens must match opens. Either solver error makes that pair inconclusive, even if both return the same error. The overall result is `different` if any pair proves a mismatch, otherwise `inconclusive` if any pair cannot be evaluated, otherwise `equivalent`. All pair summaries are returned and frozen. `equivalent` means numerical agreement for the supplied terminal set/tolerances, not a symbolic proof or equivalence after arbitrary changes to protected internal boundaries. To test such a boundary electrically, expose it as a terminal in the comparison networks.
+
+Verification is explicitly optional and is never called by normal application. With t terminals it performs `t*(t-1)` solver calls across the two circuits; large all-pairs checks can be expensive and inherit M2's numerical and 512-unknown-node limits.
+
+### Implementation cost, tests, and M4 integration
+
+The module separates `context.ts` (validated M1 context), `candidates.ts` (eligibility/discovery), `formulas.ts` (resistance arithmetic), `apply-transformation.ts` (single immutable rewrite), `verify-equivalence.ts` (independent M2 comparisons), and `types.ts` (public data). No M0/M1/M2 source, dependency, or existing expected test result changes are required.
+
+Discovery builds branch adjacency/group maps, examines vertex-neighbor pairs for triangles, and expands parallel-edge combinations. Candidate validation currently scans active resistors, so c candidates among r branches can add O(c*r) work beyond M1 and triangle enumeration; candidate sorting adds O(c log c). Dense multigraphs may produce many candidates. This implementation targets educational networks, makes no linear-time claim, and has no discovery cache or automatic candidate scheduler. Application validates only the requested selection and does not enumerate all candidates.
+
+M3 adds 72 tests: 33 transformation/integration cases, 16 numerical cases, and 23 verifier cases. Analytic references include 2+3=5, 6||3=2, symmetric delta/star, delta sides 2/3/5 yielding arms 1/0.6/1.5, and star arms 2/3/5 yielding delta sides 31/5, 31/2, 31/3. Multi-terminal integration tests compare all distinct pairs with M2, including short and open relationships. Round trips, repeated rewrites, wire groups, protected centers, exact multigraph selections, stable IDs, immutability, invalid selections, and numerical failures are covered.
+
+M4 can display candidate boundary/internal nodes, select an operation by type plus exact element IDs, highlight original/replacement elements from metadata, and update geometry separately using created/removed point IDs. It must account for retained internal wire groups, preserve the protection policy between discovery and application, and handle non-applicable/numerical-failure results. No SVG, layout generation, editor, or educational UI is implemented by M3.
 
 ## Verification
 

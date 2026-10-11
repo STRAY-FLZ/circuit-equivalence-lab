@@ -1,5 +1,53 @@
 # 开发记录
 
+## 2026-10-11 · M3 Circuit Equivalence Transformation Engine
+
+### Git preparation and scope
+
+- Inspected `feat/03-solver` at `93743c8`; the working tree contained exactly the 14 known M2 files from the preceding delivery. No unrelated modifications were included.
+- At the user's explicit request, created local commit `d845dcb14e962a7883bca5af2a42d7b05f22bdad` (`feat(solver): implement nodal analysis engine`) and branched `feat/04-transforms` from it. Reused the completed M2 acceptance results for that Git operation without rerunning them.
+- M3 changes are confined to transforms and relevant sections of ARCHITECTURE, ROADMAP and this log. M0–M2 implementation/tests, dependency/configuration files, README and the UI remain unchanged from the M2 commit. Historical log entries below are preserved verbatim.
+- M3 work is left uncommitted for review. No push, merge, deployment, history rewrite, or M4 development was performed.
+
+### Implemented behavior
+
+- Added deterministic discovery and single-operation application for series, parallel, delta-to-star and star-to-delta transformations. Exact resistor IDs disambiguate multigraph candidates. Every application rechecks current structural eligibility and caller-protected connection points using actual M1 topology.
+- Series/star centers require exactly two/three active branches, distinct neighbors and no terminal/protected node. Parallel discovery returns maximal groups while application permits subsets. Delta discovery permits extra vertex branches and enumerates exact edge combinations.
+- Preserved all unselected elements, ideal wires and external terminal records. Boundary rewrites connect through representatives of their M1 wire-equivalence classes. Remove only newly unreferenced internal points; wire groups and shorted resistors at former centers remain explicitly reported isolated internal components.
+- Added frozen metadata with original/replacement records, resistance values, affected/boundary nodes, created/removed points/nodes, retained internal nodes, and formula expressions. Outputs are immutable without modifying/freezing caller inputs.
+- New IDs use a shared `m3:<BigInt counter>` namespace above all matching input IDs. Sequential rewrites advance the counter, including when selected old elements are removed. Tests exercise collisions across network, point, element and terminal namespaces and eight consecutive alternating rewrites.
+- Stable formula evaluation avoids naive reciprocal/product/sum overflow. Binary mantissa/exponent arithmetic handles Y-to-delta product ratios; negligible underflowed terms may be omitted only under a documented relative bound. Unrepresentable positive values or significant subnormal quantization cause explicit numerical failure with no partial network.
+- Added independently callable all-terminal-pairs M1/M2 verification. It distinguishes equivalent/different/inconclusive, checks terminal identity and physical result classification, uses configurable absolute/relative tolerances, and never treats solver errors as equivalence. Normal application does not trigger numerical verification.
+
+### Files
+
+- Updated `src/transforms/index.ts` to export the public API.
+- Added `types.ts`, `context.ts`, `candidates.ts`, `formulas.ts`, `apply-transformation.ts`, and `verify-equivalence.ts` inside transforms.
+- Added `transformations.test.ts`, `numerical.test.ts`, and `verify-equivalence.test.ts` inside transforms.
+- Updated only the M3-relevant scope/API/status sections of ARCHITECTURE and ROADMAP, and appended this new record above the unchanged historical records.
+
+### Actual verification results
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck` | Passed with existing strict settings |
+| `npm run lint` | Passed; zero errors/warnings |
+| `npm run test` | Passed: 13 files, 226 tests, no skipped tests |
+| `npm run build` | Passed: typecheck and Vite production build |
+
+The 72 M3 tests comprise 33 transformation/integration tests, 16 numerical tests and 23 verifier tests. The existing 154 tests remain unchanged and pass. Multi-terminal applied transformations are checked against every distinct external-terminal pair. Independent analytical expectations include asymmetric delta legs 1/0.6/1.5 and star-to-delta values 31/5, 31/2, 31/3. Verification tests include genuine mismatch, exact open/short preservation, one/both solver failures, invalid terminal sets/tolerances, no available terminal pair, and tiny resistances without a masking absolute tolerance floor.
+
+Initial execution encountered Windows sandbox restrictions: a Vitest temporary-cache rename failed with EPERM, then the original Vite startup test failed with EACCES connecting to 127.0.0.1. Moved process-local TEMP/TMP to ignored `.artifacts/m3/temp` and reran the full suite with permission for loopback access; all 226 tests passed. No project test/configuration was disabled or altered. A new parameterized test initially used an array as a single argument; it was corrected to explicit object cases to satisfy Vitest's argument expansion and strict typing.
+
+### Limitations and M4 handoff
+
+- No unresolved M3 acceptance blocker. Double-precision transformations can fail conservatively at extreme scales; numerical port agreement is tolerance-dependent evidence, not an exact symbolic proof.
+- Candidate discovery can be expensive on dense multigraphs because every delta edge combination is explicit. There is no unrestricted reduction loop, candidate cache, sparse solver extension or large-network performance claim.
+- Retained center wire groups/shorted resistors may leave isolated internal components. This preserves original connectivity/traceability and is reported in metadata; no automatic drawing cleanup is performed.
+- Protection is an explicit caller policy and must be supplied again on application. Candidate IDs identify selections, not immutable network revisions. Persist operation metadata externally for complete multi-step provenance/undo.
+- All-pairs verification inherits M2 limits; fewer than two terminals or solver errors are inconclusive. Proven mismatches take precedence over unrelated inconclusive pairs. Protected internal boundaries must be exposed as terminals if their port behavior is to be numerically checked.
+- M4 can reuse candidates for selection/highlighting, apply a request, and reconcile original/replacement elements and created/removed/retained nodes using metadata. Geometry remains external. Stop here; M4 requires explicit authorization.
+
 ## 2026-10-11 · M2 Nodal Analysis and Resistive Network Solver
 
 ### Baseline, resumption and scope
