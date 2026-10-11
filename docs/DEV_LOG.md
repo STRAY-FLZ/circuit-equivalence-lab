@@ -1,5 +1,51 @@
 # 开发记录
 
+## 2026-10-11 · M6 Targeted Integration Testing and Quality Assurance
+
+### Git preparation and scope
+
+- Committed the completed M5 implementation locally as `cb93198` (`feat(education): implement interactive circuit lessons`) and created `feat/07-integration`. M6 changes remain uncommitted. No push, merge, deployment, history rewrite, personal website change or M7 implementation.
+- Started from actual selection, preview, lesson, feedback and recovery workflows. No historical M1–M5 acceptance rerun, broad source audit, dependency installation or algorithm/state refactoring.
+
+### Confirmed defect and minimal fix
+
+- Reproduction: in light theme, select the series candidate and preview it. The selected candidate detail and preview paragraphs use `rgb(101,117,111)` on `rgb(234,242,238)`, measured at 4.2598:1 for small text, below the 4.5:1 target.
+- Cause: `--muted` was reused on `--subtle`, although it was adequate on the white card surface. Added one scoped CSS rule for these two selectors to reuse existing `--symbol`; no palette, typography or layout redesign. Measured contrast after the fix: 8.0100:1 light, 9.4644:1 dark.
+- Added `tests/browser/preview-contrast.js`. The real-browser regression failed before the CSS fix (`light: R1 + R2: contrast 4.26 < 4.5`) and passed afterward for the selected detail and all three preview paragraphs in both themes.
+- No other product defect was confirmed in the tested journeys. An SVG group-center click in the browser harness hit empty space within a bent parallel route; clicking the actual resistor symbol worked. An immediate scroll assertion ran before native scrolling completed; waiting for nonzero scroll confirmed working keyboard scrolling. Neither observation required a product fix.
+
+### New integration coverage
+
+- Added three tests in `src/integration.test.tsx` for real M3 equivalent, different and inconclusive evidence across preview -> cached five-stage lesson -> exit -> new parallel example. They assert status/table association, no additional verification during cached entry/exit, removal of old diagrams/evidence on selection change, and fresh authoritative evidence for the next example.
+- Different/inconclusive evidence is supplied at the verification boundary using actual computations, not fabricated numeric result objects. The normal predefined transformations verify; this harness does not claim a failing transformation occurred in the browser. Existing M5 verdict/precision tests were not recreated.
+- The first standard typecheck caught an unsupported `exact` option accidentally copied from Playwright to Testing Library queries in the new tests. Removed that option; no strictness or rule was relaxed. Then completed the full regression below.
+
+### Actual verification
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck` | Passed |
+| `npm run lint` | Passed, zero warnings/errors |
+| `npm run test` | Passed: 18 files, 307 tests; none skipped |
+| `npm run build` | Passed: strict typecheck and Vite production build |
+| Browser contrast regression | Failed before fix; passed after fix in light/dark |
+
+The complete project suite ran once to completion after the new test typecheck fix; the unchanged real Vite startup test used local loopback access and process-local `.artifacts/m6/temp` TEMP/TMP. No separate numerical/topology/transformation acceptance run was performed.
+
+### Browser workflows and accessibility
+
+- Used the existing Playwright CLI skill/wrapper and local Chrome on Vite port 5175. Series, parallel, delta, star, bridge and bypass example transitions checked exact rendered element IDs, resistance labels, terminal identities, original-candidate highlighting, actual M3 transformed networks, reset and unavailable lesson controls.
+- Completed all five stages for parallel, star and the second bridge candidate, with formulas/substitution outputs compared to actual M3 replacement records. Checked structural diagrams, final terminal-pair counts/verdicts, backward/forward navigation, restart, exit preserving the current preview and switching after a completed delta lesson. No stale result/table/highlight survived a new example or candidate.
+- A keyboard-only series journey exercised the skip link, candidate selection, lesson entry, all five steps, Previous with Space, restart, exit and SVG inspection. The focused Next button had a visible 3px outline. These are focused keyboard checks, not screen-reader certification.
+- At 1440x1100, 820x1100 and 390x844, checked both themes, native MathML namespace/rendered sizes/subscripts, no page-level horizontal overflow, local equation-row overflow, lesson buttons at least 36px high and 44px wide, and reduced-motion emulation with no running animation/transition.
+- On mobile, the long parallel substitution remained locally scrollable: keyboard ArrowRight focused the row and scrolled 108px within a 322px-wide row (430px content). Visually inspected mobile dark formulas and the 820px light star comparison; the latter showed one removed center and three replacement branches.
+- Final browser console: zero errors and zero warnings. Screenshots are ignored artifacts under `output/playwright/`, including `m6-mobile-math-dark.png` and `m6-tablet-star-light.png`.
+- Firefox and WebKit were explicitly attempted, but failed before navigation: missing `firefox-1553/firefox/firefox.exe` and `webkit-2368/Playwright.exe`. Neither is counted as tested. No browser downloads or global configuration changes were made.
+
+### Remaining limits and handoff
+
+No unresolved product defect was found within the representative checked workflows. Firefox/WebKit, real mobile devices and screen readers remain unverified. Existing bounded drawing, numerical conditioning, single-operation lessons and display rounding limits remain unchanged. M7 can proceed with visual alignment using the existing contracts; M8 deployment and personal website navigation remain separately scoped.
+
 ## 2026-10-11 · M5 Interactive Educational System
 
 ### Git preparation and scope

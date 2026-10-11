@@ -79,6 +79,8 @@ th, td { border-bottom:1px solid var(--line); padding:8px 5px; }
 .preview-status { padding:18px; margin-top:16px; border:1px solid var(--line); background:var(--subtle); border-radius:8px; color:var(--muted); font-size:12px; line-height:1.8; overflow-wrap:anywhere; }
 .preview-status strong { color:var(--accent); }
 .preview-status p { margin:8px 0 0; }
+/* Keep small text legible on the existing subtle background in both themes. */
+.candidate-picker button[aria-pressed='true'] span, .preview-status { color:var(--symbol); }
 .site-footer { display:flex; justify-content:space-between; gap:12px; border-top:1px solid var(--line); padding:18px 0; color:var(--muted); font-size:11px; }
 .skip-link { position:absolute; top:8px; left:8px; transform:translateY(-150%); background:var(--surface); color:var(--accent); padding:12px; z-index:10; }
 .skip-link:focus { transform:none; }
