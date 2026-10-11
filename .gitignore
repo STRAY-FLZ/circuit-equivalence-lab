@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+.npm-cache/
+.artifacts/
+output/playwright/
+.playwright-cli/
+*.local
+*.tsbuildinfo
+
