@@ -1,71 +1,173 @@
-# 模块架构
+# Architecture
 
-## M0 范围
+## Current scope
 
-本轮实现工程、领域类型与数据完整性检查、模块契约、基础页面和主题切换。除 `domain` 与通用 UI 外，各业务区域只有类型导出，没有算法、假实现或返回示例计算结果的占位函数。
+M0 provides the React/TypeScript/Vite project, domain types and validation, module contracts, and a presentation shell with theme switching. M1 adds a deterministic, UI-independent topology engine. Numerical solving, equivalent transformations, circuit drawing, and interactive teaching remain future work.
 
-## 模块职责与依赖
+The topology engine lives in `src/topology/`. It imports only `domain` and its own internal helpers, uses standard JavaScript data structures, and has no React, DOM, SVG, coordinate, browser, or graph-library dependency. The existing UI remains the M0 presentation shell; M1 is consumed through the TypeScript API.
 
-下表表示允许的直接依赖；箭头始终从使用者指向提供者。并非每个预留依赖当前都有 import。
+## Module boundaries
 
-| 模块 | 职责 | 允许依赖 |
+Dependencies point from consumers to providers. These are permitted directions, not a claim that every planned dependency is currently used.
+
+| Module | Responsibility | Allowed project dependencies |
 | --- | --- | --- |
-| domain | 稳定 ID、连接点、导线、正电阻、端子和网络完整性 | 无其他项目模块，无 React |
-| topology | 基于连接关系形成电气节点与拓扑结果 | domain |
-| solver | 电阻网络数值计算与明确的有限/短路/开路结果 | domain、topology |
-| transforms | 等效变换的适用性与新网络结果 | domain、topology、solver |
-| visualization | 几何布局与未来 SVG 视图 | domain、topology，可使用 React |
-| education | 教学公式、文字解释、推导步骤 | domain、topology、solver、transforms，无 React |
-| components | 不依赖电路业务的通用 React UI | React，无其他项目模块 |
-| App | 页面与未来模块组合 | 可组合上述模块 |
+| domain | Stable IDs, connection points, wires, positive resistors, terminals, data integrity | None; no React |
+| topology | Wire equivalence, normalized branches, terminal mappings, resistive components | domain |
+| solver | Future numerical resistance-network solver and explicit result states | domain, topology |
+| transforms | Future equivalent transformations and applicability checks | domain, topology, solver |
+| visualization | Separate layout data and future SVG views | domain, topology; React allowed |
+| education | Formula, explanation, and derivation data | domain, topology, solver, transforms; no React |
+| components | Generic React UI without circuit knowledge | None; React allowed |
+| App | Application composition | May combine the modules above |
 
-各模块通过 `index.ts` 导出公共接口。`eslint.config.js` 对生产源码执行模块方向约束，并禁止计算和教学模块依赖 React。测试文件允许组合模块。未来需要跨模块调用时优先通过公共接口，在 App 层组合，避免反向依赖和循环依赖。
+Public module APIs are exported through `index.ts`. ESLint restricts production cross-module imports and React dependencies. Tests may compose modules. M1 does not change the existing solver, transform, visualization, education, or UI implementations.
 
-## 核心类型
+## Domain model and validation
 
-| 类型 | 含义与边界 |
+| Type | Meaning |
 | --- | --- |
-| ConnectionPoint | 电路连接点，只有稳定 ID，不是已识别的电气节点 |
-| Endpoints | 恰好两个连接点 ID，明确表示元件两端 |
-| IdealWire | `kind: 'wire'`，明确表示理想导线，不存储电阻值 |
-| ResistanceOhms | 带品牌的 number，单位 Ω，构造时必须为有限正数 |
-| Resistor | `kind: 'resistor'`，端点与 ResistanceOhms |
-| ExternalTerminal | 独立稳定 ID、展示 label、关联 pointId，可表达 A/B/C 等多端子 |
-| CircuitNetwork | 网络 ID 与 readonly points/elements/terminals，不携带布局 |
-| CircuitLayout | 按连接点 ID 保存的可选坐标，不决定电气连接 |
-| ElectricalNode | M1 将识别出的理想导线连通组，含节点 ID 与 pointIds |
+| ConnectionPoint | A declared point with a stable ID; not necessarily an electrical node |
+| Endpoints | Exactly two point IDs, preserving original endpoint order |
+| IdealWire | `kind: 'wire'`; explicitly represents an ideal conductive connection |
+| ResistanceOhms | A branded number in ohms, finite and strictly positive |
+| Resistor | `kind: 'resistor'`; endpoints and a ResistanceOhms value |
+| ExternalTerminal | Stable terminal ID, display label, and referenced point ID |
+| CircuitNetwork | Network ID and readonly point, element, and terminal collections |
+| CircuitLayout | Independent optional coordinates indexed by point ID |
 
-连接点、元件、端子分别拥有独立的 ID 命名空间，在各自集合内必须唯一。ID 用字符串保持易于序列化，不依赖数组下标、端子显示名称或几何位置；调用方负责其跨编辑过程的稳定性。M1 电气节点 ID 的稳定生成规则留待该模块确定。
+Points, elements, and terminals have independent ID namespaces. Wires and resistors share the element namespace. Within each namespace, IDs must be unique, nonempty strings without leading/trailing whitespace. Callers assign IDs; array positions, labels, and coordinates do not define identity.
 
-同坐标不表示连接，线条交叉不表示连接，坐标缺失不表示断路。移动图形无需改变 CircuitNetwork。多个端子可以引用同一连接点；空网络、孤立点和不连通子网合法。重边和自环不在 M0 数据校验层禁止，后续拓扑或算法模块应明确处理。
+`resistanceOhms(value)` requires `Number.isFinite(value) && value > 0`. Zero (including negative zero), negative values, NaN, and infinities are rejected. No arbitrary positive minimum or maximum is imposed. Numerical conditioning and tolerances belong to M2.
 
-## 构造与校验边界
+`createCircuitNetwork(input)` validates IDs, endpoint arity, point references, element kinds, positive resistances, and nonempty terminal labels, then copies and deeply freezes the network. It does not merge points or perform circuit calculations. M1 reuses this boundary for every analysis call, including inputs that were previously constructed by the factory.
 
-`resistanceOhms(value)` 使用 `Number.isFinite(value) && value > 0` 校验，再创建带品牌的数值。0Ω、负数、NaN、Infinity、-Infinity 均被拒绝。不设人为最小/最大阻值；数值尺度、病态矩阵和容差属于后续 solver 的责任。
+Invalid references and endpoint data throw TypeError with the owning element or terminal ID. Invalid resistance throws RangeError with the resistor ID and the original validation error as its cause. Duplicate-ID errors name the namespace and duplicate ID. No invalid component is silently removed. Sparse endpoint tuples are checked at both positions.
 
-`createCircuitNetwork(input)` 校验：
+This is a typed `CircuitNetwork` API, not a complete parser for arbitrary unknown/JSON values. Unsafe casts do not replace validation; malformed object/collection shapes beyond the typed contract are not promised schema diagnostics. Error classes and contextual messages are available; there is no new structured error-code API.
 
-1. 网络及各类 ID 非空、无首尾空白，同类 ID 不重复。
-2. 元件恰好有两个端点，且端点和端子均引用已存在连接点。
-3. 元件种类仅为理想导线或线性正电阻，所有电阻重新验证。
-4. 端子展示名称非空。
+Valid unusual structures include:
 
-成功后复制并冻结网络、数组、记录和端点元组，防止调用方修改输入导致已有网络失效；失败抛出 TypeError 或 RangeError。该函数不读取或解析 unknown/JSON，不承担完整反序列化 schema 验证。TypeScript 品牌与 readonly 可被强制断言绕过，调用方应通过工厂进入业务边界，不能把类型声明当作外部数据验证。
+- Repeated or reversed wires with **distinct element IDs**, wire cycles, and self-connecting wires.
+- Isolated points, empty networks, and disconnected subgraphs.
+- Parallel resistor branches, resistor self-loops, and wire-bypassed resistors.
+- Multiple terminal IDs referencing one point or one electrical node; repeated display labels.
+- Very small or large finite positive resistances, preserved without arithmetic.
 
-短路用导线表达，断路通过未连接的网络关系表达。未来求解结果采用 `finite | short-circuit | open-circuit | error` 判别联合，使短路与开路不进入正电阻公式。
+An ideal short is expressed by a wire; an open connection by absence of an edge. A bypassed resistor must still contain a valid positive resistance.
 
-## 后续模块契约
+## Public topology API
 
-- `TopologyAnalyzer(network): TopologyResult`：M1 的入口，返回完整的电气节点分组。
-- `ResistanceSolver(query): EquivalentResistanceResult`：M2 的入口，查询端子使用稳定 TerminalId。
-- `CircuitTransform(request): TransformResult`：后续变换模块根据元件 ID 选区，返回新网络或不适用原因。
-- `CircuitViewModel`：网络与布局的组合输入；无绘图实现。
-- `LessonContent` / `DerivationStep`：纯教学数据；无公式执行器或数学渲染依赖。
+~~~ts
+import { analyzeTopology } from './src/topology'
+import type { TopologyAnalyzer, TopologyResult } from './src/topology'
 
-当前接口保持最小形态。节点连通分量、详细错误代码、数值容差、变换推导元数据将在相应模块结合有效测试演进，不在 M0 假定算法细节。
+const analyze: TopologyAnalyzer = analyzeTopology
+const topology: TopologyResult = analyze(network)
+~~~
 
-## 工程检查与 UI
+The preserved entry contract is:
 
-TypeScript 开启 strict、noUncheckedIndexedAccess、exactOptionalPropertyTypes 等检查，覆盖源码、测试和 Vite/Vitest 配置。ESLint 使用类型感知规则，并把警告视为失败。Vitest 明确 import 测试 API，无全局类型捷径；领域和 HTTP 服务测试在 Node 环境执行，React 页面测试在 jsdom 执行。
+~~~ts
+type TopologyAnalyzer = (network: CircuitNetwork) => TopologyResult
+~~~
 
-主题初次加载优先读取已保存的有效设置，否则读取系统偏好；按钮切换主题并尝试保存。存储不可用时仍可切换。当前没有系统偏好变更监听，也没有服务端渲染。页面采用原生 CSS 媒体查询，无外部字体与 UI 库，无尚未实现功能的按钮。
+| Result field | Contents |
+| --- | --- |
+| networkId | The source network's ID |
+| nodes | ElectricalNode records: `id` and sorted original `pointIds` |
+| pointToNode | Every declared point ID mapped to its electrical-node ID |
+| resistors | Every original resistor, retaining `id`, ordered `nodeIds`, original `resistance`, and `isShortCircuited` |
+| terminalToNode | Every external terminal ID mapped to its electrical-node ID |
+| components | ResistiveComponent records: `id`, sorted `nodeIds`, sorted `resistorIds` |
+| nodeToComponent | Every electrical-node ID mapped to its resistive component |
+
+Exported types are `ElectricalNodeId`, `ElectricalNode`, `NormalizedResistor`, `ResistiveComponentId`, `ResistiveComponent`, `TopologyResult`, and `TopologyAnalyzer`. No duplicate domain model is introduced. The DSU class is an internal module, intentionally absent from the public barrel.
+
+All returned records, collections, endpoint tuples, and dictionaries are frozen. Lookup dictionaries have null prototypes, so IDs such as `__proto__`, `constructor`, and `toString` cannot collide with inherited properties. The mappings use readonly partial records: an undeclared dynamic lookup returns undefined. Use bracket indexing, Object.entries, or Object.hasOwn; do not call prototype methods on a dictionary.
+
+The output shares no mutable caller-owned arrays or objects. The analyzer neither modifies nor freezes the caller's input.
+
+## Normalization pipeline
+
+1. Validate and copy the input through the existing domain factory.
+2. Initialize a DSU with every declared point, including isolated points.
+3. Union only ideal-wire endpoints. Resistors never participate in this equivalence operation.
+4. Find wire equivalence classes, sort their original point IDs, and construct canonical nodes and the point lookup.
+5. Normalize every resistor endpoint through the point lookup, preserve its identity/resistance/endpoint order, and mark it short-circuited exactly when both node IDs are equal.
+6. Normalize terminals by their stable terminal IDs, not their labels.
+7. Initialize a second DSU with every normalized node. Union endpoints of non-short-circuited resistor branches to identify resistive connected components.
+8. Assign all resistor IDs, including short-circuited self-loops, to their owning component. Freeze and return the normalized result.
+
+The DSU uses iterative full path compression and union by size. Redundant unions are no-ops. Its internal roots may change with union order and are never exposed as public IDs.
+
+Parallel branches remain separate entries with their original IDs and values. No parallel aggregation, series reduction, conductance calculation, or equivalent resistance is performed.
+
+## Canonical IDs and determinism
+
+String ordering is JavaScript UTF-16 code-unit lexicographic order, using `<` and `>`; it is not locale-sensitive or numeric ordering. There is no Unicode normalization. For example, `10` precedes `2`, and `A` precedes `a`.
+
+- Electrical node ID: `node:` followed by the smallest original point ID in that wire equivalence class.
+- Resistive component ID: `component:` followed by the smallest electrical-node ID in the component.
+
+For points B and A joined by a wire, the node is `node:A`, with `pointIds: ['A', 'B']`. If a resistor connects that node to `node:C`, their component is `component:node:A`.
+
+These fixed-prefix encodings are injective within their respective namespaces, even when a caller's ID already contains colons or the prefix. IDs are network-scoped, not globally unique across circuits.
+
+Membership arrays are sorted. Nodes and components are sorted by their canonical IDs, and resistors by original resistor ID. Lookup construction follows deterministic sorted traversal; consumers should treat dictionaries as mappings rather than depend on their enumeration order. Equivalent inputs reordered across points, wires, resistors, and terminals produce equal normalized results and deterministic JSON serialization. Reversing a wire's endpoints also preserves the result.
+
+Resistor endpoint order is intentionally preserved for future orientation-sensitive consumers. Swapping the two endpoints of a resistor changes its stored tuple even though undirected connectivity is equivalent.
+
+IDs remain stable under input permutations, redundant-wire changes that preserve the partition, and geometry-only changes. They are **not** guaranteed stable after renaming a minimum member, adding a smaller member to a group, merging/splitting groups, or otherwise editing connectivity. The source network ID is an identity label, not a topology fingerprint; recompute after electrical edits.
+
+## Electrical nodes versus resistive components
+
+An electrical node is a maximal group connected using **only ideal wires**. A resistive connected component is a maximal group of these nodes connected through resistor branches.
+
+A resistor between A and B therefore normally gives two electrical nodes in one resistive component. An isolated electrical node forms a singleton component even without a terminal or resistor.
+
+A short-circuited resistor is a self-loop on an already established electrical node. It remains in `resistors` and in its component's `resistorIds`, but contributes no connection to another node and creates no extra component. Every resistor belongs to exactly one component, and every node belongs to exactly one component. An empty network returns empty collections and mappings.
+
+## Geometry separation
+
+Coordinates belong exclusively to the visualization model. Crossing or overlapping lines create no connection unless the declared graph explicitly shares a point or contains a connecting wire. The topology engine reads no geometry fields; even extra coordinate fields on structurally compatible input objects cannot affect the result. Missing coordinates do not imply an open circuit.
+
+Future drawing code consumes domain/topology data. It must not infer electrical connectivity from screen intersections.
+
+## Complexity
+
+Let P be the number of points, W ideal wires, R resistors, T external terminals, N normalized electrical nodes, and C resistive components. N <= P and C <= N. Let alpha be the inverse Ackermann function. Bounds below assume expected constant-time map/set operations and unit-cost ID comparisons; long identifier strings add their comparison/hash costs.
+
+| Phase | Time |
+| --- | --- |
+| Domain validation and snapshot | O(P + W + R + T) |
+| Point DSU initialization | O(P) |
+| Wire union/find operations | O((P + W) alpha(P + 1)) amortized |
+| Node canonicalization and ordering | O(P alpha(P + 1) + P log(P + 1) + N log(N + 1)) |
+| Resistor normalization and ordering | O(R + R log(R + 1)) |
+| Terminal normalization and ordering | O(T + T log(T + 1)) |
+| Component DSU, branch assignment, and canonicalization | O(N + (N + R) alpha(N + 1) + N log(N + 1) + C log(C + 1)) |
+| Output dictionaries and freezing | O(P + R + T + N + C) |
+
+A simplified total bound is:
+
+~~~text
+O((P + W + R) alpha(P + 1)
+  + P log(P + 1) + R log(R + 1) + T log(T + 1))
+~~~
+
+Peak space is O(P + W + R + T), including the validated domain snapshot. The returned topology occupies O(P + R + T). Sorting is part of the implementation, so the whole analyzer is not claimed to be purely near-linear.
+
+## M2 integration boundary
+
+M2 can resolve query terminals with `terminalToNode`, identify their components using `nodeToComponent`, enumerate component nodes and resistor IDs, and consume branch endpoint IDs and ResistanceOhms values. It can filter `isShortCircuited` branches while retaining their identities for later explanations.
+
+M2 must decide reference-node selection, excitation, numerical tolerances, matrix assembly, conditioning/error behavior, and interpretation of query states. M1 performs none of these operations. It assigns no voltage, current, power, ground node, or equivalent resistance, and does not invent open/short resistor values.
+
+The existing `ResistanceSolver` result contract still distinguishes finite resistance, short-circuit, open-circuit, and error states. Transform, visualization, and education contracts remain future interfaces.
+
+## Verification
+
+Tests run in the Node environment for domain and topology and use real implementations. The required A/B/C cases verify membership, canonical IDs, original branch identity and values, terminal mappings, short flags, components, validation errors, and input/output immutability. Additional checks cover unusual string IDs, endpoint arity/sparsity, extreme finite resistances, permutations, and 64 reproducible graphs compared with an independent traversal oracle.
+
+TypeScript strict settings and type-aware ESLint remain enabled. Existing M0 tests and the real Vite startup test continue to run. Exact command outcomes and test counts are recorded in DEV_LOG.md.

@@ -2,7 +2,7 @@
 
 Circuit Equivalence Lab 是面向大学本科《电路》课程的交互式学习项目。后续将逐步支持拓扑识别、节点电压法、串并联与 Y–Δ 等效变换、惠斯通电桥，以及 SVG 电路图和教学推导。
 
-**当前仅完成 M0 项目基础架构。** 页面提供项目介绍、开发状态和深浅主题切换；尚无电路计算、变换、绘图或拖拽编辑功能。
+**当前已完成 M0 基础架构与 M1 拓扑分析引擎。** M1 通过独立 TypeScript API 提供电气节点识别、电阻支路归一化和连通分量分析。页面仍为 M0 介绍与主题切换界面；尚无数值求解、等效变换、绘图或拖拽编辑功能。
 
 ## 本地运行
 
@@ -35,7 +35,7 @@ npm run preview
 ```text
 src/
   domain/          电路类型、有限正电阻与网络完整性校验
-  topology/        电气节点与拓扑分析契约
+  topology/        DSU、电气节点识别、支路与连通分量归一化
   solver/          等效电阻查询与结果契约
   transforms/      等效变换输入与结果契约
   visualization/  独立坐标和未来视图输入契约
@@ -70,5 +70,17 @@ const network = createCircuitNetwork({
 ```
 
 ID 由调用方稳定分配，标签只用于展示。该构造函数只校验数据，不识别拓扑或计算电路。
+
+## M1 拓扑 API
+
+```ts
+import { analyzeTopology } from './src/topology'
+
+const topology = analyzeTopology(network)
+```
+
+结果包含 `nodes`、`pointToNode`、`resistors`、`terminalToNode`、`components` 和 `nodeToComponent`。理想导线合并电气节点；电阻只连接不同节点形成电阻连通分量。并联支路和短路电阻均保留原始 ID、阻值与归一化端点，短路使用 `isShortCircuited` 标记。
+
+节点 ID 为 `node:` 加组内按 UTF-16 码元字典序排列的最小连接点 ID；结果不受输入集合顺序影响。输入不被修改，输出深层冻结。详细 ID 稳定性、校验规则、复杂度与 M2 接口见架构文档。本模块不计算电压、电流、功率或等效电阻。
 
 详见 [模块架构](docs/ARCHITECTURE.md)、[开发记录](docs/DEV_LOG.md) 与 [M0～M6 路线图](docs/ROADMAP.md)。工具配置参考 [Vite](https://vite.dev/guide/)、[Vitest](https://vitest.dev/guide/) 和 [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files) 官方文档。

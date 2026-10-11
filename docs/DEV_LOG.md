@@ -1,5 +1,77 @@
 # 开发记录
 
+## 2026-10-11 · M1 Circuit Topology Modeling and Node Identification
+
+### Baseline and scope
+
+- Continued from `feat/01-foundation`, whose uncommitted files were the known M0 delivery from the preceding round. Created `feat/02-topology` without discarding, stashing, or committing that work.
+- Existing commit history and main were preserved. No commit, push, merge, or deployment was performed.
+- Implemented the topology engine and its tests. Shared domain changes are limited to contextual diagnostics and checking both positions of an actual two-endpoint array. No domain type was duplicated or replaced.
+- No dependency or tool configuration changes. Solver, transforms, visualization, education, components, and App source remain outside this round's changes.
+
+### Implementation and decisions
+
+- Added an internal Map-based DSU with `find`, `union`, iterative full path compression, union by size, and redundant-union handling.
+- Added `analyzeTopology(network): TopologyResult`, preserving the existing TopologyAnalyzer contract. Validation uses `createCircuitNetwork` before normalization.
+- Canonical node IDs use `node:` plus the minimum original point ID in UTF-16 code-unit order. DSU roots never become public IDs. Component IDs use `component:` plus the minimum node ID.
+- All collections have deterministic ordering. Reordering points, wires, resistors, and terminals preserves normalized output; geometry is never read. Endpoint order within a resistor remains the original order.
+- Preserved every resistor ID, resistance, normalized endpoint tuple, and short-circuit flag. Parallel branches remain separate; wire-bypassed resistors and literal self-loops remain traceable.
+- Used a separate DSU for resistive connected components. Every node belongs to one component, including isolated nodes; shorted branches stay in their component without connecting new nodes.
+- Added point-to-node, terminal-to-node, and node-to-component dictionaries. Null prototypes support arbitrary valid property-like identifiers without inherited-property collisions.
+- Returned a deeply frozen snapshot without changing or freezing caller-owned data. No numerical computation or electrical simplification is performed.
+
+### Files changed
+
+New files:
+
+- `src/topology/types.ts`
+- `src/topology/disjoint-set.ts`
+- `src/topology/analyze-topology.ts`
+- `src/topology/disjoint-set.test.ts`
+- `src/topology/analyze-topology.test.ts`
+- `src/topology/reference.test.ts`
+
+Updated files:
+
+- `src/topology/index.ts`: public API exports.
+- `src/domain/network.ts`: errors name the offending component/terminal; reject malformed/sparse endpoints with context.
+- `README.md`: current engine status and API introduction; explicitly distinguishes the unchanged UI shell.
+- `docs/ARCHITECTURE.md`: English documentation of contracts, pipeline, determinism, validation, geometry separation, complexity, and M2 integration.
+- `docs/ROADMAP.md`: M1 verified complete; future phase numbering follows the M1 task specification. No future module is marked complete.
+- `docs/DEV_LOG.md`: this record; historical M0 record retained below.
+
+### Actual verification results
+
+| Command | Result |
+| --- | --- |
+| `npm run typecheck` | Passed; strict typing and dependency declaration checks remain enabled |
+| `npm run lint` | Passed; zero errors and warnings |
+| `npm run test` | Passed: 6 files, 90 tests, no skipped tests |
+| `npm run build` | Passed: type checking followed by Vite production output |
+
+The suite contains 57 new M1 tests (49 analyzer tests, 7 DSU tests, 1 independent reference test) and the original 33 M0 tests. The reference test checks 64 deterministic generated networks and their reordered forms; those graphs are not counted as separate Vitest tests. The existing real Vite HTTP startup test also passed.
+
+Coverage includes all A1–A5, B1–B7, and C1–C7 requirements: node membership and IDs, delta/parallel networks, transitive bypasses, self-loops, isolated and disconnected structures, terminal equivalence, geometry-only crossings, every wire permutation of a four-wire example, resistor permutations, invalid references/IDs/resistances, immutability, and the distinction between the two partitions. Additional cases exercise empty networks, ID namespaces, prototype-like/Unicode/numeric-looking IDs, endpoint arity/sparsity, deterministic serialization, and extreme finite positive resistances.
+
+During the first lint pass, an assertion that read the dictionary key `valueOf` triggered the unbound-method rule. The assertion now checks own-property absence plus the null prototype. No rule was disabled. All final checks passed after that correction and the added boundary/reference tests.
+
+### Complexity and integration considerations
+
+For P points, W wires, R resistors, and T terminals, the total bound is
+`O((P + W + R) alpha(P + 1) + P log(P + 1) + R log(R + 1) + T log(T + 1))`,
+assuming expected constant-time maps and unit-cost identifier operations. The second DSU operates on N <= P electrical nodes. Peak space is `O(P + W + R + T)`, including the validated input copy. Sorting costs are explicitly included; the complete engine is not described as purely near-linear.
+
+M2 can reuse `TopologyResult`, `NormalizedResistor`, `ElectricalNode`, and `ResistiveComponent`. Resolve terminals through `terminalToNode`, select connected components through `nodeToComponent`, and retain/filter branches using their IDs and `isShortCircuited` flags. No ground node, excitation, matrix, voltage, current, power, or equivalent resistance is supplied by M1.
+
+### Limitations and unresolved issues
+
+- No unresolved verification blockers. Stop after M1; M2 requires explicit user authorization.
+- This is a typed network API, not a general unknown/JSON schema parser. Contextual TypeError/RangeError diagnostics cover the stated model invariants; there is no structured error-code protocol yet.
+- Canonical IDs are stable for the same partition and identifiers, not across arbitrary renaming or connectivity edits. The original network ID is not a content hash.
+- Snapshot construction validates/copies the input on every call; there is no incremental or cached topology maintenance. No large-scale performance benchmark is claimed.
+- Shorted resistor IDs are retained inside component membership; downstream numerical consumers must explicitly exclude their self-loop contribution as appropriate.
+- The UI remains the M0 shell and does not display M1 analysis. Browser rendering was not changed or re-audited in this round; the existing App and startup regression tests passed.
+
 ## 2026-10-11 · M0 项目基础架构
 
 ### 起点与 Git
