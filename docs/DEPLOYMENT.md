@@ -10,7 +10,9 @@
 
 Both repositories publish from `main`. The application uses GitHub Pages with
 the **GitHub Actions** source (`build_type: workflow`). The personal website
-keeps its existing publishing mechanism.
+keeps its existing branch source (`build_type: legacy`, `main`, `/`) and
+GitHub's existing `pages build and deployment` workflow; `.nojekyll` remains
+unchanged. Its unrelated video-check workflow is not a deployment workflow.
 
 ## Application workflow
 
@@ -18,7 +20,7 @@ keeps its existing publishing mechanism.
 The build job uses Node.js 24, installs the exact lockfile with `npm ci`, runs
 type checking, lint and all existing tests, builds with Vite, configures Pages,
 and uploads only `dist/`. The dependent deployment job publishes the artifact
-to the `github-pages` environment. Builds have `contents: read`; only deployment
+to the `github-pages` environment. Builds have `contents: read` and `pages: read`; only deployment
 has `pages: write` and `id-token: write`. Pages releases are serialized without
 cancelling a running release. No custom deployment secret is required.
 
@@ -51,6 +53,21 @@ application using the existing Playwright CLI. It does not install a new test
 framework or run in the Pages build. Run it against the actual public URL;
 it also works with a local production preview. Browser evidence is saved under
 ignored `output/playwright/`.
+
+`tests/browser/website-integration.js` verifies the live navigation flow, the
+five tool entries, both themes at desktop/mobile widths, same-origin tab
+synchronization, and browser access to the four existing tools. Open either
+live site in the existing Playwright CLI session before invoking the replay.
+For example, from the repository root with the CLI installed:
+
+```powershell
+npx playwright-cli open https://stray-flz.github.io/circuit-equivalence-lab/
+npx playwright-cli run-code --filename=tests/browser/production-release.js
+npx playwright-cli run-code --filename=tests/browser/website-integration.js
+```
+
+Use the locally available Chrome/Chromium configuration and create the ignored
+`output/playwright/` directory first. Replays produce screenshots there.
 
 ## Navigation and themes
 
@@ -85,7 +102,15 @@ describe deployment permissions and the `workflow` publishing source.
 
 ## Release evidence
 
-The M8 entry in `DEV_LOG.md` records final commit/run URLs and actual live checks.
-Until that entry reports successful verification, configuration alone is not a
-completed public release. Browser coverage is Chrome/Chromium on desktop and
-an emulated mobile viewport; it is not a full cross-browser certification.
+The release was verified on 2026-10-11. The application release
+[`a7096c7`](https://github.com/STRAY-FLZ/circuit-equivalence-lab/commit/a7096c7d4e66c21fdc96c9ecc1d1adbdec2607e8)
+and its [build/deploy run](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/38141334784)
+succeeded before the personal website entry was added. The focused website
+commit [`e609a82`](https://github.com/STRAY-FLZ/stray-articles/commit/e609a8209cbb9e61ab61c11f8845b89a24b3c9c6)
+and its [existing Pages run](https://github.com/STRAY-FLZ/stray-articles/actions/runs/38141574793)
+also succeeded. The following documentation/evidence commit does not change
+the built application. See the M8 entry in `DEV_LOG.md` for actual checks.
+
+Browser coverage is Chrome/Chromium at 1440x1100 and an emulated 390x844 mobile
+viewport in both themes; it is not a full cross-browser certification. No
+unresolved deployment or integration defect was found in the verified scope.

@@ -1,6 +1,6 @@
 # Development Roadmap (M0–M8)
 
-Each round implements and verifies one module. M0–M7 have passed their scoped acceptance; the authorized M8 production release is in progress. Browser coverage is limited to the locally available Chrome/Chromium engine.
+Each round implements and verifies one module. M0–M8 have passed their scoped acceptance, including the actual production release and website navigation. Browser coverage is limited to the locally available Chrome/Chromium engine.
 
 | 阶段 | 状态 | 内容 | 验收条件 |
 | --- | --- | --- | --- |
@@ -12,6 +12,7 @@ Each round implements and verifies one module. M0–M7 have passed their scoped 
 | M5 Interactive educational system | Complete | Five-stage series/parallel/delta/star lessons, actual substitutions, synchronized SVG metadata highlights, cached numerical evidence | 31 focused tests plus unchanged M4 regressions; 304 tests total; all standard checks pass; Chrome delta/series learning smoke tests; original networks preserved |
 | M6 Targeted integration and quality assurance | Complete | Representative selection/preview/lesson/recovery workflows, verification handoff and focused browser/accessibility checks | Three new integration tests; 307 total tests in 18 files; all standard checks pass; measured small-text contrast defect fixed with browser regression; Chrome at 1440/820/390px; Firefox/WebKit unavailable and explicitly unverified |
 | M7 Personal website design alignment | Complete | Verified Stray source tokens, branding/header/home links, shared theme lifecycle and restrained application styling | Eight new theme/header/bootstrap cases; 315 total tests in 19 files; all standard checks pass; actual main-site comparison; Chrome light/dark at 1440/820/390px; shared-theme/restricted-storage/pre-paint checks; DESIGN_SYSTEM.md |
+| M8 Production deployment and website integration | Complete | Preserved M0–M7 history on remote main, Actions Pages deployment, production base, focused personal website tool entry and release documentation | Both repositories' Pages runs succeeded; live SVG/Delta-to-star/five-stage lesson/MathML/assets/refresh checks; desktop/mobile light/dark full navigation; four existing tools browser-accessible; same-origin theme sync; 315 tests and all standard checks passed |
 
 M1 验收结果：新增 57 个拓扑测试，加上保留的 33 个 M0 测试，共 6 个文件、90 个测试通过。独立遍历测试在一个测试用例中检查 64 个可复现图及其重排输入；它们不计作额外 Vitest 用例。详见 DEV_LOG.md。
 
@@ -27,8 +28,4 @@ M6 acceptance: representative actual browser workflows compared SVG data and ter
 
 M7 acceptance: read-only source/live inspection verified the personal website's actual CSS, theme script and two relevant HTML pages. Presentation tokens, typography, Stray header, absolute home navigation and `stray-theme` synchronization are aligned. Eight new cases brought the final regression to 315 tests in 19 files; typecheck/lint/build passed. Actual Chrome comparison and replays covered pre-React theme initialization, persistence, cross-tab sync, storage restriction, keyboard focus, lesson/preview navigation, MathML and three light/dark viewport sizes. M6 contrast protection remains passing. No electrical/educational engine or personal website implementation changed.
 
-| Release stage | Status | Scope |
-| --- | --- | --- |
-| M8 Deployment and website navigation | In progress | Authorized GitHub Actions/Pages release, production project-path checks and focused personal website tool integration |
-
-M8 is explicitly authorized. M7 has been committed and fast-forwarded into `main`, preserving all previous commits. Production completion requires successful Actions and live application/website navigation verification; see DEPLOYMENT.md and the current DEV_LOG.md entry. Arbitrary circuit editing, symbolic algebra and tutoring services remain outside this scope.
+M8 acceptance: application commit `a7096c7` deployed successfully through GitHub Actions/Pages before website commit `e609a82` added the requested entry. Live Chrome checks passed at 1440x1100 and 390x844 in both themes, including the complete homepage -> tools -> circuit lab -> homepage journey, project-path assets, SVG Delta-to-star preview, all five lesson stages, native MathML, refresh and bidirectional cross-project tab synchronization. All four previous tool destinations returned HTTP 200 in the actual browser; the personal website commit changed only tools/index.html. The release preserves every earlier application commit and uses no force push. See DEPLOYMENT.md and the current DEV_LOG.md entry for evidence and maintenance. Arbitrary circuit editing, symbolic algebra and tutoring services remain outside this scope.
