@@ -1,5 +1,18 @@
 # 开发记录
 
+## 2026-10-11 · M8 Production Deployment and Website Integration
+
+### Authorized release and preparation
+
+- The user explicitly authorized both repositories' production pushes, Pages configuration, and the focused personal website tool entry. M7 was committed as `c4ba6b7` (`style(design): align circuit lab with personal website`); `main` was updated with fast-forward merges after fetching the unchanged remote README commit. All M0–M7 history is preserved; no force push or history rewrite.
+- Added the project base `/circuit-equivalence-lab/` and a GitHub Actions workflow with Node.js 24, locked installation, existing type/lint/test checks, Vite build, Pages artifact upload and a dependent deployment job. Read-only build permissions are separated from deployment write permissions. GitHub's authenticated API enabled `build_type: workflow`; repository admin/push access and enabled Actions were verified without exposing credentials.
+- Updated the existing real startup test to request the configured project base and head initializer. Added a focused production Playwright replay, DEPLOYMENT.md maintenance instructions and current README/roadmap descriptions. Electrical algorithms, lessons, M7 design and dependency versions are unchanged; generated files remain ignored.
+- Local typecheck/lint/test/build passed: 315 tests in 19 files, 47 Vite modules. Production HTML uses the correct project path for the bootstrap, favicon, CSS and JavaScript. The classic blocking theme initializer is deliberately copied as a public asset; Vite's non-module bundling notice is informational, and the built reference/file are valid.
+
+### Release verification
+
+Publication and live integration verification are in progress. This entry will be completed with actual workflow/commit URLs and browser evidence; preparation alone is not reported as a completed release.
+
 ## 2026-10-11 · M7 Personal Website Design Alignment
 
 ### Git preparation and reference evidence

@@ -1,6 +1,6 @@
 # Development Roadmap (M0–M8)
 
-Each round implements and verifies one module. M0–M7 have passed their scoped acceptance; M8 remains unimplemented. M6/M7 browser coverage is limited to the locally available Chrome/Chromium engine.
+Each round implements and verifies one module. M0–M7 have passed their scoped acceptance; the authorized M8 production release is in progress. Browser coverage is limited to the locally available Chrome/Chromium engine.
 
 | 阶段 | 状态 | 内容 | 验收条件 |
 | --- | --- | --- | --- |
@@ -27,8 +27,8 @@ M6 acceptance: representative actual browser workflows compared SVG data and ter
 
 M7 acceptance: read-only source/live inspection verified the personal website's actual CSS, theme script and two relevant HTML pages. Presentation tokens, typography, Stray header, absolute home navigation and `stray-theme` synchronization are aligned. Eight new cases brought the final regression to 315 tests in 19 files; typecheck/lint/build passed. Actual Chrome comparison and replays covered pre-React theme initialization, persistence, cross-tab sync, storage restriction, keyboard focus, lesson/preview navigation, MathML and three light/dark viewport sizes. M6 contrast protection remains passing. No electrical/educational engine or personal website implementation changed.
 
-| Future stage | Status | Planned scope |
+| Release stage | Status | Scope |
 | --- | --- | --- |
-| M8 Deployment and website navigation | Not started | Separately authorized public deployment and personal website navigation integration |
+| M8 Deployment and website navigation | In progress | Authorized GitHub Actions/Pages release, production project-path checks and focused personal website tool integration |
 
-Stop after M7 and leave its changes uncommitted for review. M8 requires explicit user authorization; project-path deployment and personal website navigation integration remain pending. No personal website modification, push, merge or deployment was performed. Arbitrary circuit editing, symbolic algebra and tutoring services remain outside this scope.
+M8 is explicitly authorized. M7 has been committed and fast-forwarded into `main`, preserving all previous commits. Production completion requires successful Actions and live application/website navigation verification; see DEPLOYMENT.md and the current DEV_LOG.md entry. Arbitrary circuit editing, symbolic algebra and tutoring services remain outside this scope.

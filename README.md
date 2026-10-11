@@ -1,8 +1,8 @@
 # 电路等效变换实验室
 
-Circuit Equivalence Lab 是面向大学本科《电路》课程的交互式学习项目。后续将逐步支持拓扑识别、节点电压法、串并联与 Y–Δ 等效变换、惠斯通电桥，以及 SVG 电路图和教学推导。
+Circuit Equivalence Lab is an interactive learning tool for undergraduate circuit courses. It supports topology analysis, nodal resistance solving, series/parallel and Y–Δ transformations, SVG previews, and five-stage guided lessons.
 
-**当前已完成 M0 基础架构、M1 拓扑分析与 M2 电阻网络求解。** 独立 TypeScript API 提供拓扑识别、节点电压法、两端等效电阻及数值诊断。页面仍为 M0 介绍与主题切换界面，尚未接入这些引擎；等效变换、绘图和拖拽编辑尚未实现。
+M0–M7 are complete. M8 publishes the application at [Circuit Equivalence Lab](https://stray-flz.github.io/circuit-equivalence-lab/) and integrates it into the [Stray tools page](https://stray-flz.github.io/stray-articles/tools/). See [deployment and maintenance](docs/DEPLOYMENT.md) and [release evidence](docs/DEV_LOG.md). Arbitrary circuit editing remains outside the current scope.
 
 ## 本地运行
 
@@ -37,11 +37,11 @@ src/
   domain/          电路类型、有限正电阻与网络完整性校验
   topology/        DSU、电气节点识别、支路与连通分量归一化
   solver/          节点电压法、等效电阻、数值检查与诊断
-  transforms/      等效变换输入与结果契约
-  visualization/  独立坐标和未来视图输入契约
-  education/      教学内容与推导步骤契约
-  components/     通用 React 组件（主题切换）
-  App.tsx         M0 项目介绍页面
+  transforms/      Transformation discovery, immutable rewrites and verification
+  visualization/  Circuit layout, SVG diagrams and built-in examples
+  education/      Five-stage lesson content and formula mappings
+  components/     Shared header, theme switch and controls
+  App.tsx         Interactive circuit laboratory
   main.tsx        React 启动入口
   styles.css      响应式布局与主题样式
 tests/            测试环境与真实服务启动测试
@@ -96,4 +96,4 @@ if (result.kind === 'finite') {
 
 结果区分 `finite`、`short-circuit`（明确为 0Ω）、`open-circuit` 和带错误代码的 `error`。有限结果含所选分量的节点电压、各电阻支路的电流/压降及残差诊断；以第二端子为参考，在第一端子注入 1 A。极端尺度、病态矩阵或结果溢出会返回数值失败，不会伪装为物理开路。稠密求解限制为最多 512 个未知节点。
 
-完整测试共 154 个，包括既有 90 个回归测试和 64 个 M2 测试。详见 [模块架构](docs/ARCHITECTURE.md)、[开发记录](docs/DEV_LOG.md) 与 [M0～M6 路线图](docs/ROADMAP.md)。工具配置参考 [Vite](https://vite.dev/guide/)、[Vitest](https://vitest.dev/guide/) 和 [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files) 官方文档。
+The current regression suite contains 315 tests in 19 files. See [architecture](docs/ARCHITECTURE.md), [development log](docs/DEV_LOG.md), and [M0–M8 roadmap](docs/ROADMAP.md). Tool configuration follows the official [Vite](https://vite.dev/guide/), [Vitest](https://vitest.dev/guide/), and [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files) documentation.
