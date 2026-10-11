@@ -1,5 +1,47 @@
 # 开发记录
 
+## 2026-10-11 · M4 SVG Circuit Visualization
+
+### Git and scope
+
+- Committed only the known M3 transform sources/tests and corresponding ARCHITECTURE, DEV_LOG and ROADMAP changes as `0b39f28` (`feat(transforms): implement circuit equivalence transformations`). No unrelated modifications were found. No M3 acceptance rerun was performed before this commit.
+- Created `feat/05-visualization` from the committed M3 state. Git required access to the restricted .git directory. Missing Git identity was resolved using the previous repository commit identity as command-local options; no global configuration was changed.
+- M4 changes remain uncommitted. No push, merge, deployment, M5 implementation, mathematical algorithm change, package dependency change or ESLint rule relaxation.
+
+### Implementation and files
+
+- Added `src/visualization/types.ts`, `layout.ts`, `examples.ts`, and `CircuitDiagram.tsx`; updated the visualization barrel. The separate readonly presentation model keeps geometry outside domain/topology. M1 supplies electrical meaning and short-circuit classification.
+- Added eight real immutable circuit fixtures: series, parallel, delta, star, balanced Wheatstone bridge, ideal-wire bypass, retained center wire/isolated point, and unconnected crossing. Templates provide clear initial geometry; deterministic component/lane fallback supports other small networks.
+- Every declared resistor/wire/point/terminal stays represented. Parallel branches get distinct routes, self-loops get explicit loops, crossings have gaps, and declared junctions get dots. Disconnected residual components are stacked in a labeled section. Unsupported/crowded/ambiguous geometry returns a clear message; complete inventory remains available.
+- Added generic `src/components/CandidatePicker.tsx` and its barrel export. Replaced the M0 shell in App with the Chinese experiment UI, source/replacement highlighting, keyboard/click inspection, preview/reset, metadata status and actual M3 all-terminal verification. Updated `src/styles.css` for readable symbols, native controls, themes and responsive panels.
+- App alone composes M3 discovery/application and adapts transformation metadata to `LayoutTransition`; no UI eligibility rules or transformation formulas. Existing active point positions and terminal identities are preserved, new centers use boundary centroids, and comparison diagrams share a viewBox.
+- Added `src/visualization/visualization.test.tsx` (28 tests) and `src/preview.test.tsx` (19 tests). Updated one obsolete M0 shell case in `src/App.test.tsx` to assert the M4 drawing; retained its five theme cases. Updated only M4-related architecture/roadmap sections and this new log entry; historical entries remain intact.
+
+### Actual verification
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck` | Passed with unchanged strict settings |
+| `npm run lint` | Passed; zero errors/warnings |
+| `npm run test` | Passed: 15 files, 273 tests, none skipped |
+| `npm run build` | Passed: typecheck and Vite production build |
+| Actual Chrome / Playwright CLI | Passed the inspected flows and screenshots described below |
+
+The 47 new tests cover all example symbols and actual resistance labels, node/terminal mappings, independent parallel lanes, connected/unconnected crossings, shorted branches/self-loops, selected/replacement/unaffected styles, M3 results for all available example candidates, terminal positions/labels, retained residual elements, deterministic geometry under permutations, immutable inputs, unsupported bounds/coordinates/false junctions, keyboard inspection, exact M3 candidate lists, preview/reset/example/candidate changes, failed discovery/application feedback, and comparison viewBox consistency. Mocked failure returns test UI feedback only; successful transformations use real M3 APIs and actual networks.
+
+The first permutation test accidentally compared the deliberately preserved source network array order; corrected it to compare layout, drawn elements and M1 topology separately. A comprehensive candidate-rendering test found insufficient margin for one bridge Y-to-delta result; reduced the lane interval to 76 drawing units without changing the circuit. Visual inspection found overlapping crossing wire labels; added deterministic label separation and rendered labels above routes.
+
+The full sandboxed suite initially passed 272 tests but the unchanged real Vite startup case hit `connect EACCES 127.0.0.1`. Reran `npm run test` with authorized loopback access and workspace-local TEMP/TMP (`.artifacts/m4/temp`); all 273 passed. No test/configuration was skipped or weakened. The sandboxed Chrome process also could not start crashpad; the authorized browser and Vite service on port 5174 enabled actual inspection.
+
+Browser work used the Playwright skill and the repository's existing ignored CLI wrapper with local Chrome. Actually operated series, parallel, delta-to-star and star-to-delta previews; candidate selection, reset/example switching; keyboard activation; theme switching; and wire/point inspection. Visually inspected screenshots of series, delta in both themes, star-to-delta, bridge, parallel/tablet, bypass, crossing, residual components and narrow layout. At 820px and 390px document width equaled viewport width; diagram panels may scroll internally to preserve text size. Final browser console had no errors or warnings. Screenshots are ignored artifacts under `output/playwright/m4-*.png`; this is viewport emulation, not physical tablet/device testing.
+
+### Limitations and M5 interfaces
+
+- Educational layouts are bounded to 16 points/24 elements. Explicit overlap/spacing failures are reported with the full inventory; no complex automatic routing or arbitrary editing. Label separation is a modest heuristic, not a general collision-free graph engine.
+- Drawing labels use six significant digits; the inventory preserves the stored numeric value. Complex networks/long identifiers can require explicit templates. Residual sections may be tall, and narrow diagram panels intentionally scroll.
+- Preview applies one candidate to the original immutable example. No chained editor, undo history, teaching formulas or animations. M3/M2 numerical limits and inconclusive equivalence results remain explicit.
+- M5 can consume public drawing/layout types, `buildDrawing`, `CircuitDiagram` highlight props, `LayoutTransition`, existing M3 metadata and terminal verification evidence. No M5 work has begun.
+
 ## 2026-10-11 · M3 Circuit Equivalence Transformation Engine
 
 ### Git preparation and scope

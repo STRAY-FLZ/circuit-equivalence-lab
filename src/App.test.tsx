@@ -16,14 +16,12 @@ beforeEach(() => {
 })
 
 describe('基础页面启动', () => {
-  it('渲染项目名称、简介、M0 状态以及真实主题操作', () => {
+  it('渲染项目名称、M4 电路图以及真实主题操作', () => {
     render(<App />)
     expect(screen.getByRole('heading', { level: 1, name: '电路等效变换实验室' })).toBeInTheDocument()
     expect(screen.getByText(/从连接关系出发/)).toBeInTheDocument()
-    expect(screen.getByText('当前阶段：M0 项目基础架构')).toBeInTheDocument()
-    expect(screen.getByText('本阶段尚不提供电路计算')).toBeInTheDocument()
-    expect(screen.getAllByRole('listitem')).toHaveLength(6)
-    expect(screen.getAllByRole('button')).toHaveLength(1)
+    expect(screen.getByRole('group', { name: '原始电路图' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '预览等效变换' })).toBeDisabled()
   })
 
   it('支持浅色与深色切换，并持久化用户选择', () => {

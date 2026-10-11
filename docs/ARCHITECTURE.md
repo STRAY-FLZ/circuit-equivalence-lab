@@ -2,9 +2,9 @@
 
 ## Current scope
 
-M0 provides the React/TypeScript/Vite project, domain types and validation, module contracts, and a presentation shell with theme switching. M1 adds a deterministic, UI-independent topology engine. M2 adds a component-aware DC nodal solver with explicit physical states and numerical diagnostics. M3 adds explicit series, parallel, delta-to-star and star-to-delta rewrites with independent terminal-equivalence verification. Circuit drawing and interactive teaching remain future work.
+M0 provides the React/TypeScript/Vite project, domain types and validation, module contracts, and a presentation shell with theme switching. M1 adds a deterministic, UI-independent topology engine. M2 adds a component-aware DC nodal solver with explicit physical states and numerical diagnostics. M3 adds explicit series, parallel, delta-to-star and star-to-delta rewrites with independent terminal-equivalence verification. M4 adds real SVG circuit diagrams and single-operation transformation previews. Interactive derivations remain future work.
 
-The topology engine lives in `src/topology/`. It imports only `domain` and its own internal helpers, uses standard JavaScript data structures, and has no React, DOM, SVG, coordinate, browser, or graph-library dependency. The existing UI remains the M0 presentation shell; M1 is consumed through the TypeScript API.
+The topology engine lives in `src/topology/`. It imports only `domain` and its own internal helpers, uses standard JavaScript data structures, and has no React, DOM, SVG, coordinate, browser, or graph-library dependency. The M4 UI consumes M1 topology through the visualization layer and composes M3 discovery, application and verification in App.
 
 ## Module boundaries
 
@@ -16,7 +16,7 @@ Dependencies point from consumers to providers. These are permitted directions, 
 | topology | Wire equivalence, normalized branches, terminal mappings, resistive components | domain |
 | solver | DC nodal analysis, equivalent resistance, explicit physical states and numerical failures | domain, topology |
 | transforms | Candidate eligibility, immutable graph rewrites, operation metadata and optional equivalence verification | domain, topology, solver |
-| visualization | Separate layout data and future SVG views | domain, topology; React allowed |
+| visualization | Deterministic presentation models, layouts and SVG views | domain, topology; React allowed |
 | education | Formula, explanation, and derivation data | domain, topology, solver, transforms; no React |
 | components | Generic React UI without circuit knowledge | None; React allowed |
 | App | Application composition | May combine the modules above |
@@ -132,7 +132,7 @@ A short-circuited resistor is a self-loop on an already established electrical n
 
 Coordinates belong exclusively to the visualization model. Crossing or overlapping lines create no connection unless the declared graph explicitly shares a point or contains a connecting wire. The topology engine reads no geometry fields; even extra coordinate fields on structurally compatible input objects cannot affect the result. Missing coordinates do not imply an open circuit.
 
-Future drawing code consumes domain/topology data. It must not infer electrical connectivity from screen intersections.
+Drawing code consumes domain/topology data. It must not infer electrical connectivity from screen intersections.
 
 ## Complexity
 
@@ -164,7 +164,7 @@ M2 can resolve query terminals with `terminalToNode`, identify their components 
 
 M2 must decide reference-node selection, excitation, numerical tolerances, matrix assembly, conditioning/error behavior, and interpretation of query states. M1 performs none of these operations. It assigns no voltage, current, power, ground node, or equivalent resistance, and does not invent open/short resistor values.
 
-The existing `ResistanceSolver` result contract still distinguishes finite resistance, short-circuit, open-circuit, and error states. M3 transformation contracts are implemented below; visualization and education remain future interfaces.
+The existing `ResistanceSolver` result contract still distinguishes finite resistance, short-circuit, open-circuit, and error states. M3 transformation contracts are implemented below; visualization is implemented in M4; education remains a future interface.
 
 ## M2 solver API and module boundaries
 
@@ -337,3 +337,35 @@ M4 can display candidate boundary/internal nodes, select an operation by type pl
 Tests run in the Node environment for domain and topology and use real implementations. The required A/B/C cases verify membership, canonical IDs, original branch identity and values, terminal mappings, short flags, components, validation errors, and input/output immutability. Additional checks cover unusual string IDs, endpoint arity/sparsity, extreme finite resistances, permutations, and 64 reproducible graphs compared with an independent traversal oracle.
 
 TypeScript strict settings and type-aware ESLint remain enabled. Existing M0 tests and the real Vite startup test continue to run. Exact command outcomes and test counts are recorded in DEV_LOG.md.
+
+## M4 visualization and preview
+
+### Public interfaces and dependency direction
+
+`visualization/index.ts` exports `buildDrawing`, `CircuitDiagram`, `circuitExamples`, and the separate presentation types `Position`, `CircuitLayout`, `LayoutTransition`, `DrawnElement`, `CircuitViewModel`, and `DrawingResult`. The domain network is reused unchanged. Visualization imports only domain/topology (and React for rendering); the existing ESLint boundary configuration is unchanged. `CandidatePicker` is a generic component receiving option IDs, text and callbacks, with no circuit dependency.
+
+`buildDrawing(network, explicitLayout?, transition?)` is a pure function returning either `ready/model` or `unsupported/message`. The model includes the original network reference, independently analyzed M1 topology, point coordinates, one route per original element, resistor centers/angles, separated label positions, residual point IDs and SVG dimensions. It neither mutates nor freezes caller-owned input. Its readonly types are a presentation contract, not an additional deep-freezing boundary.
+
+`LayoutTransition` accepts previous coordinates, created point IDs and boundary representative point IDs. App adapts M3 metadata into this structural presentation contract rather than letting visualization import transforms. Existing active point coordinates are preserved; new star centers use the boundary centroid. Removed points disappear with the new domain network. Residual components deliberately move to a separate section.
+
+### Deterministic geometry and electrical meaning
+
+Eight immutable examples cover series, three parallel branches, delta, star, balanced Wheatstone bridge, ideal-wire bypass, retained internal wires/isolated points, and unconnected crossings. Explicit template coordinates carry no electrical information. The fallback lays out M1 components in stable sorted order, with circular positions for their declared points. Elements are sorted by stable IDs; endpoint pairs identify geometric lane groups only. Parallel resistors and wires have separate offset routes. Literal self-loops use a rectangular route.
+
+M1 alone supplies point-to-electrical-node identity and short-circuit flags. Every declared point has a junction or external-terminal symbol; terminal labels use original terminal records and IDs. Only declared endpoints form connections. A background under-stroke marks unconnected crossings, and node dots render above all routes. Label separation is a modest deterministic bounding-box heuristic; labels render above paths. A third point overlapping an unrelated path is explicitly unsupported, avoiding false junctions. No graph data is rewritten to fix geometry.
+
+Components without any external terminal are shown in a labeled residual section when the network has terminals. This includes retained center wire groups, disconnected resistors and isolated points. Distinct residual components are stacked; no connecting edge is invented. Networks without terminals still render their components normally. App gives both preview diagrams the same maximum viewBox dimensions to preserve comparison scale. SVGs maintain a minimum drawing width to keep text readable; narrow panels can scroll internally.
+
+### App integration and interaction
+
+App calls `discoverTransformations` on the selected example, uses candidate IDs for native keyboard-operable buttons, and highlights only candidate resistor IDs. The preview button passes the candidate type and element IDs directly to `applyTransformation`; eligibility and all numerical transformation formulas remain in M3. The source network is never replaced. Selecting a different candidate/example or resetting clears the preview.
+
+Applied results provide the transformed network, original/replacement IDs, affected/created/removed/retained nodes and layout inputs. App calls `verifyTerminalEquivalence` to display the actual all-port-pairs verdict, including different/inconclusive states. This uses existing M1/M2/M3 behavior and default numerical tolerances, without introducing derivations. Non-applicable, invalid-input and numerical-failure results receive Chinese feedback and no invented transformed drawing.
+
+`CircuitDiagram` draws IEC rectangular resistor symbols, ideal wires, point/junction symbols and labeled terminal rings. Selected resistors have orange dashed symbols, replacements have green thicker strokes, and unaffected elements keep their base style. Keyboard/click inspection of elements and points reveals actual resistance, endpoint and electrical-node data. Complete expandable inventories show every element, point and terminal even if drawing is unsupported. Labels use six significant digits for readability; the inventory shows the stored value. Theme colors, focus/hover states, responsive cards, native controls and live status text are defined in `styles.css`.
+
+### Limits and M5 handoff
+
+The layout supports at most 16 points and 24 elements, with validated finite template coordinates. Crowded branches, insufficient label space and ambiguous point/path overlap return explicit unsupported results. This is a bounded educational schematic MVP, not arbitrary automatic routing, collision-free general graph layout or a drag editor. Complex networks and long identifiers may require new presentation templates. Residual sections can make drawings tall, and small panels scroll rather than shrinking labels indefinitely.
+
+M5 may reuse `CircuitDiagram` highlighting props (`selectedIds`, `replacementIds`, `affectedNodeIds`), pure `buildDrawing` output, the `LayoutTransition` adapter and existing M3 metadata/equivalence evidence. There is no teaching animation, mathematical derivation engine or multi-step editor/undo implementation in M4.
