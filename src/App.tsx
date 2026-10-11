@@ -1,5 +1,5 @@
 import { useMemo, useReducer, useState } from 'react'
-import { ThemeToggle, CandidatePicker } from './components'
+import { SiteHeader, CandidatePicker } from './components'
 import { applyTransformation, discoverTransformations, verifyTerminalEquivalence } from './transforms'
 import type { TransformCandidate, TransformType } from './transforms'
 import { buildDrawing, CircuitDiagram } from './visualization'
@@ -81,9 +81,9 @@ export default function App() {
 
   return <div className="app-shell">
     <a className="skip-link" href="#main-content">跳转到主要内容</a>
-    <header className="site-header"><div className="wordmark"><span className="brand-mark" aria-hidden="true">CE</span><span>电路等效实验室</span></div><ThemeToggle /></header>
-    <main id="main-content">
-      <section className="intro"><p className="eyebrow">电路实验 / M5 · 分步学习</p><h1>电路等效变换实验室</h1><p>从连接关系出发，选择真实网络，逐步理解一次等效变换。</p></section>
+    <SiteHeader />
+    <main id="main-content" className="shell">
+      <section className="intro"><p className="eyebrow">工具 / 电路学习</p><h1>电路等效变换实验室</h1><p>从连接关系出发，选择真实网络，逐步理解一次等效变换。</p></section>
       <div className="lab-grid">
         <aside className="controls" aria-label="实验控制">
           <label className="field-label" htmlFor="example">01 / 选择电路</label>
@@ -112,6 +112,6 @@ export default function App() {
           </div>}
         </section>
       </div>
-    </main><footer className="site-footer"><p>理想导线与线性正电阻 · 位置不决定电气连接</p><span>一次变换，前后对照。</span></footer>
+    </main><footer className="site-footer"><div className="shell footer-inner"><p>理想导线与线性正电阻 · 位置不决定电气连接</p><span>一次变换，前后对照。</span></div></footer>
   </div>
 }

@@ -1,5 +1,52 @@
 # 开发记录
 
+## 2026-10-11 · M7 Personal Website Design Alignment
+
+### Git preparation and reference evidence
+
+- Committed completed M6 changes as `515cd58` (`fix(integration): improve application reliability and accessibility`), then created `feat/08-design-alignment`. M7 changes remain uncommitted. No push, merge, deployment, history rewrite, unrelated repository edit or M8 implementation.
+- Read only Stray's actual `site.css`, `theme.js`, `index.html` and `tools/index.html` from both the live site and the main-branch source. All four pairs matched SHA-256 hashes. Browser inspection measured the 1240px desktop shell / 92px header, mobile shell/type and the actual dark palette. No general website audit or historical module acceptance rerun.
+- The web fetch tool could not retrieve this site, and the GitHub metadata API was rate-limited. Direct read-only HTTPS retrieval of the four main-branch source files succeeded; actual Chrome navigation to the live site also succeeded. Reference files/screenshots are ignored workspace artifacts.
+
+### Implementation and files
+
+- Added `src/design-tokens.css` with the exact main-site paper/surface/ink/muted/line/blue/gold and font tokens, shell dimensions, spacing scale, switch tokens and separate selected/replacement/failure colors. Reworked `src/styles.css` around thin rules, restrained blue controls and compact sections, retaining existing SVG electrical presentation rules and local scrolling.
+- Added generic `src/components/SiteHeader.tsx` and updated its barrel/App composition. Header branding links to the absolute main homepage, followed on the right by the theme switch, short vertical divider and `返回首页`. Main/footer share the reference shell. Replaced the development-stage eyebrow with a Chinese tool label. Favicon follows the source's S mark.
+- Updated `ThemeToggle.tsx` for `stray-theme`, system default/following, manual-only persistence, storage-event synchronization/clearing, restored-page refresh, restricted storage and reference-style accessible switch semantics. Added `public/theme-init.js` and its head inclusion in `index.html` for initialization before React/production CSS. No extra runtime theme controller or UI library.
+- Updated existing App theme tests and added four header/shared-theme cases. Added `tests/theme-bootstrap.test.ts` with four pre-paint/head-order cases. Added `tests/browser/design-alignment.js`; updated the M6 contrast replay's locator to the new switch role without changing its contrast assertions.
+- Added `docs/DESIGN_SYSTEM.md` and updated only current M7 architecture/roadmap sections plus this entry. Domain, topology, solver, transformations, drawing/layout and educational content/state files are unchanged; no package/configuration/dependency change.
+
+### Actual visual and interaction verification
+
+- Compared actual main-site desktop/mobile pages with the local application and inspected the real main-site dark tokens. Application palette/font/header match the verified source; denser type, semantic circuit inks, a compact mobile row and a vector crescent are deliberate tool-specific adaptations documented in DESIGN_SYSTEM.md.
+- Chrome at 1440x1100, 820x1100 and 390x844 passed both themes. Measured page width matched viewport width. Desktop comparison panels were 484px each; tablet/mobile stacked. Header controls remained ordered switch -> divider -> home and at least 44px high. Native MathML namespace/size/subscripts remained present; long mobile substitutions scrolled locally with keyboard arrows.
+- The browser replay held the Vite React entry request and confirmed dark `data-theme` while `#root` was still empty. It then verified React agreed, a real second tab synchronized manual preferences, reload preserved them, clearing returned to the system default and subsequent system changes applied. A separate page with throwing Storage methods still initialized and switched correctly.
+- Actual `返回首页` navigation reached the personal homepage, and browser Back restored a usable app. Tab reached the header switch with a visible 3px outline. Reduced-motion emulation disabled the thumb transition. Series preview, delta substitutions, parallel lesson completion, Previous/Restart/Exit/Reset remained functional.
+- Retained the M6 browser contrast regression: selected detail/preview paragraphs measured 11.9687:1 light and 11.9079:1 dark. Surface samples for ink/muted/blue/selected/replacement/failure were at least 5.49:1 light and 7.96:1 dark. Gold is restricted to decorative rules, not small text. Final app console contained zero errors/warnings.
+- Saved one application before screenshot, two reference screenshots and four after screenshots under ignored `output/playwright/`; visually inspected desktop light/dark and mobile light/dark. Full-page captures reset page scrolling so the sticky header appears at the top.
+- An initial browser replay waited on a Vite entry URL without its development timestamp query. Fixed the replay's URL glob and reran successfully. A shared browser profile prevented a second independent session, so the comparison reused one session and isolated peer tabs. Neither issue required an application change.
+
+### Final project verification
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck` | Passed with unchanged strict options |
+| `npm run lint` | Passed, zero warnings/errors |
+| `npm run test` | Passed: 19 files, 315 tests; none skipped |
+| `npm run build` | Passed: strict typecheck and Vite build |
+| Focused browser replays | M7 design/theme/navigation and retained M6 contrast checks passed |
+
+The first full regression exposed nine old preview cases whose global `svg` counts included the two new decorative theme icons. Narrowed those six diagram-count assertions to `svg.circuit-svg`, preserving expected counts and all original electrical assertions. The subsequent complete run passed. An earlier focused test launch hit sandbox temporary-cache rename restrictions; workspace-local TEMP/TMP supported the successful runs and unchanged real startup test. No check/rule was disabled and no algorithm acceptance suite was run separately.
+
+The final production HTML places `theme-init.js` before the generated stylesheet/React module, and the copied bootstrap file matches its source hash. Build artifacts remain ignored; no publication occurred.
+
+### Limitations and M8 handoff
+
+- Visual checks used Chrome/Chromium and viewport emulation. Firefox/WebKit, physical phones and screen readers were not tested in M7; no broader compatibility claim or accessibility certification.
+- Font rendering depends on installed system/math fonts. Narrow diagrams/formulas deliberately scroll internally. Existing single-operation lessons and numerical/drawing limits remain unchanged.
+- Theme sharing requires the same origin; localhost does not share storage with github.io. Same-origin tab synchronization is verified locally, while the final hosted project path is not yet configured or tested.
+- M7 is ready for separately authorized M8 deployment work. No personal website repository/navigation or public host was modified.
+
 ## 2026-10-11 · M6 Targeted Integration Testing and Quality Assurance
 
 ### Git preparation and scope

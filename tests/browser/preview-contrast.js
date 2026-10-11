@@ -7,7 +7,7 @@ async (page) => {
   const results = [];
   for (const theme of ['light', 'dark']) {
     if (await page.evaluate(() => globalThis.document.documentElement.dataset.theme) !== theme) {
-      await page.getByRole('button', { name: /切换为.*主题/ }).click();
+      await page.getByRole('switch', { name: '夜间模式' }).click();
     }
     const samples = await page.evaluate(() => {
       const luminance = color => {

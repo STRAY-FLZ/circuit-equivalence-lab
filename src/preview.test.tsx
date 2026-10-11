@@ -29,18 +29,18 @@ describe('M4 preview integration', () => {
     const candidate = discovery.candidates[0]!
     fireEvent.click(screen.getByRole('button', { name: new RegExp(name.replace('+', '\\+')) }))
     expect(container.querySelectorAll('[data-state="selected"]')).toHaveLength(candidate.elementIds.length)
-    expect(container.querySelectorAll('svg')).toHaveLength(1)
+    expect(container.querySelectorAll('svg.circuit-svg')).toHaveLength(1)
     fireEvent.click(screen.getByRole('button', { name: '预览等效变换' }))
     const expected = applyTransformation({ network: example.network, type: candidate.type, elementIds: candidate.elementIds })
     if (expected.kind !== 'applied') throw new Error('Transformation failed')
-    expect(container.querySelectorAll('svg')).toHaveLength(2)
+    expect(container.querySelectorAll('svg.circuit-svg')).toHaveLength(2)
     expect(container.querySelectorAll('[data-state="replacement"]')).toHaveLength(expected.metadata.replacements.length)
     const after = screen.getByRole('group', { name: '变换后电路图' })
     for (const element of expected.metadata.replacements) expect(within(after).getByRole('button', { name: `${element.id} · ${Number(element.resistance.toPrecision(6))} Ω` })).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent('端口等效验证通过')
     expect(JSON.stringify(example.network)).toBe(snapshot)
     fireEvent.click(screen.getByRole('button', { name: '重置预览' }))
-    expect(container.querySelectorAll('svg')).toHaveLength(1)
+    expect(container.querySelectorAll('svg.circuit-svg')).toHaveLength(1)
     expect(container.querySelectorAll('[data-state="selected"]')).toHaveLength(0)
   })
 
@@ -51,7 +51,7 @@ describe('M4 preview integration', () => {
     fireEvent.change(screen.getByLabelText('01 / 选择电路'), { target: { value: 'bypass' } })
     expect(screen.getByRole('button', { name: '预览等效变换' })).toBeDisabled()
     expect(screen.getByText('当前电路没有可用的变换候选。')).toBeInTheDocument()
-    expect(container.querySelectorAll('svg')).toHaveLength(1)
+    expect(container.querySelectorAll('svg.circuit-svg')).toHaveLength(1)
   })
 
   it('changing candidate clears the previous preview and keeps unaffected elements', () => {
@@ -62,7 +62,7 @@ describe('M4 preview integration', () => {
     fireEvent.click(screen.getByRole('button', { name: '预览等效变换' }))
     expect(container.querySelectorAll('[data-state="unaffected"]')).toHaveLength(4)
     fireEvent.click(buttons[1]!)
-    expect(container.querySelectorAll('svg')).toHaveLength(1)
+    expect(container.querySelectorAll('svg.circuit-svg')).toHaveLength(1)
     expect(buttons[1]).toHaveAttribute('aria-pressed', 'true')
   })
 
@@ -76,7 +76,7 @@ describe('M4 preview integration', () => {
     fireEvent.click(screen.getByRole('button', { name: /串联化简/ }))
     fireEvent.click(screen.getByRole('button', { name: '预览等效变换' }))
     expect(screen.getByRole('status')).toHaveTextContent(message)
-    expect(container.querySelectorAll('svg')).toHaveLength(1)
+    expect(container.querySelectorAll('svg.circuit-svg')).toHaveLength(1)
   })
 
   it('shows discovery failure and disables preview', () => {

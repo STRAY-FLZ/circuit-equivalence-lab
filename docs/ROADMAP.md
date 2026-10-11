@@ -1,6 +1,6 @@
 # Development Roadmap (M0–M8)
 
-Each round implements and verifies one module. M0–M6 have passed their scoped acceptance; M7–M8 remain unimplemented. M6 browser coverage is limited to the locally available Chrome/Chromium engine.
+Each round implements and verifies one module. M0–M7 have passed their scoped acceptance; M8 remains unimplemented. M6/M7 browser coverage is limited to the locally available Chrome/Chromium engine.
 
 | 阶段 | 状态 | 内容 | 验收条件 |
 | --- | --- | --- | --- |
@@ -11,6 +11,7 @@ Each round implements and verifies one module. M0–M6 have passed their scoped 
 | M4 SVG circuit visualization | Complete | Separate layout/SVG models, eight real examples, M3 candidate selection and before/after preview | Every declared element rendered or explicitly unsupported; crossing/junction distinction; terminal identity and source immutability; responsive light/dark UI and keyboard inspection; 47 new tests; 273 total tests and all checks pass; actual Chrome inspection |
 | M5 Interactive educational system | Complete | Five-stage series/parallel/delta/star lessons, actual substitutions, synchronized SVG metadata highlights, cached numerical evidence | 31 focused tests plus unchanged M4 regressions; 304 tests total; all standard checks pass; Chrome delta/series learning smoke tests; original networks preserved |
 | M6 Targeted integration and quality assurance | Complete | Representative selection/preview/lesson/recovery workflows, verification handoff and focused browser/accessibility checks | Three new integration tests; 307 total tests in 18 files; all standard checks pass; measured small-text contrast defect fixed with browser regression; Chrome at 1440/820/390px; Firefox/WebKit unavailable and explicitly unverified |
+| M7 Personal website design alignment | Complete | Verified Stray source tokens, branding/header/home links, shared theme lifecycle and restrained application styling | Eight new theme/header/bootstrap cases; 315 total tests in 19 files; all standard checks pass; actual main-site comparison; Chrome light/dark at 1440/820/390px; shared-theme/restricted-storage/pre-paint checks; DESIGN_SYSTEM.md |
 
 M1 验收结果：新增 57 个拓扑测试，加上保留的 33 个 M0 测试，共 6 个文件、90 个测试通过。独立遍历测试在一个测试用例中检查 64 个可复现图及其重排输入；它们不计作额外 Vitest 用例。详见 DEV_LOG.md。
 
@@ -24,9 +25,10 @@ M5 acceptance: 15 educational-content tests and 16 React integration/verificatio
 
 M6 acceptance: representative actual browser workflows compared SVG data and terminal identities with M3 results; learning navigation, candidate/example switches and recovery passed. Three verification handoff tests were added without repeating numerical algorithm validation. One confirmed light-theme contrast defect was fixed locally (4.26:1 -> 8.01:1), with a separate replayable Playwright regression. The final complete regression passed 307 tests in 18 files plus typecheck/lint/build. Keyboard, native MathML, SVG, both themes and three viewports were checked in Chrome; absent Firefox/WebKit executables prevented those runs. No unresolved product defect was found in the checked sample; this is not full browser or accessibility certification.
 
+M7 acceptance: read-only source/live inspection verified the personal website's actual CSS, theme script and two relevant HTML pages. Presentation tokens, typography, Stray header, absolute home navigation and `stray-theme` synchronization are aligned. Eight new cases brought the final regression to 315 tests in 19 files; typecheck/lint/build passed. Actual Chrome comparison and replays covered pre-React theme initialization, persistence, cross-tab sync, storage restriction, keyboard focus, lesson/preview navigation, MathML and three light/dark viewport sizes. M6 contrast protection remains passing. No electrical/educational engine or personal website implementation changed.
+
 | Future stage | Status | Planned scope |
 | --- | --- | --- |
-| M7 Personal website visual alignment | Not started | Align typography, theme, headers, separators and navigation with https://stray-flz.github.io/stray-articles/ (STRAY-FLZ/stray-articles); keep educational views modular |
 | M8 Deployment and website navigation | Not started | Separately authorized public deployment and personal website navigation integration |
 
-Stop after M6 and leave its changes uncommitted for review. M7 requires explicit user authorization. No personal website modification, push, merge or deployment was performed. Arbitrary circuit editing, symbolic algebra and tutoring services remain outside this scope.
+Stop after M7 and leave its changes uncommitted for review. M8 requires explicit user authorization; project-path deployment and personal website navigation integration remain pending. No personal website modification, push, merge or deployment was performed. Arbitrary circuit editing, symbolic algebra and tutoring services remain outside this scope.
