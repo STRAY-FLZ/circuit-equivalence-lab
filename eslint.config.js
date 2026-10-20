@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
-const layers = ['domain', 'topology', 'solver', 'transforms', 'visualization', 'education', 'components', 'engineering', 'project-format', 'compatibility', 'analysis']
+const layers = ['domain', 'topology', 'solver', 'transforms', 'visualization', 'education', 'components', 'engineering', 'project-format', 'compatibility', 'analysis', 'editing', 'editor']
 const allowedDependencies = {
   domain: [],
   topology: ['domain'],
@@ -18,6 +18,8 @@ const allowedDependencies = {
   'project-format': ['engineering'],
   compatibility: ['engineering', 'domain'],
   analysis: ['engineering'],
+  editing: ['engineering'],
+  editor: ['engineering', 'editing', 'project-format'],
 }
 
 export default defineConfig([
@@ -47,7 +49,7 @@ export default defineConfig([
               .flatMap((other) => [`**/${other}`, `**/${other}/**`]),
             message: '此依赖违反模块方向；请通过 domain 类型或在 App 中组合模块。',
           },
-          ...(layer === 'components' || layer === 'visualization' ? [] : [{
+          ...(layer === 'components' || layer === 'visualization' || layer === 'editor' ? [] : [{
             group: ['react', 'react/*', 'react-dom', 'react-dom/*'],
             message: '计算与教学契约不依赖 React。',
           }]),

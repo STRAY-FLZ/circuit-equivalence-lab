@@ -9,6 +9,7 @@ import { labExamples } from './learning-examples'
 import { lessonSessionReducer } from './lesson-session'
 import type { PreviewSnapshot } from './lesson-session'
 import type { CircuitNetwork } from './domain'
+import { SchematicEditor } from './editor'
 
 const transformNames: Record<TransformType, string> = { series: '串联化简', parallel: '并联化简', 'delta-to-star': 'Δ → Y', 'star-to-delta': 'Y → Δ' }
 const verdictNames = { equivalent: '端口等效验证通过', different: '端口验证发现差异', inconclusive: '端口验证无法确定' }
@@ -22,6 +23,8 @@ function ElementInventory({ network }: { readonly network: CircuitNetwork }) {
 }
 
 export default function App() {
+  const [workspace, setWorkspace] = useState<'v1' | 'editor'>('v1')
+  const [editorVisited, setEditorVisited] = useState(false)
   const [exampleId, setExampleId] = useState('series')
   const [candidateId, setCandidateId] = useState<string | null>(null)
   const [session, dispatch] = useReducer(lessonSessionReducer, { kind: 'idle' })
@@ -83,6 +86,9 @@ export default function App() {
     <a className="skip-link" href="#main-content">跳转到主要内容</a>
     <SiteHeader />
     <main id="main-content" className="shell">
+      <nav className="workspace-tabs" aria-label="实验工作区"><button aria-pressed={workspace === 'v1'} onClick={() => setWorkspace('v1')}>等效变换与课程</button><button aria-pressed={workspace === 'editor'} onClick={() => { setEditorVisited(true); setWorkspace('editor') }}>原理图编辑器</button></nav>
+      {editorVisited && <div className="workspace-panel" hidden={workspace !== 'editor'}><SchematicEditor /></div>}
+      <div className="workspace-panel" hidden={workspace !== 'v1'}>
       <section className="intro"><p className="eyebrow">工具 / 电路学习</p><h1>电路等效变换实验室</h1><p>从连接关系出发，选择真实网络，逐步理解一次等效变换。</p></section>
       <div className="lab-grid">
         <aside className="controls" aria-label="实验控制">
@@ -112,6 +118,7 @@ export default function App() {
           </div>}
         </section>
       </div>
-    </main><footer className="site-footer"><div className="shell footer-inner"><p>理想导线与线性正电阻 · 位置不决定电气连接</p><span>一次变换，前后对照。</span></div></footer>
+      </div>
+    </main><footer className="site-footer"><div className="shell footer-inner"><p>位置不决定电气连接 · 工程计算与呈现分离</p><span>STRAY Electronics Lab</span></div></footer>
   </div>
 }

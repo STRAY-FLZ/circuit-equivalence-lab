@@ -1,0 +1,184 @@
+import { useId, useMemo, useRef, useState } from 'react'
+import type { PointerEvent as ReactPointerEvent } from 'react'
+import { ProjectValidationError, reviseProject } from '../engineering'
+import type { EngineeringProject, Position } from '../engineering'
+import { commitEdit, createHistory, emptySheet, newEditorProject, PALETTE, redoEdit, snap, undoEdit } from '../editing'
+import type { EditOperation, Endpoint, PaletteKind, Selection } from '../editing'
+import { createProjectDocument, deserializeProject, serializeProject } from '../project-format'
+import type { InlineAsset } from '../project-format'
+import packageText from '../../package.json?raw'
+import { buildEditorView, nearestAnchor, netInspection } from './view'
+import { SymbolBody } from './SymbolBody'
+import { ComponentProperties } from './Properties'
+import './editor.css'
+
+type Tool = 'select' | 'pan' | 'place' | 'wire' | 'junction' | 'ground' | 'label' | 'reference' | 'port'
+interface Viewport { readonly x: number; readonly y: number; readonly zoom: number }
+const INITIAL_VIEW: Viewport = { x: 0, y: 0, zoom: 1 }
+const writer = { name: 'STRAY Electronics Lab', version: (JSON.parse(packageText) as { version: string }).version }
+const tools: readonly [Tool, string][] = [['select', '选择 V'], ['pan', '平移'], ['wire', '接线 W'], ['junction', '结点 J'], ['ground', '接地 GND'], ['label', '网络标签'], ['port', '外部端口'], ['reference', '求解参考']]
+function errorMessage(error: unknown): string {
+  if (error instanceof ProjectValidationError) {
+    const code = error.issues[0]?.code
+    if (code === 'resistance' || code === 'positive') return '电阻必须是有限正数；理想短路请使用导线。'
+    if (code === 'finite-number' || code === 'unit' || code === 'parameter-kind') return '参数必须是可表示的有限数值，并使用定义规定的单位。'
+    if (code === 'reference') return '此操作会使已有引用失效，工程保持不变。'
+    return '操作未保存：输入不符合工程约束，请检查参数和关联对象。'
+  }
+  return error instanceof Error ? error.message : '操作失败，工程保持不变。'
+}
+
+export function SchematicEditor() {
+  const [history, setHistory] = useState(() => createHistory(newEditorProject()))
+  const project = history.present
+  const [activeSheet, setActiveSheet] = useState<string | null>(null), sheetId = activeSheet ?? project.sheets[0]!.id
+  const [selection, setSelection] = useState<Selection>(null), [tool, setTool] = useState<Tool>('select'), [kind, setKind] = useState<PaletteKind>('resistor')
+  const [wireStart, setWireStart] = useState<Endpoint | null>(null), [label, setLabel] = useState('NET'), [labelScope, setLabelScope] = useState<'sheet' | 'project'>('sheet')
+  const [viewport, setViewport] = useState(INITIAL_VIEW), [drag, setDrag] = useState<{ id: string; origin: Position } | undefined>()
+  const gesture = useRef<{ kind: 'component' | 'pan'; client: Position; world: Position; origin: Position; id?: string; scale: number } | null>(null)
+  const suppressClick = useRef(false)
+  const [message, setMessage] = useState('从左侧选择元件，再点击画布放置。'), [error, setError] = useState(false), [busy, setBusy] = useState(false)
+  const [assets, setAssets] = useState<readonly InlineAsset[]>([]), [savedRevision, setSavedRevision] = useState(project.revision)
+  const svg = useRef<SVGSVGElement>(null), fileInput = useRef<HTMLInputElement>(null)
+  const gridId = `editor-grid-${useId().replaceAll(':', '')}`
+  const view = useMemo(() => buildEditorView(project, sheetId, drag), [project, sheetId, drag]), nets = useMemo(() => netInspection(project), [project])
+  const component = selection?.kind === 'component' ? view.sheet.components.find(c => c.id === selection.id) : undefined
+  const anchorId = selection?.kind === 'anchor' ? selection.id : selection?.kind === 'connection' ? view.sheet.connections.find(c => c.id === selection.id)?.endpoints[0] : undefined
+  const selectedNet = anchorId ? nets.anchorToNet[anchorId] : undefined, net = nets.nets.find(n => n.key === selectedNet)
+  const announce = (text: string, failed = false) => { setMessage(text); setError(failed) }
+  function edit(operation: EditOperation) {
+    if (busy) return
+    try { const next = commitEdit(history, sheetId, operation); setHistory(next); announce('编辑已保存到当前工程。'); if (operation.type === 'delete') setSelection(null); return next.present }
+    catch (failure) { announce(errorMessage(failure), true); return undefined }
+  }
+  function chooseTool(next: Tool) { setTool(next); setWireStart(null); setDrag(undefined); gesture.current = null }
+  function undo() { if (busy) return; setHistory(undoEdit(history)); setSelection(null); setWireStart(null); announce('已撤销；恢复内容并生成新的工程修订。') }
+  function redo() { if (busy) return; setHistory(redoEdit(history)); setSelection(null); setWireStart(null); announce('已重做。') }
+  function world(event: { readonly clientX: number; readonly clientY: number }): Position {
+    const matrix = svg.current?.getScreenCTM()
+    if (!matrix) return { x: 0, y: 0 }
+    const point = svg.current!.createSVGPoint(); point.x = event.clientX; point.y = event.clientY
+    const result = point.matrixTransform(matrix.inverse()); return { x: result.x, y: result.y }
+  }
+  function endpoint(point: Position): Endpoint { const scale = svg.current?.getScreenCTM()?.a ?? viewport.zoom; const id = nearestAnchor(view.positions, point, 12 / scale); return id ? { anchorId: id } : { position: snap(point) } }
+  function activate(at: Endpoint) {
+    if (busy) return
+    if (tool === 'wire') {
+      if (!wireStart) { setWireStart(at); announce('已选起点；点击另一个引脚或空白位置完成接线。') }
+      else if (edit({ type: 'connect', from: wireStart, to: at })) { setWireStart(null); announce('导线已创建。交叉位置不会自动导通。') }
+    } else if (['ground', 'label', 'reference', 'port'].includes(tool)) {
+      edit({ type: 'marker', kind: tool as 'ground' | 'label' | 'reference' | 'port', at, name: label, scope: labelScope })
+    } else if ('anchorId' in at) setSelection({ kind: 'anchor', id: at.anchorId })
+  }
+  function canvasClick(event: React.MouseEvent<SVGSVGElement>) {
+    if (suppressClick.current) { suppressClick.current = false; return }
+    if (busy || gesture.current) return
+    const point = world(event)
+    if (tool === 'place') {
+      const next = edit({ type: 'add', kind, position: snap(point) })
+      const added = next?.sheets.find(s => s.id === sheetId)?.components.at(-1)
+      if (added) setSelection({ kind: 'component', id: added.id })
+    } else if (tool === 'wire' || ['ground', 'label', 'reference', 'port'].includes(tool)) activate(endpoint(point))
+    else if (tool === 'select') setSelection(null)
+  }
+  function pointerDown(event: ReactPointerEvent<SVGSVGElement>) {
+    if (tool !== 'pan' || busy) return
+    event.preventDefault(); const matrix = svg.current?.getScreenCTM()
+    gesture.current = { kind: 'pan', client: { x: event.clientX, y: event.clientY }, world: world(event), origin: { x: viewport.x, y: viewport.y }, scale: matrix?.a ?? 1 }
+    svg.current?.setPointerCapture(event.pointerId)
+  }
+  function beginComponent(event: ReactPointerEvent<SVGGElement>, id: string, origin: Position) {
+    if (tool !== 'select' || busy) return
+    event.stopPropagation(); event.preventDefault(); setSelection({ kind: 'component', id })
+    gesture.current = { kind: 'component', id, client: { x: event.clientX, y: event.clientY }, world: world(event), origin, scale: 1 }
+    svg.current?.setPointerCapture(event.pointerId)
+  }
+  function pointerMove(event: ReactPointerEvent<SVGSVGElement>) {
+    const g = gesture.current; if (!g) return
+    if (g.kind === 'pan') setViewport({ ...viewport, x: g.origin.x - (event.clientX - g.client.x) / g.scale, y: g.origin.y - (event.clientY - g.client.y) / g.scale })
+    else { const point = world(event); setDrag({ id: g.id!, origin: snap({ x: g.origin.x + point.x - g.world.x, y: g.origin.y + point.y - g.world.y }) }) }
+  }
+  function pointerUp(event: ReactPointerEvent<SVGSVGElement>) {
+    const g = gesture.current; gesture.current = null
+    if (g) suppressClick.current = true
+    if (g?.kind === 'component' && drag && Math.hypot(drag.origin.x - g.origin.x, drag.origin.y - g.origin.y) > 0) edit({ type: 'move', id: g.id!, position: drag.origin })
+    setDrag(undefined)
+    if (svg.current?.hasPointerCapture(event.pointerId)) svg.current.releasePointerCapture(event.pointerId)
+  }
+  function zoom(factor: number) { setViewport(v => { const next = Math.max(0.1, Math.min(8, v.zoom * factor)); return { x: v.x + 500 / v.zoom - 500 / next, y: v.y + 300 / v.zoom - 300 / next, zoom: next } }) }
+  function fit() {
+    const points = Object.values(view.positions)
+    if (!points.length) { setViewport(INITIAL_VIEW); return }
+    const xs = points.map(p => p.x), ys = points.map(p => p.y), minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys)
+    const z = Math.min(2, 1000 / (maxX - minX + 160), 600 / (maxY - minY + 160))
+    setViewport({ x: (minX + maxX) / 2 - 500 / z, y: (minY + maxY) / 2 - 300 / z, zoom: z })
+  }
+  async function save() {
+    if (busy) return; setBusy(true)
+    try {
+      const doc = await createProjectDocument(project, writer, assets), text = await serializeProject(doc)
+      const url = URL.createObjectURL(new Blob([text], { type: 'application/json;charset=utf-8' })), link = document.createElement('a')
+      link.href = url; link.download = `${project.title.replace(/[<>:"/\\|?*]/g, '-') || 'circuit'}.straylab.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
+      setSavedRevision(project.revision); announce('工程文件已导出，可使用“打开工程”重新载入。')
+    } catch (failure) { announce(failure instanceof ProjectValidationError ? errorMessage(failure) : '导出失败，当前工程保持不变。', true) } finally { setBusy(false) }
+  }
+  function reset(projectToOpen: EngineeringProject, inlineAssets: readonly InlineAsset[], saved: boolean) {
+    setHistory(createHistory(projectToOpen)); setAssets(inlineAssets); setActiveSheet(null); setSelection(null); chooseTool('select'); setViewport(INITIAL_VIEW); setSavedRevision(saved ? projectToOpen.revision : '')
+  }
+  const mayReplace = () => project.revision === savedRevision || window.confirm('当前工程有未导出的修改，继续将替换当前工程。是否继续？')
+  async function open(file: File) {
+    if (busy || !mayReplace()) return; setBusy(true)
+    try {
+      const result = await deserializeProject(new Uint8Array(await file.arrayBuffer()))
+      if (result.kind !== 'ready') { announce(result.kind === 'unrecognized' ? '此工程格式、版本或扩展尚不支持，当前工程保持不变。' : '文件数据或资产校验失败，当前工程保持不变。', true); return }
+      const p = result.document.project, hasSheet = p.sheets.length > 0
+      reset(hasSheet ? p : reviseProject(p, p.revision, { sheets: [emptySheet()] }), result.document.inlineAssets, hasSheet)
+      announce(hasSheet ? '工程已打开，连接、参数与身份已保留。' : '空工程已打开，并建立第一张空白图纸。')
+    } catch { announce('读取文件失败，当前工程保持不变。', true) } finally { setBusy(false) }
+  }
+  const sheet = view.sheet
+  const valueText = (id: string) => { const c = sheet.components.find(c => c.id === id); if (!c) return ''; return Object.values(c.parameters).filter(p => p.kind === 'quantity').map(p => p.kind === 'quantity' ? `${p.quantity.value} ${p.quantity.unit === 'ohm' ? 'Ω' : p.quantity.unit}` : '').join(' / ') }
+  return <section className="schematic-editor" aria-label="原理图编辑工作区" aria-busy={busy} onKeyDown={event => {
+    const target = event.target as HTMLElement
+    if (target.closest('input,select,textarea,[contenteditable=true]')) return
+    const modified = event.ctrlKey || event.metaKey, key = event.key.toLowerCase()
+    if (modified && key === 's') { event.preventDefault(); void save(); return }
+    if (modified && key === 'o') { event.preventDefault(); fileInput.current?.click(); return }
+    if (modified && key === 'z') { event.preventDefault(); if (event.shiftKey) redo(); else undo(); return }
+    if (modified && key === 'y') { event.preventDefault(); redo(); return }
+    if (event.key === 'Escape') { chooseTool('select'); return }
+    if ((event.key === 'Delete' || event.key === 'Backspace') && selection) { event.preventDefault(); edit({ type: 'delete', selection }); return }
+    if (key === 'r' && component) { event.preventDefault(); edit({ type: 'rotate', id: component.id }); return }
+    if (key === 'w') chooseTool('wire'); else if (key === 'j') chooseTool('junction'); else if (key === 'v') chooseTool('select')
+    if (event.key.startsWith('Arrow') && component) { event.preventDefault(); const at = sheet.geometry.placements.find(p => p.componentId === component.id)?.origin ?? { x: 200, y: 200 }; edit({ type: 'move', id: component.id, position: { x: at.x + (event.key === 'ArrowRight' ? 20 : event.key === 'ArrowLeft' ? -20 : 0), y: at.y + (event.key === 'ArrowDown' ? 20 : event.key === 'ArrowUp' ? -20 : 0) } }) }
+  }}>
+    <div className="editor-heading"><div><p className="eyebrow">工程 / 自由编辑</p><h1>原理图编辑器</h1><p className="muted">连接来自工程数据。当前支持结构编辑与文件保存，尚不运行仿真。</p></div>
+      <div className="editor-file-actions"><button disabled={busy} onClick={() => { if (mayReplace()) { reset(newEditorProject(), [], true); announce('已新建空白工程。') } }}>新建工程</button><button disabled={busy} onClick={() => fileInput.current?.click()}>打开工程</button><input hidden ref={fileInput} aria-label="打开工程文件" type="file" accept=".json,application/json" onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ''; if (file) void open(file) }} /><button disabled={busy} onClick={() => { void save() }}>导出工程</button></div>
+    </div>
+    <div className="editor-project-row"><form key={`title-${project.revision}`} onSubmit={event => { event.preventDefault(); const title = new FormData(event.currentTarget).get('title'); if (typeof title === 'string') edit({ type: 'title', title }) }}><label>工程名称<input name="title" aria-label="工程名称" defaultValue={project.title} /></label><button disabled={busy}>更新名称</button></form><span>{project.revision === savedRevision ? '已导出或未修改' : '有未导出的修改'}</span><label>当前图纸<select aria-label="当前图纸" value={sheetId} onChange={event => { setActiveSheet(event.target.value); setSelection(null); setWireStart(null) }}>{project.sheets.map(s => <option key={s.id} value={s.id}>{s.title || '未命名图纸'}</option>)}</select></label></div>
+    <div className="editor-toolbar" aria-label="编辑工具"><button disabled={!history.past.length || busy} onClick={undo}>撤销</button><button disabled={!history.future.length || busy} onClick={redo}>重做</button><span className="editor-divider" />{tools.map(([key, name]) => <button key={key} disabled={busy} aria-pressed={tool === key} onClick={() => chooseTool(key)}>{name}</button>)}<span className="editor-divider" /><button onClick={() => zoom(1.25)} aria-label="放大画布">＋</button><button onClick={() => zoom(0.8)} aria-label="缩小画布">−</button><button onClick={fit}>适合视图</button><button onClick={() => setViewport(INITIAL_VIEW)}>重置视图</button><span>{Math.round(viewport.zoom * 100)}%</span></div>
+    {(tool === 'label' || tool === 'port') && <div className="editor-marker-options"><label>标注名称<input aria-label="标注名称" value={label} onChange={e => setLabel(e.target.value)} /></label>{tool === 'label' && <label>标签作用域<select value={labelScope} onChange={e => setLabelScope(e.target.value as 'sheet' | 'project')}><option value="sheet">当前图纸</option><option value="project">整个工程</option></select></label>}</div>}
+    <p role={error ? 'alert' : 'status'} className={`editor-message ${error ? 'error' : ''}`}>{message}</p>
+    <div className="editor-layout"><aside className="editor-palette" aria-label="元件库"><h2>01 / 元件</h2>{(Object.keys(PALETTE) as PaletteKind[]).map(key => <button key={key} aria-pressed={tool === 'place' && kind === key} disabled={busy} onClick={() => { setKind(key); chooseTool('place'); announce(`点击画布放置${PALETTE[key].title}；Esc 返回选择。`) }}>{PALETTE[key].title} {PALETTE[key].prefix}</button>)}<p className="muted">先选元件，再点画布。拖动移动；R 旋转；Delete 删除。</p><p className="muted">GND 建立显式地网连接；求解参考只标记零电位，不连接网络。</p></aside>
+      <div className="editor-canvas-area"><p className="editor-summary" data-testid="editor-summary">{sheet.components.length} 个元件 · {sheet.connections.length} 条导线 · {nets.nets.filter(n => n.anchorIds.some(id => sheet.anchors.some(a => a.id === id))).length} 个电气网络</p>
+        <svg ref={svg} className={`editor-canvas tool-${tool}`} role="application" aria-label="原理图编辑画布" tabIndex={0} viewBox={`${viewport.x} ${viewport.y} ${1000 / viewport.zoom} ${600 / viewport.zoom}`} onClick={canvasClick} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={() => { gesture.current = null; setDrag(undefined) }}>
+          <defs><pattern id={gridId} width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="0" cy="0" r="1" className="editor-grid-dot" /></pattern></defs><rect x={viewport.x} y={viewport.y} width={1000 / viewport.zoom} height={600 / viewport.zoom} fill={`url(#${gridId})`} />
+          {view.wires.map(({ connection, route }) => { const path = route.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' '); return <g key={connection.id} className={`editor-wire ${selection?.kind === 'connection' && selection.id === connection.id ? 'selected' : ''} ${selectedNet && nets.anchorToNet[connection.endpoints[0]] === selectedNet ? 'net-highlight' : ''}`} data-connection-id={connection.id}><path d={path} className="wire-underlay" /><path d={path} className="wire-ink" /><path d={path} className="wire-hit" role="button" tabIndex={0} aria-label={`导线 ${sheet.connections.indexOf(connection) + 1}`} onClick={event => { event.stopPropagation(); if (tool === 'junction') edit({ type: 'junction', connectionId: connection.id, position: world(event) }); else setSelection({ kind: 'connection', id: connection.id }) }} onKeyDown={event => { if (event.key === 'Enter') { event.stopPropagation(); setSelection({ kind: 'connection', id: connection.id }) } }} /></g> })}
+          {view.components.map(({ component: c, definition, placement: p, symbol }) => <g key={c.id} className={`editor-component ${selection?.kind === 'component' && selection.id === c.id ? 'selected' : ''}`} role="button" tabIndex={0} aria-label={`${c.reference} 元件`} data-component-id={c.id} onPointerDown={event => beginComponent(event, c.id, p.origin)} onClick={event => { event.stopPropagation(); suppressClick.current = false; setSelection({ kind: 'component', id: c.id }) }} onKeyDown={event => { if (event.key === 'Enter') { event.stopPropagation(); setSelection({ kind: 'component', id: c.id }) } }}>
+            <g transform={`translate(${p.origin.x} ${p.origin.y}) rotate(${p.rotationDegrees}) scale(${p.mirrored ? -1 : 1} 1)`}><rect className="component-hit" x="-65" y="-36" width="130" height="72" />{!Object.keys(PALETTE).includes(definition.kind) && Object.entries(symbol.pinPositions).map(([key, at]) => <path key={key} d={`M${at.x} ${at.y}H${at.x < 0 ? -45 : 45}`} />)}<SymbolBody kind={definition.kind} /></g><text x={p.origin.x} y={p.origin.y - 45} textAnchor="middle">{c.reference}</text><text className="component-value" x={p.origin.x} y={p.origin.y + 50} textAnchor="middle">{valueText(c.id)}</text>
+          </g>)}
+          {sheet.anchors.map((a, i) => { const at = view.positions[a.id]; if (!at) return null; const owner = sheet.components.find(c => c.pins.some(p => p.anchorId === a.id)), pin = owner?.pins.find(p => p.anchorId === a.id), degree = sheet.connections.filter(c => c.endpoints.includes(a.id)).length; return <g key={a.id} className={`editor-anchor ${selection?.kind === 'anchor' && selection.id === a.id ? 'selected' : ''} ${selectedNet && nets.anchorToNet[a.id] === selectedNet ? 'net-highlight' : ''}`}><circle cx={at.x} cy={at.y} r={degree > 1 && !owner ? 5 : 4} data-anchor-id={a.id} className={degree > 1 && !owner ? 'junction-dot' : ''} role="button" tabIndex={0} aria-label={owner ? `${owner.reference}.${pin!.definitionPinKey} 引脚` : `连接点 ${i + 1}`} onClick={event => { event.stopPropagation(); activate({ anchorId: a.id }) }} onPointerDown={event => { if (tool !== 'pan') event.stopPropagation() }} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); activate({ anchorId: a.id }) } }} />{sheet.labels.filter(l => l.anchorId === a.id).map((l, j) => l.name === 'GND' ? <g key={l.id} className="editor-ground"><path d={`M${at.x} ${at.y}v16 m-12 0h24 m-20 5h16 m-12 5h8`} /><text x={at.x + 16} y={at.y + 28}>GND</text></g> : <text key={l.id} x={at.x + 8} y={at.y - 12 - j * 16}>{l.name}{l.scope === 'project' ? ' ↗' : ''}</text>)}{sheet.ports.filter(p => p.anchorId === a.id).map(p => <text key={p.id} x={at.x + 8} y={at.y + 20}>{p.label}</text>)}{sheet.references.filter(r => r.anchorId === a.id).map(r => <g key={r.id} className="editor-reference"><rect x={at.x - 9} y={at.y - 9} width="18" height="18" /><text x={at.x + 12} y={at.y - 24}>参考</text></g>)}</g> })}
+          {wireStart && <text className="editor-wire-hint" x={viewport.x + 20 / viewport.zoom} y={viewport.y + 30 / viewport.zoom}>接线中：点击第二个端点 · Esc 取消</text>}
+        </svg><p className="editor-legend">线间断＝无连接跨越 · 实心结点＝显式连接 · 位置重叠不等于导通</p>
+        {(view.unplaced.length > 0 || view.missingAnchors.length > 0) && <div className="editor-unplaced"><p>尚有 {view.unplaced.length} 个未放置元件、{view.missingAnchors.length} 个无坐标连接点；电气数据已完整保留。</p>{view.unplaced.map((c, i) => <button key={c.id} onClick={() => edit({ type: 'move', id: c.id, position: { x: 160 + i * 160, y: 200 } })}>放置 {c.reference}</button>)}</div>}
+      </div>
+      <aside className="editor-inspector" aria-label="属性与连接检查"><h2>02 / 属性与连接</h2>
+        {component ? <><ComponentProperties key={`${component.id}-${project.revision}`} component={component} definition={project.definitions.find(d => d.id === component.definitionId)!} onEdit={edit} /><div className="editor-inspector-actions"><button disabled={busy} onClick={() => edit({ type: 'rotate', id: component.id })}>旋转 90°</button><button disabled={busy} onClick={() => edit({ type: 'delete', selection: { kind: 'component', id: component.id } })}>删除元件</button></div><p>引脚连接</p>{component.pins.map(p => <button key={p.id} onClick={() => setSelection({ kind: 'anchor', id: p.anchorId })}>{component.reference}.{p.definitionPinKey} · N{nets.nets.findIndex(n => n.key === nets.anchorToNet[p.anchorId]) + 1}</button>)}</> : <>
+          {selection?.kind === 'connection' && <button onClick={() => edit({ type: 'delete', selection })}>删除导线</button>}
+          {anchorId ? <><h3>网络 N{nets.nets.findIndex(n => n.key === selectedNet) + 1}</h3><p>{net?.anchorIds.length ?? 0} 个连接点 · {net?.pinIds.length ?? 0} 个元件引脚</p><ul>{project.sheets.flatMap(s => s.components.flatMap(c => c.pins.filter(p => net?.pinIds.includes(p.id)).map(p => <li key={p.id}>{c.reference}.{p.definitionPinKey}</li>)))}</ul><details><summary>连接点身份</summary><p className="editor-id">{anchorId}</p></details>{[...sheet.labels, ...sheet.references, ...sheet.ports].filter(item => item.anchorId === anchorId).map(item => <div key={item.id} className="editor-marker-entry"><span>{'name' in item ? `标签 ${item.name}` : 'label' in item ? `端口 ${item.label}` : '求解参考（不连接）'}</span><button onClick={() => edit({ type: 'remove-marker', id: item.id })}>移除标记</button></div>)}{!sheet.components.some(c => c.pins.some(p => p.anchorId === anchorId)) && <button onClick={() => edit({ type: 'delete', selection: { kind: 'anchor', id: anchorId } })}>删除连接点及相连导线</button>}</> : <p className="muted">选择元件以编辑属性；点击引脚或导线可高亮真实电气网络。</p>}
+        </>}
+        <details className="editor-shortcuts"><summary>操作提示与快捷键</summary><p>V 选择，W 接线，J 结点，R 旋转，方向键微移，Delete 删除。Ctrl / ⌘ Z 撤销，Shift Z 或 Y 重做，S 导出，O 打开。</p><p>结点工具会显式连接点击处经过的导线。平移、缩放、选中和拖动预览不改变工程修订。</p></details>
+      </aside>
+    </div>
+  </section>
+}
