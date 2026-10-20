@@ -50,7 +50,8 @@ verified; the public application was not changed or reverified live this round.
   metadata/assets are retained, but this editor cannot edit every engineering
   record. Narrow drawings use zoom/pan for detail; physical mobile/cross-browser
   certification is outside this check. Unchanged dev-mode pre-theme request 404
-  is recorded; built preview resources pass.
+  and a CLI download-cache/dev-watcher EBUSY are recorded; built preview resources
+  pass. Task-started browser/dev/preview processes were closed after verification.
 - Next recommended module: separately authorize **V2.0-D** transactional V1
   projection/writeback under unchanged D05. No material design blocker identified.
   C is complete; no next phase is active. Public V2 requires usable verified B+C+D

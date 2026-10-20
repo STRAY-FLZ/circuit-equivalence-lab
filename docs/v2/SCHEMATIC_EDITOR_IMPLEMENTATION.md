@@ -173,6 +173,11 @@ No browser-testing dependency or application dependency was installed.
 - The unchanged development HTML pre-theme script produced a duplicate-base
   request/404 in Vite dev; the built production preview served the script and
   all resources correctly. This module's browser acceptance uses that preview.
+- Cleanup exposed a dev watcher `EBUSY` on the CLI's default
+  `.playwright-cli/` download cache while dev and browser verification ran
+  concurrently. Keep browser verification on the built preview or run it with
+  dev stopped; this is a local tool-cache constraint. The acceptance browser and
+  both task-started Vite services were closed after verification.
 
 Git baseline: accepted A/B/context work was separately checkpointed as local
 `b7b53bc`; verified C implementation is `290de9b` on `codex/v2-schematic-editor`.

@@ -39,6 +39,10 @@
   Narrow overview needs zoom for detail; no physical phone/cross-browser claim.
   An unchanged dev-mode pre-theme duplicate-base request produces 404; all built
   preview resources passed. No material C acceptance blocker remains.
+- Service cleanup also exposed a dev watcher `EBUSY` on the Playwright CLI's
+  default download cache. Verification on the built preview passed; run that
+  workflow with dev stopped to avoid the local cache watcher conflict. Closed
+  the task's Chrome session and dev/preview services after verification.
 - [Editor implementation/API/acceptance](v2/SCHEMATIC_EDITOR_IMPLEMENTATION.md),
   CURRENT_STATUS and DEVELOPMENT_PROGRESS updated. Stop at C; next recommendation
   is separately authorized V2.0-D under existing transactional writeback/D05 rules.
