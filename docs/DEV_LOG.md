@@ -1,5 +1,69 @@
 # 开发记录
 
+## 2026-10-20 · V2.0-B Engineering Project Model
+
+- Completed B01–B09, **9/9 Verified**, internally implemented and checked, not
+  Released. Created the local `codex/v2-project-model` branch at `8fd6e9b`, preserving
+  all prior uncommitted context/design work and development-log edits. No commit,
+  remote push, deployment, version bump, dependency install, or personal-site change.
+- Added engineering types, UUID allocation, immutable creation/revision, complete
+  domain shape/reference validation, multi-pin and pinned resistor definitions,
+  graph-only net derivation with exact label scopes and separate solver markers.
+  Optional analysis/measurement/asset/PCB mapping records remain independent of UI.
+- Added schema-v1 UTF-8 JSON parsing/export, small inline assets with SHA-256,
+  byte/sample/time-axis integrity, unknown-version/required-extension handling,
+  canonical identity collections and preserved ordered/opaque data. No invented
+  old migrations, external container, or persistence backend.
+- Added read-only V1 import/projection with dedicated pin anchors, legacy namespace
+  provenance/ID maps, current-graph projection, scoped labels/observed boundaries,
+  and explicit unsupported-model/scope/observation results. No writeback, numerical
+  algorithm rewrite, new proof gate, or schematic editor.
+- Added minimal async engine-facing types and four-module dependency rules in
+  ESLint, preserving V1 restrictions. Source is limited to new engineering,
+  project-format, compatibility and analysis modules plus focused fixtures/tests.
+  Existing V1 code, UI, package/lockfile, and deployment workflow are unchanged.
+- Checks: typecheck/lint passed; full regression **373 tests in 23 files passed**,
+  including all existing 315 V1 tests; production build passed (47 modules).
+  Two final validation cases brought the new test inventory to 60: the final
+  four-file focused run passed **60/60**, followed by passing typecheck/lint.
+  The original full-suite result is not relabelled as a single 375-test run.
+- Initial Vitest sandbox cache rename failed with EPERM before tests; authorized
+  outside-sandbox execution passed. Corrected test-only typing/lint/order assertions
+  and completed media/time-range/provenance validation before final focused checks.
+- Added [implementation/API/acceptance notes](v2/ENGINEERING_MODEL_IMPLEMENTATION.md)
+  and updated progress/handoff. Next: separately authorize V2.0-C. Existing public
+  release evidence remains M8 `a7096c7` from 2026-10-11, package `0.1.0`; no live
+  verification or release is claimed by this internal foundation.
+
+## 2026-10-20 · V2.0-A System Architecture and Interface Design
+
+- Completed the officially authorized documentation-only module: A01–A10,
+  10/10 deliverables, internally Verified. No V2 production implementation.
+- Added ten design documents under [v2/](v2/ARCHITECTURE.md): system/reuse inventory,
+  project and multi-pin/connection contracts, independent engine capabilities,
+  V1 import/projection/writeback, versioned project files/migrations, waveform and
+  measurement provenance, PCB/EDA identity boundaries, phased implementation gates,
+  material decision register, and [acceptance record](v2/ACCEPTANCE.md).
+- Added [DEVELOPMENT_PROGRESS.md](DEVELOPMENT_PROGRESS.md), updated
+  [CURRENT_STATUS.md](CURRENT_STATUS.md), and extended root AGENTS.md with visible
+  milestone reporting and persistent per-module progress rules. Updated stable
+  context/navigation without changing historical M0–M8 records or planned scope.
+- Lightweight checks passed: local Markdown file/fragment links and fences,
+  whitespace (including untracked documents), documentation-only changed paths,
+  six TypeScript specification modules checked together in memory under repository
+  ES2023/strict settings with V1 public type imports, and a parsed/type-checked
+  complete JSON format fixture. No source files emitted by these checks.
+- Material recommendations D01–D09 remain pending owner review at their relevant
+  implementation/release gates. Verified design output does not mean owner approval
+  or implemented behavior. Next recommended module is V2.0-B only after authorization.
+- Git baseline remained local `main` at `8fd6e9b`; existing persistent-context
+  documents were already uncommitted at kickoff. Changes remain local for review;
+  no new commit, tag, push, version bump, installation, or deployment. No source,
+  tests, dependencies, UI, deployment configuration, or personal website changed.
+- Did not rerun historical V1 tests/build/browser acceptance. Latest confirmed
+  public release remains the repository-recorded M8 `a7096c7`, verified 2026-10-11,
+  actual package `0.1.0`; no live verification was performed in this design task.
+
 ## 2026-10-11 · M8 Production Deployment and Website Integration
 
 ### Authorized release and preparation
