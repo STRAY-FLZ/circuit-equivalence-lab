@@ -1,7 +1,7 @@
 # Current Development Status
 
-Last development handoff: **2026-10-20**. V2.0-B is an internally verified
-foundation; historical public release evidence was not reverified live this round.
+Last development handoff: **2026-10-21**. V2.0-C is internally implemented and
+verified; the public application was not changed or reverified live this round.
 
 ## Published baseline
 
@@ -27,27 +27,35 @@ foundation; historical public release evidence was not reverified live this roun
 
 ## Latest completed module and next task
 
-- Latest implementation: **V2.0-B — Engineering Project Model: Verified,
-  9/9 deliverables (100%)**, Implementation Complete, **not Released**.
-- Implemented independent engineering DTOs, pinned multi-pin definitions/instances,
-  explicit graph/labels/ground/reference semantics, immutable validated revisions,
-  derived net snapshots, version-1 portable JSON/small assets, read-only V1
-  import/projection, and minimal async engine-facing types.
-- Public APIs and actual limitations: [implementation/acceptance](v2/ENGINEERING_MODEL_IMPLEMENTATION.md).
-  History: V2.0-A **10/10 Verified**, owner review **4/4 Verified**; approved contracts
-  remain in [design index](v2/ARCHITECTURE.md) and [decision register](v2/DECISIONS.md).
-- Verification: typecheck/lint passed; standard full test run **373/373** (including
-  all 315 unchanged V1 cases), production build passed with 47 modules. Following
-  two final boundary cases, **60/60 new V2 focused tests** passed and typecheck/lint
-  passed again. Current inventory is 315 existing + 60 new, not a claimed single
-  375-case full run. See [DEVELOPMENT_PROGRESS.md](DEVELOPMENT_PROGRESS.md).
-- Branch: `codex/v2-project-model`, HEAD/baseline `8fd6e9b`. Pre-existing uncommitted
-  design/context and DEV_LOG changes are preserved; no new commit/tag/push/deploy.
-- Active implementation module: **none**. No material blocker. Next recommended
-  task: separately authorized **V2.0-C — General Schematic Editor**.
-- Deferred: editor/navigation/history UI, new numerical/signal/digital engines,
-  hardware/cloud/EDA/PCB behavior, external dataset packaging, and V1 transformation
-  writeback (V2.0-D). No production UI, dependency, package version, or live app change.
+- Latest implementation: **V2.0-C — Interactive Schematic Editor: Verified,
+  C01–C10, 10/10 (100%)**, Implementation Complete, **not Released**.
+- Implemented actual B-model SVG editing: R/C/L/V/I palette, ground, placement,
+  move/rotate/delete, properties, explicit wires/junctions, scoped labels/ports,
+  separate solver references, derived net inspection, immutable undo/redo,
+  keyboard controls, zoom/pan and real UTF-8 JSON download/open.
+- Actual APIs, supported/deferred behavior and evidence:
+  [editor implementation/acceptance](v2/SCHEMATIC_EDITOR_IMPLEMENTATION.md).
+  B contracts and files remain compatible; V1 algorithms and educational
+  workflows are preserved. History: A **10/10**, owner review **4/4**, B **9/9 Verified**.
+- Final verification: typecheck/lint/build passed; **404 tests in 25 files passed**
+  (315 V1 + 60 B + 29 C). Local installed Chrome 155.0.8059.40 passed seven
+  workflow groups on the production preview, including actual save/reopen,
+  junctions, drag history, themes, all five V1 lesson stages and 390px layouts.
+  Browser errors/HTTP failures: zero. Screenshots visually inspected.
+- Branch: `codex/v2-schematic-editor`. Accepted A/B/context work was checkpointed
+  locally as `b7b53bc` before C; C implementation and handoff commits are recorded
+  in the C progress entry. No remote push, deployment, tag or version bump.
+- Limits: basic single selection, automatic orthogonal routes; edit wires by
+  deleting/reconnecting; no bend handles, autosave or persisted history. Imported
+  metadata/assets are retained, but this editor cannot edit every engineering
+  record. Narrow drawings use zoom/pan for detail; physical mobile/cross-browser
+  certification is outside this check. Unchanged dev-mode pre-theme request 404
+  is recorded; built preview resources pass.
+- Next recommended module: separately authorize **V2.0-D** transactional V1
+  projection/writeback under unchanged D05. No material design blocker identified.
+  C is complete; no next phase is active. Public V2 requires usable verified B+C+D
+  and release/compatibility/rollback procedures. New engines, cloud/EDA/PCB and
+  external data packaging remain deferred.
 
 ## Architecture review outcomes and deferred questions
 
@@ -62,8 +70,8 @@ foundation; historical public release evidence was not reverified live this roun
   compatibility/rollback procedures established before release; no historical tags invented.
 - **Material unresolved architecture questions blocking B: none at this scope.**
   Specific external-data containers, autosave backend, EDA formats, simulation and
-  hardware backends remain deferred until needed. B is now complete; separate
-  authorization for C/D or public release has not been granted.
+  hardware backends remain deferred until needed. B/C are complete; separate
+  authorization for D or public release has not been granted.
 
 Exact owner outcomes and remaining release conditions are recorded as D01–D09 in
 [v2/DECISIONS.md](v2/DECISIONS.md). No further original V2.0-A deliverable work remains. See

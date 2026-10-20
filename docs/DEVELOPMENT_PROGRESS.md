@@ -1,6 +1,6 @@
 # Development Progress
 
-Updated: **2026-10-20**. Progress is measured per scoped module; no overall
+Updated: **2026-10-21**. Progress is measured per scoped module; no overall
 completion percentage is assigned to the evolving multi-year product.
 
 ## Status vocabulary
@@ -24,7 +24,7 @@ production code. Verified does not imply owner approval of proposed decisions.
 | V1, M0–M8 | Released | Last repository-recorded live verification 2026-10-11, `a7096c7`; actual package `0.1.0` |
 | V2.0-A architecture/interfaces | Verified | Internal design complete; no public release required or authorized |
 | V2.0-B engineering model/files | Verified | Internal foundation complete; not Released |
-| V2.0-C schematic editor | Planned | Part of usable V2.0 workflow |
+| V2.0-C schematic editor | Verified | Internal editor complete; not Released |
 | V2.0-D V1 integration | Planned | Integrated V2.0 release only after authorized acceptance |
 | V2.1 signal measurement | Planned | Future usable feature release |
 | V2.2 DC analysis | Planned | Future usable feature release |
@@ -154,3 +154,41 @@ After two final media/time-range/provenance cases, all 60 new tests passed toget
 in four focused files, and typecheck/lint passed again. No repeated historical suite
 or browser/live deployment check. Package `0.1.0`, branch `codex/v2-project-model`,
 HEAD `8fd6e9b`; no commit/push/deployment. All pre-existing uncommitted docs preserved.
+
+## Completed module: V2.0-C — Interactive Schematic Editor
+
+Status: **Verified**, **10/10 deliverables (100%)**. Accepted A/B work checkpointed
+locally as `b7b53bc` on `codex/v2-project-model`; development branch is
+`codex/v2-schematic-editor`. No unrelated files were staged or discarded.
+
+| ID | Deliverable | Status | Evidence |
+| --- | --- | --- | --- |
+| C01 | Editor architecture and state separation | Verified | Pure editing API and derived presentation tests |
+| C02 | SVG workspace, viewport and selection | Verified | Chrome desktop/narrow zoom, pan, screenshots |
+| C03 | Palette, placement, move/rotate/delete | Verified | Placement, geometry and deletion tests |
+| C04 | Explicit wiring, junctions and net inspection | Verified | Crossing/junction/reference/ground tests |
+| C05 | Properties and grounded feedback | Verified | Stable identity and invalid-input tests |
+| C06 | Immutable history and keyboard operations | Verified | Fresh revisions, undo/redo and shortcut tests |
+| C07 | Actual file save/open | Verified | UI export/import and B format round trips |
+| C08 | Application entry and preserved V1 workflows | Verified | Chrome themes, previews and all five lesson stages |
+| C09 | Focused/full tests and real Chrome checks | Verified | 29 focused C cases; 404 full tests; seven Chrome workflow groups |
+| C10 | Implementation notes and handoff | Verified | [Editor implementation/acceptance](v2/SCHEMATIC_EDITOR_IMPLEMENTATION.md), CURRENT_STATUS and DEV_LOG |
+
+Checkpoint (2026-10-21): initial typecheck/lint/full test/build passed, 403 tests.
+After one final UI inline-asset/metadata case and screen-scale/readability changes,
+the final typecheck/lint/build and **404-test / 25-file full run passed**
+(315 V1 + 60 B + 29 C). Build transforms 64 modules. Chrome **155.0.8059.40**
+passed seven workflow groups using the local production preview at the existing
+`/circuit-equivalence-lab/` base; zero page/console errors or HTTP failures.
+Desktop 1440×1100 and narrow 390×844 light/dark screenshots visually inspected.
+Actual download/reopen preserves graph/IDs/parameters/geometry/markers; re-export
+is byte-identical. Evidence and limits are in the linked acceptance document.
+
+Status: Implementation Complete / Verified, **not Released**. Package remains
+`0.1.0`. No material blocker to a separately authorized D module. Next recommended
+module: V2.0-D under the existing D05 contract; **do not start automatically**.
+No V2.0-D writeback, new engine, dependency, personal-site change, push or deployment.
+
+Verified C implementation is local commit **`290de9b`**; the final handoff documents
+are committed separately after lightweight documentation checks. A/B checkpoint
+`b7b53bc` remains intact; see local branch history for the handoff commit.

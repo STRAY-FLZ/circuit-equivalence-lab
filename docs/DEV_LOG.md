@@ -1,5 +1,49 @@
 # 开发记录
 
+## 2026-10-21 · V2.0-C Interactive Schematic Editor
+
+- Completed C01–C10, **10/10 Verified / Implementation Complete, not Released**.
+  Preserved accepted A/B/context work in local checkpoint `b7b53bc`, then worked
+  on `codex/v2-schematic-editor`. Verified implementation commit: **`290de9b`**.
+  Local commits reuse the prior commit's identity per command; no global identity
+  setting, history rewrite, remote push, deployment, tag or version bump.
+- Added React-free edit operations/history over the actual immutable B aggregate,
+  a derived editable SVG view, and independent selection/tool/viewport/drag state.
+  Added R/C/L/V/I placement, move/rotate/delete, definition-driven properties,
+  explicit wires/anchors/junctions, scoped labels/ground/reference/ports, graph
+  inspection, keyboard controls, and real B-format file download/open.
+- Preserved pin/anchor identity, graph/geometry separation, all supported opaque
+  engineering metadata and inline assets. Invalid edits/imports preserve current
+  data. Undo/redo restore complete content with fresh revisions; each drag is one
+  transaction, while viewport and selection do not create revisions.
+- Added a workspace entry with existing tokens, shared theme/header/home link
+  and a narrow layout. V1 remains the default; cached original/transformed
+  previews and all five lesson stages remain usable across workspace switches.
+  B contracts/adapters, V1 numerical algorithms, package/lockfile and deployment
+  workflow are unchanged. D05 is unchanged; no writeback or additional proof gate.
+- Final checks passed: `typecheck`, `lint`, full **404 tests / 25 files**
+  (315 V1 + 60 B + 29 C), production `build` (64 modules). The earlier 403-case
+  run preceded a final UI asset/metadata test and screen-scale/readability work;
+  404 is the actual final full-suite result.
+- Existing Playwright CLI drove local installed Chrome **155.0.8059.40** against
+  the built preview. Seven workflow groups passed: connected resistor circuit/net
+  inspection, properties/drag/history/rotation, actual download/reopen, both
+  themes, V1 previews/all five lesson stages, 390px layout/zoom/pan, explicit
+  crossing/junction behavior and all palette kinds. Zero page/console errors or
+  HTTP failures. Final downloaded/reopened files have identical SHA-256 hashes.
+  Desktop/narrow screenshots visually inspected; ignored local evidence remains
+  in `output/playwright/`. No browser framework or dependency was added.
+- Actual limits: single selection, simple auto-routes and delete/reconnect wire
+  editing; no sheet-management UI, bend handles, autosave or persisted history.
+  Generic imported symbols/absent optional parameters have limited editing UI.
+  Narrow overview needs zoom for detail; no physical phone/cross-browser claim.
+  An unchanged dev-mode pre-theme duplicate-base request produces 404; all built
+  preview resources passed. No material C acceptance blocker remains.
+- [Editor implementation/API/acceptance](v2/SCHEMATIC_EDITOR_IMPLEMENTATION.md),
+  CURRENT_STATUS and DEVELOPMENT_PROGRESS updated. Stop at C; next recommendation
+  is separately authorized V2.0-D under existing transactional writeback/D05 rules.
+  Public release still requires usable verified B+C+D and release procedures.
+
 ## 2026-10-20 · V2.0-B Engineering Project Model
 
 - Completed B01–B09, **9/9 Verified**, internally implemented and checked, not
