@@ -47,6 +47,13 @@
 .editor-wire .wire-hit { stroke:transparent; stroke-width:14; cursor:pointer; }
 .editor-wire.selected .wire-ink, .editor-wire:has(.wire-hit:focus) .wire-ink { stroke:var(--selected); stroke-dasharray:5 3; stroke-width:3; }
 .editor-anchor > circle { fill:var(--surface); stroke:currentColor; stroke-width:2; cursor:pointer; }
+.editor-canvas.tool-select .editor-anchor > circle, .editor-canvas.tool-wire .editor-anchor > circle { cursor:crosshair; }
+.editor-anchor > circle:hover { stroke:var(--blue); stroke-width:4; }
+.editor-anchor.wire-source > circle { stroke:var(--blue); stroke-width:4; }
+.editor-anchor.wire-target > circle { stroke:var(--replacement); stroke-width:6; paint-order:stroke; }
+.editor-anchor > .wire-target-ring { fill:none; stroke:var(--replacement); stroke-width:2; pointer-events:none; }
+.editor-wire-preview { fill:none; stroke:var(--blue); stroke-width:2; stroke-dasharray:6 4; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; pointer-events:none; }
+.editor-wire-preview.snapped { stroke:var(--replacement); }
 .editor-anchor > .junction-dot { fill:currentColor; }
 .editor-anchor.selected > circle, .editor-anchor > circle:focus { stroke:var(--selected); stroke-width:4; }
 .editor-wire.net-highlight .wire-ink, .editor-anchor.net-highlight > circle { stroke:var(--blue); stroke-width:4; }

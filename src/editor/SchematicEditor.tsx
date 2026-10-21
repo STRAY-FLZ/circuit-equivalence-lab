@@ -1,8 +1,8 @@
-import { useId, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { ProjectValidationError, reviseProject } from '../engineering'
 import type { EngineeringProject, Position } from '../engineering'
-import { commitEdit, commitSnapshot, createHistory, emptySheet, newEditorProject, PALETTE, redoEdit, snap, undoEdit } from '../editing'
+import { commitEdit, commitSnapshot, createHistory, emptySheet, newEditorProject, PALETTE, redoEdit, snap, undoEdit, wireRoute } from '../editing'
 import type { EditOperation, Endpoint, PaletteKind, Selection } from '../editing'
 import { createProjectDocument, deserializeProject, serializeProject } from '../project-format'
 import type { InlineAsset } from '../project-format'
@@ -17,6 +17,12 @@ import './editor.css'
 
 type Tool = 'select' | 'pan' | 'place' | 'wire' | 'junction' | 'ground' | 'label' | 'reference' | 'port'
 interface Viewport { readonly x: number; readonly y: number; readonly zoom: number }
+type Gesture = { pointerId: number; client: Position } & (
+  | { kind: 'wire'; anchorId: string; source: Position; moved: boolean }
+  | { kind: 'component'; id: string; world: Position; origin: Position }
+  | { kind: 'pan'; origin: Position; scale: number }
+)
+interface WirePreview { sourceId: string; source: Position; end: Position; targetId: string | undefined }
 const INITIAL_VIEW: Viewport = { x: 0, y: 0, zoom: 1 }
 function fittedViewport(positions: Readonly<Record<string, Position>>): Viewport {
   const points = Object.values(positions)
@@ -46,12 +52,23 @@ export function SchematicEditor() {
   const [selection, setSelection] = useState<Selection>(null), [tool, setTool] = useState<Tool>('select'), [kind, setKind] = useState<PaletteKind>('resistor')
   const [wireStart, setWireStart] = useState<Endpoint | null>(null), [label, setLabel] = useState('NET'), [labelScope, setLabelScope] = useState<'sheet' | 'project'>('sheet')
   const [viewport, setViewport] = useState(INITIAL_VIEW), [drag, setDrag] = useState<{ id: string; origin: Position } | undefined>()
-  const gesture = useRef<{ kind: 'component' | 'pan'; client: Position; world: Position; origin: Position; id?: string; scale: number } | null>(null)
+  const gesture = useRef<Gesture | null>(null)
+  const [wirePreview, setWirePreview] = useState<WirePreview | null>(null)
   const suppressClick = useRef(false)
   const [message, setMessage] = useState('从左侧选择元件，再点击画布放置。'), [error, setError] = useState(false), [busy, setBusy] = useState(false)
   const [assets, setAssets] = useState<readonly InlineAsset[]>([]), [savedRevision, setSavedRevision] = useState(project.revision)
   const svg = useRef<SVGSVGElement>(null), fileInput = useRef<HTMLInputElement>(null)
   const gridId = `editor-grid-${useId().replaceAll(':', '')}`
+  const cancelGesture = useCallback(() => {
+    const g = gesture.current; gesture.current = null
+    if (g) suppressClick.current = true
+    setDrag(undefined); setWirePreview(null)
+    if (g && svg.current?.hasPointerCapture(g.pointerId)) svg.current.releasePointerCapture(g.pointerId)
+  }, [])
+  useEffect(() => {
+    window.addEventListener('blur', cancelGesture)
+    return () => window.removeEventListener('blur', cancelGesture)
+  }, [cancelGesture])
   const view = useMemo(() => buildEditorView(project, sheetId, drag), [project, sheetId, drag]), nets = useMemo(() => netInspection(project), [project])
   const component = selection?.kind === 'component' ? view.sheet.components.find(c => c.id === selection.id) : undefined
   const anchorId = selection?.kind === 'anchor' ? selection.id : selection?.kind === 'connection' ? view.sheet.connections.find(c => c.id === selection.id)?.endpoints[0] : undefined
@@ -63,7 +80,7 @@ export function SchematicEditor() {
     try { const next = commitEdit(history, sheetId, operation); setHistory(next); announce('编辑已保存到当前工程。'); if (operation.type === 'delete') setSelection(null); return next.present }
     catch (failure) { announce(errorMessage(failure), true); return undefined }
   }
-  function chooseTool(next: Tool) { setTool(next); setWireStart(null); setDrag(undefined); gesture.current = null }
+  function chooseTool(next: Tool) { cancelGesture(); setTool(next); setWireStart(null) }
   function commitTransformation(preview: TransformationPreview): boolean {
     if (busy) return false
     try {
@@ -74,8 +91,8 @@ export function SchematicEditor() {
       return true
     } catch (failure) { announce(errorMessage(failure), true); return false }
   }
-  function undo() { if (busy) return; setHistory(undoEdit(history)); setSelection(null); setWireStart(null); announce('已撤销；恢复内容并生成新的工程修订。') }
-  function redo() { if (busy) return; setHistory(redoEdit(history)); setSelection(null); setWireStart(null); announce('已重做。') }
+  function undo() { if (busy) return; cancelGesture(); setHistory(undoEdit(history)); setSelection(null); setWireStart(null); announce('已撤销；恢复内容并生成新的工程修订。') }
+  function redo() { if (busy) return; cancelGesture(); setHistory(redoEdit(history)); setSelection(null); setWireStart(null); announce('已重做。') }
   function world(event: { readonly clientX: number; readonly clientY: number }): Position {
     const matrix = svg.current?.getScreenCTM()
     if (!matrix) return { x: 0, y: 0 }
@@ -104,27 +121,59 @@ export function SchematicEditor() {
     else if (tool === 'select') setSelection(null)
   }
   function pointerDown(event: ReactPointerEvent<SVGSVGElement>) {
-    if (tool !== 'pan' || busy) return
+    if (event.button !== 0 || gesture.current || tool !== 'pan' || busy) return
     event.preventDefault(); const matrix = svg.current?.getScreenCTM()
-    gesture.current = { kind: 'pan', client: { x: event.clientX, y: event.clientY }, world: world(event), origin: { x: viewport.x, y: viewport.y }, scale: matrix?.a ?? 1 }
+    gesture.current = { kind: 'pan', pointerId: event.pointerId, client: { x: event.clientX, y: event.clientY }, origin: { x: viewport.x, y: viewport.y }, scale: Math.hypot(matrix?.a ?? 1, matrix?.b ?? 0) }
     svg.current?.setPointerCapture(event.pointerId)
   }
+  function beginWire(event: ReactPointerEvent<SVGCircleElement>, id: string, source: Position) {
+    if (tool === 'pan') return
+    event.stopPropagation()
+    if (event.button !== 0 || gesture.current || busy || (tool !== 'select' && tool !== 'wire')) return
+    event.preventDefault(); svg.current?.focus()
+    gesture.current = { kind: 'wire', pointerId: event.pointerId, anchorId: id, source, moved: false, client: { x: event.clientX, y: event.clientY } }
+    setSelection({ kind: 'anchor', id }); setWirePreview({ sourceId: id, source, end: source, targetId: undefined })
+    svg.current?.setPointerCapture(event.pointerId)
+  }
+  function previewAt(g: Extract<Gesture, { kind: 'wire' }>, event: { clientX: number; clientY: number }): WirePreview {
+    const point = world(event), matrix = svg.current?.getScreenCTM()
+    const scale = Math.hypot(matrix?.a ?? viewport.zoom, matrix?.b ?? 0)
+    const nearby = nearestAnchor(view.positions, point, 14 / scale)
+    const targetId = nearby && nearby !== g.anchorId && !view.sheet.connections.some(c => c.endpoints.includes(g.anchorId) && c.endpoints.includes(nearby)) ? nearby : undefined
+    return { sourceId: g.anchorId, source: g.source, end: targetId ? view.positions[targetId]! : point, targetId }
+  }
   function beginComponent(event: ReactPointerEvent<SVGGElement>, id: string, origin: Position) {
-    if (tool !== 'select' || busy) return
+    if (event.button !== 0 || gesture.current || tool !== 'select' || busy) return
     event.stopPropagation(); event.preventDefault(); setSelection({ kind: 'component', id })
-    gesture.current = { kind: 'component', id, client: { x: event.clientX, y: event.clientY }, world: world(event), origin, scale: 1 }
+    gesture.current = { kind: 'component', pointerId: event.pointerId, id, client: { x: event.clientX, y: event.clientY }, world: world(event), origin }
     svg.current?.setPointerCapture(event.pointerId)
   }
   function pointerMove(event: ReactPointerEvent<SVGSVGElement>) {
-    const g = gesture.current; if (!g) return
+    const g = gesture.current; if (!g || g.pointerId !== event.pointerId) return
     if (g.kind === 'pan') setViewport({ ...viewport, x: g.origin.x - (event.clientX - g.client.x) / g.scale, y: g.origin.y - (event.clientY - g.client.y) / g.scale })
-    else { const point = world(event); setDrag({ id: g.id!, origin: snap({ x: g.origin.x + point.x - g.world.x, y: g.origin.y + point.y - g.world.y }) }) }
+    else if (g.kind === 'wire') {
+      g.moved ||= Math.hypot(event.clientX - g.client.x, event.clientY - g.client.y) >= 3
+      if (g.moved) setWireStart(null)
+      setWirePreview(previewAt(g, event))
+    } else { const point = world(event); setDrag({ id: g.id, origin: snap({ x: g.origin.x + point.x - g.world.x, y: g.origin.y + point.y - g.world.y }) }) }
   }
   function pointerUp(event: ReactPointerEvent<SVGSVGElement>) {
-    const g = gesture.current; gesture.current = null
+    const g = gesture.current; if (!g || g.pointerId !== event.pointerId) return
+    gesture.current = null
     if (g) suppressClick.current = true
-    if (g?.kind === 'component' && drag && Math.hypot(drag.origin.x - g.origin.x, drag.origin.y - g.origin.y) > 0) edit({ type: 'move', id: g.id!, position: drag.origin })
-    setDrag(undefined)
+    if (g.kind === 'wire') {
+      const preview = previewAt(g, event)
+      const moved = g.moved || Math.hypot(event.clientX - g.client.x, event.clientY - g.client.y) >= 3
+      if (!moved) activate({ anchorId: g.anchorId })
+      else {
+        setWireStart(null)
+        if (preview.targetId) {
+          if (edit({ type: 'connect', from: { anchorId: g.anchorId }, to: { anchorId: preview.targetId } })) announce('导线已创建。交叉位置不会自动导通。')
+        } else announce('接线已取消：请拖到其他未直连的引脚或连接点。')
+      }
+    }
+    if (g.kind === 'component' && drag && Math.hypot(drag.origin.x - g.origin.x, drag.origin.y - g.origin.y) > 0) edit({ type: 'move', id: g.id, position: drag.origin })
+    setDrag(undefined); setWirePreview(null)
     if (svg.current?.hasPointerCapture(event.pointerId)) svg.current.releasePointerCapture(event.pointerId)
   }
   function zoom(factor: number) { setViewport(v => { const next = Math.max(0.1, Math.min(8, v.zoom * factor)); return { x: v.x + 500 / v.zoom - 500 / next, y: v.y + 300 / v.zoom - 300 / next, zoom: next } }) }
@@ -173,21 +222,22 @@ export function SchematicEditor() {
     <div className="editor-heading"><div><p className="eyebrow">工程 / 自由编辑</p><h1>原理图编辑器</h1><p className="muted">编辑真实连接，预览电阻等效变换，验证后应用或分步学习。</p></div>
       <div className="editor-file-actions"><button disabled={busy} onClick={() => { if (mayReplace()) { reset(newEditorProject(), [], true); announce('已新建空白工程。') } }}>新建工程</button><button disabled={busy} onClick={() => fileInput.current?.click()}>打开工程</button><input hidden ref={fileInput} aria-label="打开工程文件" type="file" accept=".json,application/json" onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ''; if (file) void open(file) }} /><button disabled={busy} onClick={() => { void save() }}>导出工程</button></div>
     </div>
-    <div className="editor-project-row"><form key={`title-${project.revision}`} onSubmit={event => { event.preventDefault(); const title = new FormData(event.currentTarget).get('title'); if (typeof title === 'string') edit({ type: 'title', title }) }}><label>工程名称<input name="title" aria-label="工程名称" defaultValue={project.title} /></label><button disabled={busy}>更新名称</button></form><span>{project.revision === savedRevision ? '已导出或未修改' : '有未导出的修改'}</span><label>当前图纸<select aria-label="当前图纸" value={sheetId} onChange={event => { setActiveSheet(event.target.value); setSelection(null); setWireStart(null) }}>{project.sheets.map(s => <option key={s.id} value={s.id}>{s.title || '未命名图纸'}</option>)}</select></label></div>
+    <div className="editor-project-row"><form key={`title-${project.revision}`} onSubmit={event => { event.preventDefault(); const title = new FormData(event.currentTarget).get('title'); if (typeof title === 'string') edit({ type: 'title', title }) }}><label>工程名称<input name="title" aria-label="工程名称" defaultValue={project.title} /></label><button disabled={busy}>更新名称</button></form><span>{project.revision === savedRevision ? '已导出或未修改' : '有未导出的修改'}</span><label>当前图纸<select aria-label="当前图纸" value={sheetId} onChange={event => { cancelGesture(); setActiveSheet(event.target.value); setSelection(null); setWireStart(null) }}>{project.sheets.map(s => <option key={s.id} value={s.id}>{s.title || '未命名图纸'}</option>)}</select></label></div>
     <div className="editor-toolbar" aria-label="编辑工具"><button disabled={!history.past.length || busy} onClick={undo}>撤销</button><button disabled={!history.future.length || busy} onClick={redo}>重做</button><span className="editor-divider" />{tools.map(([key, name]) => <button key={key} disabled={busy} aria-pressed={tool === key} onClick={() => chooseTool(key)}>{name}</button>)}<span className="editor-divider" /><button onClick={() => zoom(1.25)} aria-label="放大画布">＋</button><button onClick={() => zoom(0.8)} aria-label="缩小画布">−</button><button onClick={fit}>适合视图</button><button onClick={() => setViewport(INITIAL_VIEW)}>重置视图</button><span>{Math.round(viewport.zoom * 100)}%</span></div>
     {(tool === 'label' || tool === 'port') && <div className="editor-marker-options"><label>标注名称<input aria-label="标注名称" value={label} onChange={e => setLabel(e.target.value)} /></label>{tool === 'label' && <label>标签作用域<select value={labelScope} onChange={e => setLabelScope(e.target.value as 'sheet' | 'project')}><option value="sheet">当前图纸</option><option value="project">整个工程</option></select></label>}</div>}
     <p role={error ? 'alert' : 'status'} className={`editor-message ${error ? 'error' : ''}`}>{message}</p>
-    <div className="editor-layout"><aside className="editor-palette" aria-label="元件库"><h2>01 / 元件</h2>{(Object.keys(PALETTE) as PaletteKind[]).map(key => <button key={key} aria-pressed={tool === 'place' && kind === key} disabled={busy} onClick={() => { setKind(key); chooseTool('place'); announce(`点击画布放置${PALETTE[key].title}；Esc 返回选择。`) }}>{PALETTE[key].title} {PALETTE[key].prefix}</button>)}<p className="muted">先选元件，再点画布。拖动移动；R 旋转；Delete 删除。</p><p className="muted">GND 建立显式地网连接；求解参考只标记零电位，不连接网络。</p></aside>
+    <div className="editor-layout"><aside className="editor-palette" aria-label="元件库"><h2>01 / 元件</h2>{(Object.keys(PALETTE) as PaletteKind[]).map(key => <button key={key} aria-pressed={tool === 'place' && kind === key} disabled={busy} onClick={() => { setKind(key); chooseTool('place'); announce(`点击画布放置${PALETTE[key].title}；Esc 返回选择。`) }}>{PALETTE[key].title} {PALETTE[key].prefix}</button>)}<p className="muted">先选元件，再点画布。拖动元件本体移动；拖动引脚接线；R 旋转；Delete 删除。</p><p className="muted">GND 建立显式地网连接；求解参考只标记零电位，不连接网络。</p></aside>
       <div className="editor-canvas-area"><p className="editor-summary" data-testid="editor-summary">{sheet.components.length} 个元件 · {sheet.connections.length} 条导线 · {nets.nets.filter(n => n.anchorIds.some(id => sheet.anchors.some(a => a.id === id))).length} 个电气网络</p>
-        <svg ref={svg} className={`editor-canvas tool-${tool}`} role="application" aria-label="原理图编辑画布" tabIndex={0} viewBox={`${viewport.x} ${viewport.y} ${1000 / viewport.zoom} ${600 / viewport.zoom}`} onClick={canvasClick} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={() => { gesture.current = null; setDrag(undefined) }}>
+        <svg ref={svg} className={`editor-canvas tool-${tool}`} role="application" aria-label="原理图编辑画布" tabIndex={0} viewBox={`${viewport.x} ${viewport.y} ${1000 / viewport.zoom} ${600 / viewport.zoom}`} onClick={canvasClick} onClickCapture={event => { if (suppressClick.current) { suppressClick.current = false; event.stopPropagation() } }} onPointerDownCapture={() => { suppressClick.current = false }} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={event => { if (gesture.current?.pointerId === event.pointerId) cancelGesture() }} onLostPointerCapture={event => { if (gesture.current?.pointerId === event.pointerId) cancelGesture() }} onBlur={cancelGesture}>
           <defs><pattern id={gridId} width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="0" cy="0" r="1" className="editor-grid-dot" /></pattern></defs><rect x={viewport.x} y={viewport.y} width={1000 / viewport.zoom} height={600 / viewport.zoom} fill={`url(#${gridId})`} />
           {view.wires.map(({ connection, route }) => { const path = route.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' '); return <g key={connection.id} className={`editor-wire ${selection?.kind === 'connection' && selection.id === connection.id ? 'selected' : ''} ${selectedNet && nets.anchorToNet[connection.endpoints[0]] === selectedNet ? 'net-highlight' : ''}`} data-connection-id={connection.id}><path d={path} className="wire-underlay" /><path d={path} className="wire-ink" /><path d={path} className="wire-hit" role="button" tabIndex={0} aria-label={`导线 ${sheet.connections.indexOf(connection) + 1}`} onClick={event => { event.stopPropagation(); if (tool === 'junction') edit({ type: 'junction', connectionId: connection.id, position: world(event) }); else setSelection({ kind: 'connection', id: connection.id }) }} onKeyDown={event => { if (event.key === 'Enter') { event.stopPropagation(); setSelection({ kind: 'connection', id: connection.id }) } }} /></g> })}
           {view.components.map(({ component: c, definition, placement: p, symbol }) => <g key={c.id} className={`editor-component ${activeHighlight?.componentIds.includes(c.id) ? 'candidate-highlight' : ''} ${selection?.kind === 'component' && selection.id === c.id ? 'selected' : ''}`} role="button" tabIndex={0} aria-label={`${c.reference} 元件`} data-component-id={c.id} onPointerDown={event => beginComponent(event, c.id, p.origin)} onClick={event => { event.stopPropagation(); suppressClick.current = false; setSelection({ kind: 'component', id: c.id }) }} onKeyDown={event => { if (event.key === 'Enter') { event.stopPropagation(); setSelection({ kind: 'component', id: c.id }) } }}>
             <g transform={`translate(${p.origin.x} ${p.origin.y}) rotate(${p.rotationDegrees}) scale(${p.mirrored ? -1 : 1} 1)`}><rect className="component-hit" x="-65" y="-36" width="130" height="72" />{!Object.keys(PALETTE).includes(definition.kind) && Object.entries(symbol.pinPositions).map(([key, at]) => <path key={key} d={`M${at.x} ${at.y}H${at.x < 0 ? -45 : 45}`} />)}<SymbolBody kind={definition.kind} /></g><text x={p.origin.x} y={p.origin.y - 45} textAnchor="middle">{c.reference}</text><text className="component-value" x={p.origin.x} y={p.origin.y + 50} textAnchor="middle">{valueText(c.id)}</text>
           </g>)}
-          {sheet.anchors.map((a, i) => { const at = view.positions[a.id]; if (!at) return null; const owner = sheet.components.find(c => c.pins.some(p => p.anchorId === a.id)), pin = owner?.pins.find(p => p.anchorId === a.id), degree = sheet.connections.filter(c => c.endpoints.includes(a.id)).length; return <g key={a.id} className={`editor-anchor ${activeHighlight?.anchorIds.includes(a.id) ? 'candidate-highlight' : ''} ${selection?.kind === 'anchor' && selection.id === a.id ? 'selected' : ''} ${selectedNet && nets.anchorToNet[a.id] === selectedNet ? 'net-highlight' : ''}`}><circle cx={at.x} cy={at.y} r={degree > 1 && !owner ? 5 : 4} data-anchor-id={a.id} className={degree > 1 && !owner ? 'junction-dot' : ''} role="button" tabIndex={0} aria-label={owner ? `${owner.reference}.${pin!.definitionPinKey} 引脚` : `连接点 ${i + 1}`} onClick={event => { event.stopPropagation(); activate({ anchorId: a.id }) }} onPointerDown={event => { if (tool !== 'pan') event.stopPropagation() }} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); activate({ anchorId: a.id }) } }} />{sheet.labels.filter(l => l.anchorId === a.id).map((l, j) => l.name === 'GND' ? <g key={l.id} className="editor-ground"><path d={`M${at.x} ${at.y}v16 m-12 0h24 m-20 5h16 m-12 5h8`} /><text x={at.x + 16} y={at.y + 28}>GND</text></g> : <text key={l.id} x={at.x + 8} y={at.y - 12 - j * 16}>{l.name}{l.scope === 'project' ? ' ↗' : ''}</text>)}{sheet.ports.filter(p => p.anchorId === a.id).map(p => <text key={p.id} x={at.x + 8} y={at.y + 20}>{p.label}</text>)}{sheet.references.filter(r => r.anchorId === a.id).map(r => <g key={r.id} className="editor-reference"><rect x={at.x - 9} y={at.y - 9} width="18" height="18" /><text x={at.x + 12} y={at.y - 24}>参考</text></g>)}</g> })}
-          {wireStart && <text className="editor-wire-hint" x={viewport.x + 20 / viewport.zoom} y={viewport.y + 30 / viewport.zoom}>接线中：点击第二个端点 · Esc 取消</text>}
-        </svg><p className="editor-legend">线间断＝无连接跨越 · 实心结点＝显式连接 · 位置重叠不等于导通</p>
+          {sheet.anchors.map((a, i) => { const at = view.positions[a.id]; if (!at) return null; const owner = sheet.components.find(c => c.pins.some(p => p.anchorId === a.id)), pin = owner?.pins.find(p => p.anchorId === a.id), degree = sheet.connections.filter(c => c.endpoints.includes(a.id)).length; return <g key={a.id} className={`editor-anchor ${wirePreview?.targetId === a.id ? 'wire-target' : ''} ${wirePreview?.sourceId === a.id ? 'wire-source' : ''} ${activeHighlight?.anchorIds.includes(a.id) ? 'candidate-highlight' : ''} ${selection?.kind === 'anchor' && selection.id === a.id ? 'selected' : ''} ${selectedNet && nets.anchorToNet[a.id] === selectedNet ? 'net-highlight' : ''}`}>{wirePreview?.targetId === a.id && <circle className="wire-target-ring" cx={at.x} cy={at.y} r="10" />}<circle cx={at.x} cy={at.y} r={degree > 1 && !owner ? 5 : 4} data-anchor-id={a.id} className={degree > 1 && !owner ? 'junction-dot' : ''} role="button" tabIndex={0} aria-label={owner ? `${owner.reference}.${pin!.definitionPinKey} 引脚` : `连接点 ${i + 1}`} onClick={event => { event.stopPropagation(); activate({ anchorId: a.id }) }} onPointerDown={event => beginWire(event, a.id, at)} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); activate({ anchorId: a.id }) } }} />{sheet.labels.filter(l => l.anchorId === a.id).map((l, j) => l.name === 'GND' ? <g key={l.id} className="editor-ground"><path d={`M${at.x} ${at.y}v16 m-12 0h24 m-20 5h16 m-12 5h8`} /><text x={at.x + 16} y={at.y + 28}>GND</text></g> : <text key={l.id} x={at.x + 8} y={at.y - 12 - j * 16}>{l.name}{l.scope === 'project' ? ' ↗' : ''}</text>)}{sheet.ports.filter(p => p.anchorId === a.id).map(p => <text key={p.id} x={at.x + 8} y={at.y + 20}>{p.label}</text>)}{sheet.references.filter(r => r.anchorId === a.id).map(r => <g key={r.id} className="editor-reference"><rect x={at.x - 9} y={at.y - 9} width="18" height="18" /><text x={at.x + 12} y={at.y - 24}>参考</text></g>)}</g> })}
+          {wirePreview && <path className={`editor-wire-preview ${wirePreview.targetId ? 'snapped' : ''}`} data-testid="wire-preview" data-source-id={wirePreview.sourceId} data-target-id={wirePreview.targetId} d={wireRoute(wirePreview.source, wirePreview.end).map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' ')} />}
+          {(wireStart || wirePreview) && <text className="editor-wire-hint" x={viewport.x + 20 / viewport.zoom} y={viewport.y + 30 / viewport.zoom}>{wirePreview ? wirePreview.targetId ? '松开连接到双圈目标 · Esc 取消' : '拖到其他引脚或连接点 · Esc 取消' : '接线中：点击第二个端点 · Esc 取消'}</text>}
+        </svg><p className="editor-legend">拖动引脚或连接点接线 · 虚线＝接线预览 · 双圈＝可连接目标 · Esc 取消 · 跨越不自动导通</p>
         {(view.unplaced.length > 0 || view.missingAnchors.length > 0) && <div className="editor-unplaced"><p>尚有 {view.unplaced.length} 个未放置元件、{view.missingAnchors.length} 个无坐标连接点；电气数据已完整保留。</p>{view.unplaced.map((c, i) => <button key={c.id} onClick={() => edit({ type: 'move', id: c.id, position: { x: 160 + i * 160, y: 200 } })}>放置 {c.reference}</button>)}</div>}
       </div>
       <aside className="editor-inspector" aria-label="属性与连接检查"><h2>02 / 属性与连接</h2>

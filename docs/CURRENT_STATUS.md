@@ -5,6 +5,17 @@ verified and now publicly deployed. V2.1 remains **Planned**, not started.
 
 ## Public release
 
+Active task **V2.0.1 drag-to-connect**, **Implementation Complete / focused Verified,
+P01–P06: 5/6**. Sixteen new interaction tests and four actual Chrome viewport/theme
+flows passed, including visible intermediate wire paths and simulated pen input.
+Authorized implementation/tests/production patch on `codex/v2.0.1-wire-drag`.
+Extends the existing SVG pointer interaction with a real temporary wire and
+screen-space snapping; reuses the graph/history contracts. Current public version
+remains 2.0.0 until patch deployment and actual public verification pass.
+Local package/export writer target 2.0.1. Final typecheck/lint/build and **454 tests /
+28 files** passed; built wire and seven integration workflows passed without
+console/resource failures. Production deployment, live verification and tag pending.
+
 - Application: <https://stray-flz.github.io/circuit-equivalence-lab/>.
 - Application/package/lockfile/export writer: **2.0.0**; engineering file
   `formatVersion: 1` and project revision remain independent.

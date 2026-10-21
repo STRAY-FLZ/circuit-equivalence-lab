@@ -4,7 +4,7 @@ async (page) => {
   const button=name=>page.getByRole('button',{name,exact:true});
   const errors=[],failed=[],journeys=[];
   const appUrl=page.url();
-  const evidencePrefix=new URL(appUrl).hostname==='127.0.0.1'?'release-local':'release-live';
+  const evidencePrefix=new URL(appUrl).hostname==='127.0.0.1'?'patch-local':'patch-live';
   const evidencePath=name=>`output/playwright/${evidencePrefix}-${name}`;
   const onError=e=>errors.push(e.message);
   const onConsole=m=>{if(m.type()==='error')errors.push(m.text());};
@@ -15,7 +15,7 @@ async (page) => {
   try {
     await page.setViewportSize({width:1440,height:1100});
     await page.goto(appUrl);
-    assert((await page.getByLabel('应用版本',{exact:true}).innerText()).includes('v2.0.0'),'published application version 2.0.0');
+    assert((await page.getByLabel('应用版本',{exact:true}).innerText()).includes('v2.0.1'),'published application version 2.0.1');
     await button('原理图编辑器').click();
     const canvas=page.getByRole('application',{name:'原理图编辑画布'});
     const summary=()=>page.getByTestId('editor-summary').innerText();
@@ -138,7 +138,7 @@ async (page) => {
     assert(await page.getByRole('link',{name:'返回首页',exact:true}).getAttribute('href')==='https://stray-flz.github.io/stray-articles/','home link');
     journeys.push('V1 examples/previews/navigation and return-home destination retained');
     assert(errors.length===0,`browser errors ${JSON.stringify(errors)}`);assert(failed.length===0,`HTTP failures ${JSON.stringify(failed)}`);
-    return {appUrl,applicationVersion:'2.0.0',evidencePrefix,browser:await page.context().browser().version(),journeys,errors,failed};
+    return {appUrl,applicationVersion:'2.0.1',evidencePrefix,browser:await page.context().browser().version(),journeys,errors,failed};
   } finally {
     page.off('pageerror',onError);page.off('console',onConsole);page.off('response',onResponse);page.off('requestfailed',onFailed);
   }

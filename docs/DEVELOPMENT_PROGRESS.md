@@ -3,6 +3,23 @@
 Updated: **2026-10-21**. Progress is measured per scoped module; no overall
 completion percentage is assigned to the evolving multi-year product.
 
+## Active patch: V2.0.1 — node drag-to-connect
+
+Status: **Implementation Complete / focused Verified, 5/6 (83%)**. Authorized focused implementation and production
+patch; baseline `c6e8a9f` / `v2.0.0`, clean main equal to origin/main.
+Branch: `codex/v2.0.1-wire-drag`. Project schema remains 1. Do not begin V2.1.
+
+| ID | Deliverable | Status | Evidence |
+| --- | --- | --- | --- |
+| P01 | Inspect interaction / minimal change | Verified | Extend existing SVG pointer gesture, screen CTM and connect transaction; preserve click wiring |
+| P02 | Node pointer dragging / coordinates | Verified | Existing gesture with pointer ID/capture and inverse screen CTM; component body movement retained |
+| P03 | Continuous preview / snapping | Verified | Real SVG dashed orthogonal path; fixed source; 14px screen-space snap and explicit target rings |
+| P04 | Graph commit / cancellation / history | Verified | Existing connect transaction; Escape/cancel/lost capture/blur/tool/undo; real nets and stable file endpoints |
+| P05 | Focused tests / actual browser | Verified | 16 new UI tests; Chrome four viewport/theme groups explicitly assert intermediate preview paths, zoom/pan, undo/redo, actual file reopen and CDP pen |
+| P06 | Authorized patch release / records | In Progress | Version 2.0.1; typecheck/lint/build and 454 tests / 28 files passed; built wire and seven integration workflows passed; production deployment/public verification/tag pending |
+
+Blockers: none. Prior release checkpoints below remain historical.
+
 ## Production release: V2.0.0 — R01–R09
 
 Production status: **Released**, verified 2026-10-21. Execution checkpoint before

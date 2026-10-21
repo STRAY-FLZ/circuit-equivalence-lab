@@ -2,6 +2,10 @@
 
 STRAY Electronics Lab / 电路实验室 is an interactive circuit learning and engineering tool. V2.0.0 adds engineering projects, an editable SVG schematic, explicit wiring, undo/redo, portable JSON files, and verified resistor-network transformations with five-stage lessons based on the current circuit.
 
+V2.0.1 adds pin/anchor drag-to-connect with a continuously rendered wire preview,
+screen-space snapping and the existing graph/history transactions.
+See [patch verification and release status](docs/v2/V2_0_1_WIRE_INTERACTION.md).
+
 The completed V1 M0–M8 foundation remains available at [Circuit Equivalence Lab](https://stray-flz.github.io/circuit-equivalence-lab/), linked from the [Stray tools page](https://stray-flz.github.io/stray-articles/tools/). See the [changelog](CHANGELOG.md), [V2.0.0 release record](docs/v2/V2_0_0_RELEASE.md), and [deployment and maintenance](docs/DEPLOYMENT.md). Transformations support eligible resistor-only sheets; mixed-circuit simulation remains outside this release. Application version 2.0.0 and project-file schema version 1 are independent.
 
 ## 本地运行
@@ -105,4 +109,4 @@ if (result.kind === 'finite') {
 
 结果区分 `finite`、`short-circuit`（明确为 0Ω）、`open-circuit` 和带错误代码的 `error`。有限结果含所选分量的节点电压、各电阻支路的电流/压降及残差诊断；以第二端子为参考，在第一端子注入 1 A。极端尺度、病态矩阵或结果溢出会返回数值失败，不会伪装为物理开路。稠密求解限制为最多 512 个未知节点。
 
-The V2.0.0 regression suite contains 438 tests in 27 files, including the preserved 315-test V1 baseline. See [architecture](docs/ARCHITECTURE.md), [development log](docs/DEV_LOG.md), and [M0–M8 roadmap](docs/ROADMAP.md). Tool configuration follows the official [Vite](https://vite.dev/guide/), [Vitest](https://vitest.dev/guide/), and [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files) documentation.
+The V2.0.1 regression suite contains 454 tests in 28 files, including the preserved 315-test V1 baseline. See [architecture](docs/ARCHITECTURE.md), [development log](docs/DEV_LOG.md), and [M0–M8 roadmap](docs/ROADMAP.md). Tool configuration follows the official [Vite](https://vite.dev/guide/), [Vitest](https://vitest.dev/guide/), and [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files) documentation.
