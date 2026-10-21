@@ -121,5 +121,27 @@ not silently discarded. Captures/derived analyses accumulate in the portable
 project until existing asset/file limits; export failures report incompleteness
 instead of emitting partial files. No autosave, cloud or external container.
 
-S10 production integration, Pages, real public acceptance and final tag/handoff
-remain required before Released. Relevant release record: [V2.1.0](V2_1_0_RELEASE.md).
+## Public acceptance — 2026-10-21
+
+First production `dfc5d784784bc85d7ad0cf86d5c46f6fcd210f60`, existing Pages
+[workflow 39614955343](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39614955343)
+build/deploy succeeded. The complete same browser replay passed against the real
+public V2.1.0 application: numerical outputs, 65536-point capture (226ms observed,
+not a performance guarantee), two-channel CSV, Hann/DC settings, actual downloads
+and reopen, both themes/viewport sizes and preserved circuit navigation. No
+console/resource failures. Public assets match the accepted final build above.
+
+Independent Node SHA-256/byte-length checks passed for every asset in the actual
+public export (11 datasets / 27 assets for this replay). Original CSV byte-identical;
+measurement/asset/analysis/result identities and contents equal after reopen;
+65536-point capture retained. Actual engine configurations, analysis IDs, input
+digests and result provenance agree. Ignored evidence:
+`output/playwright/signal-live-verification.txt`, `signal-live-integrity.json`
+and corresponding downloads/screenshots. Legacy compatibility evidence is the
+actual older-project test above; it is not a claim of physical instrument support.
+
+Application status **Released**; S10 final records/tag/handoff are finalized only
+after the documentation commit's deployment and targeted public confirmation.
+Exact final SHA/workflow and 10/10 completion live in the
+[canonical release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.1.0).
+Relevant detailed record: [V2.1.0](V2_1_0_RELEASE.md).

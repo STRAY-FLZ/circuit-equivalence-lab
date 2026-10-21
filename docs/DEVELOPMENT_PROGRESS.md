@@ -5,8 +5,13 @@ completion percentage is assigned to the evolving multi-year product.
 
 ## Active module: V2.1.0 — Signal Measurement & Analysis
 
-**In Progress, 9/10 (90%)**, authorized 2026-10-21. Baseline: actual public V2.0.2
-`bd79d6a`, clean main equal to origin/main. Branch `codex/v2.1-signal-lab`.
+**Application Released; finalization checkpoint 9/10 (90%)**, authorized 2026-10-21.
+Baseline: actual public V2.0.2 `bd79d6a`. Branch `codex/v2.1-signal-lab` safely
+fast-forwarded into main. First production `dfc5d78`, workflow 39614955343
+build/deploy success; full public workflow accepted. Final documentation deployment,
+verified final SHA/workflow, tag and S10 / **10/10** completion are recorded in the
+[canonical release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.1.0).
+This preserves the actual pre-tag checkpoint rather than predicting its own SHA.
 
 | ID | Deliverable | Status | Evidence |
 | --- | --- | --- | --- |
@@ -18,8 +23,8 @@ completion percentage is assigned to the evolving multi-year product.
 | S06 | CSV import/export | Verified | Explicit confirmation/units, physical row/column diagnostics, real CSV download/reimport and JSON measurement report |
 | S07 | Integrated accessible workbench | Verified | Signal tab retains data across existing editor/V1 navigation; education and desktop/narrow themes verified |
 | S08 | Data integrity/project persistence | Verified | Raw CSV byte-identical; generated 65536-point capture retained; exact dataset/channel/assets/results restored; FFT parameters and actual engine provenance persisted |
-| S09 | Numerical/UI/browser acceptance | Verified | Final typecheck/lint/build and 504 tests / 31 files passed; actual final 2.1.0 built-browser workflow, 65536-point capture, CSV/project round trips, legacy 2.0.1 circuit preservation |
-| S10 | Docs/version/release/handoff | In Progress | Version/package/writer 2.1.0, schema 1; changelog/methods/compatibility/rollback; publication gated on S09 and live checks |
+| S09 | Numerical/UI/browser acceptance | Verified | Final typecheck/lint/build and 504 tests / 31 files; built and actual public 2.1.0 workflows; 65536 samples, CSV/project round trips, all asset hashes, legacy 2.0.1 circuit preservation |
+| S10 | Docs/version/release/handoff | Finalization at this checkpoint | Package/writer 2.1.0, schema 1; docs/changelog/rollback; main dfc5d78 and Pages 39614955343 success, full public acceptance; final deployment/tag/10-of-10 handoff in canonical release |
 
 Blockers: none. Preserve latest movement fix and original V1/D05. Do not begin
 V2.2/V2.3 or claim hardware acquisition. Commit verified meaningful checkpoints.

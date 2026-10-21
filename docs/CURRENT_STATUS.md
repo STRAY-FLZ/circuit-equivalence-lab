@@ -1,57 +1,57 @@
 # Current Development Status
 
-Updated **2026-10-21**. **V2.0.2: Released** — component movement / one-shot
-placement and the accepted V2.0.1 workflow are verified and publicly deployed.
-Active V2.1.0 development is tracked below.
+Updated **2026-10-21**. **V2.1.0 application: Released** — implementation complete,
+locally verified and actual public signal workflow accepted. Authorized module:
+**Signal Measurement & Analysis**, preparation branch `codex/v2.1-signal-lab`,
+safely fast-forwarded into `main`; actual baseline V2.0.2 `bd79d6a` is preserved.
 
-Active authorized module **V2.1.0 Signal Measurement & Analysis**, 2026-10-21,
-**In Progress, S01–S10: 9/10**. S01–S09 verified. Final typecheck/lint/build and
-**504 tests / 31 files** pass, including 48 new numerical/data/UI cases. Actual final
-2.1.0 production-preview browser
-workflow passed: 100Hz sine/RMS/FFT, frequency changes, 65536-point capture,
-CSV two-channel explicit units, actual file exports/reopen, themes and navigation.
-Raw CSV bytes/IDs/assets/results preserved; an actual legacy 2.0.1 circuit project
-retained its graph/geometry/metadata after open/generate/export. Only S10 production
-integration/deployment/live acceptance and tag/handoff remain pending.
-Actual baseline is V2.0.2 `bd79d6a`
-(the new brief's V2.0.1 baseline is historical). Branch
-`codex/v2.1-signal-lab`. Scope: synthetic/imported uniform captures, generator,
-oscilloscope, statistics/frequency, FFT, CSV and portable inline-asset persistence.
-No hardware acquisition, schematic simulation, V2.2 or V2.3. Publication of 2.1.0
-is authorized after acceptance; current production remains 2.0.2.
+This final documentation checkpoint is **S01–S10: 9/10**: S01–S09 Verified;
+S10 final documentation deployment, tag/Release and handoff are being finalized.
+The [canonical v2.1.0 release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.1.0)
+records subsequent **10/10** completion, exact final production SHA and workflow
+after that commit is deployed and publicly confirmed. This file does not predict
+its own commit/run or claim an uncreated tag.
 
-Each palette activation places one component and returns to selection. Dragging
-an existing body moves its stable instance, even when placement was armed;
-another insertion requires another palette activation. Original pin wire dragging
-remains. Preparation branch: `codex/fix-component-drag-placement`.
-
-Local typecheck/lint/build and **456 tests / 28 files** passed before release;
-unchanged implementation evidence was reused. Versioned 2.0.2 build/typecheck and
-replay lint passed; existing production CI passed all its checks. Built and actual
-public Chrome 1440/390px × light/dark verified 650ms held drags, stable count/UUID,
-undo/redo and explicit one-shot additions, without console/resource errors.
+Final typecheck/lint/test/build passed: **504 tests / 31 files**, including 48 new
+numerical/data/UI cases. Actual built and public Chrome workflows passed: 100Hz
+sine/RMS/FFT, frequency changes, 65536-point full capture, explicit-unit two-channel
+CSV, real exports/reopen, responsive charts and existing circuit navigation.
+Raw CSV bytes, all asset hashes and restored IDs/results independently verified.
+A real legacy 2.0.1 circuit project retained its graph/geometry/metadata after
+open/generate/export. No hardware acquisition, schematic simulation, V2.2 or V2.3.
 
 ## Public release
 
 - Application: <https://stray-flz.github.io/circuit-equivalence-lab/>.
-- Application/package/lockfile/export writer: **2.0.2**; engineering file
+- Application/package/lockfile/export writer: **2.1.0**; engineering file
   `formatVersion: 1` and project revision remain independent.
-- First verified patch production commit: `1c51e63ebc63717c4a3ed5b1b32bae03642ad34c`.
-  [Pages workflow 39603301979](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39603301979)
-  completed successfully: build and deploy. Real public acceptance then passed.
-- Final release identity and U01–U04 completion: [v2.0.2 release record](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.2).
-  It records the exact final production SHA and workflow after this documentation
-  commit is deployed and verified. The tag must point to that final verified
-  production commit; this document does not predict its own SHA or a future run ID.
-- [Patch evidence and rollback](v2/V2_0_2_COMPONENT_MOVEMENT.md), [changelog](../CHANGELOG.md),
+- First verified V2.1.0 production commit: `dfc5d784784bc85d7ad0cf86d5c46f6fcd210f60`.
+  [Pages workflow 39614955343](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39614955343)
+  completed successfully: build and deploy. Full real public acceptance followed.
+- Final identity/tag/S10 handoff: [v2.1.0 release record](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.1.0).
+- [Signal methods and limits](v2/SIGNAL_IMPLEMENTATION.md),
+  [release evidence and rollback](v2/V2_1_0_RELEASE.md), [changelog](../CHANGELOG.md),
   [scoped progress](DEVELOPMENT_PROGRESS.md). M0–M8 and earlier internal module
   handoffs remain historical records in [DEV_LOG.md](DEV_LOG.md).
 - Prior public V2.0.0: `c6e8a9f` / `v2.0.0`; [release evidence](v2/V2_0_0_RELEASE.md).
   This patch preserves its complete history and functionality.
 - Prior public V2.0.1: `5b900ef` / `v2.0.1`; [wire release evidence](v2/V2_0_1_WIRE_INTERACTION.md).
+- Prior public V2.0.2: `bd79d6a` / `v2.0.2`;
+  [movement release evidence](v2/V2_0_2_COMPONENT_MOVEMENT.md).
 
 ## Verified behavior
 
+- Five configurable sampled generators; real multi-channel oscilloscope with
+  zoom/offset/sample cursor; full-capture min/max/pp/mean/total and AC RMS;
+  conservative frequency availability; normalized radix-2 FFT with rectangular
+  or periodic Hann windows and optional DC removal. Explicit-unit CSV mapping,
+  portable project and measurement-report exports retain real sampled values.
+- Public Chrome 155.0.8059.40: 100Hz / 1V peak sine at fs1024/N1024 produced
+  RMS 0.7071068V and FFT 100Hz/1V. Both themes at 1440/390px, 65536 samples,
+  actual CSV/project round trips, preserved metadata and editor/V1 navigation
+  passed without console/resource failures. These are emulated viewports.
+- Preserved V2.0.2 placement: one new component per palette activation; dragging
+  an existing component moves the same stable instance and never duplicates it.
 - Select/wire mode: press and drag a real pin or existing anchor. The SVG shows
   an orthogonal dashed wire from the exact source to the continuously tracked
   pointer; a 14px screen-space target snaps exactly and shows an explicit ring.
@@ -67,7 +67,7 @@ undo/redo and explicit one-shot additions, without console/resource errors.
   non-mutating previews, independent numerical evidence and atomic verified
   writeback, undo/redo, and five-stage lessons. Existing observed boundaries are
   protected. Original V1 algorithms and owner-approved D05 are unchanged.
-- Final local typecheck/lint/build passed; **456 tests / 28 files passed**,
+- Prior V2.0.2 local typecheck/lint/build passed; **456 tests / 28 files passed**,
   including the preserved 315-test V1 baseline. Existing production workflow
   independently passed its required checks.
 - Inherited V2.0.1 evidence (not repeated for this release): local built preview
@@ -96,9 +96,15 @@ editing, PCB/EDA or general DC/AC/RLC simulation. Numerical evidence remains
 boundary/tolerance-scoped. Narrow-screen checks are emulated Chrome viewports,
 not physical-phone or cross-browser certification.
 
-No core blocker prevents proposing **V2.1 signal measurement**. Its scope,
-acceptance and release authorization must be established separately. No V2.1 work,
-dependency upgrade or personal-website repository edit is part of this release.
+Signal scope: uniform captures, 2–65536 samples, at most four channels. FFT requires
+a power-of-two capture; no implicit crop/padding/resampling. CSV requires explicit
+units and uniform increasing time; full project JSON preserves provenance, CSV
+does not. No spectral power/PSD, calibrated acquisition, filters or arbitrary
+schematic waveforms. Existing inline file/asset limits apply; failures are explicit.
+
+Blockers: none. Stop after V2.1.0. Recommended next planning module is V2.2,
+requiring separate scope and authorization. No personal-website repository edit
+or dependency upgrade occurred.
 
 ## Architecture decisions and maintenance
 

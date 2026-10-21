@@ -1,5 +1,33 @@
 # 开发记录
 
+## 2026-10-21 · V2.1.0 Signal Measurement & Analysis production release
+
+- Authorized S01–S10 scope, actual baseline `bd79d6a` / v2.0.2 (the brief's
+  v2.0.1 baseline was historical). Preserved V1/D05, latest movement/wiring,
+  schema 1, dependencies, Pages/base and personal website repository.
+- `927b36b`: pure sampled generators/statistics/radix-2 FFT, explicit-unit CSV,
+  stable measurement descriptors/checksummed inline assets and typed async engine.
+  `fa90724`: independent retained-state signal workbench, responsive real SVG
+  oscilloscope/spectrum, source/options/units, real file exchange and education.
+  `dfc5d78`: 2.1.0 version/writer, final canonical digest/provenance correction,
+  exact numerical/UI/browser evidence and compatibility/rollback records.
+- Final typecheck/lint/test/build passed: **504 tests / 31 files**, 48 new.
+  Analytical/direct-DFT checks include normalization/DC/Nyquist/periodic Hann;
+  real old 2.0.1 circuit project preserved graph/geometry/metadata on export.
+- Main fast-forward/push and [workflow 39614955343](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39614955343)
+  build/deploy success for `dfc5d784784bc85d7ad0cf86d5c46f6fcd210f60`.
+  Built and actual public Chrome passed 100Hz/1V peak/fs1024/N1024,
+  RMS≈0.7071068V and FFT 100Hz/1V; changed frequency, cursor/zoom,
+  65536 samples, two-channel CSV mapping, Hann/DC, actual downloads/reopen,
+  invalid-input preservation, 1440/390px light/dark and editor/V1 navigation.
+  No console/resource errors; independent hashes/raw CSV/identity/provenance pass.
+- Application **Released**; this final documentation checkpoint is 9/10 before
+  its own deployment/tag. Final targeted public confirmation, exact production
+  SHA/workflow and S10 / **10/10** handoff are retained in the
+  [canonical release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.1.0).
+  [Methods/limits](v2/SIGNAL_IMPLEMENTATION.md), [release/rollback](v2/V2_1_0_RELEASE.md).
+  No hardware, general circuit simulation, filters, V2.2 or V2.3. Stop at V2.1.0.
+
 ## 2026-10-21 · V2.0.2 component movement production release
 
 - Owner authorized publication of the verified local movement/placement fix.
