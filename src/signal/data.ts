@@ -1,5 +1,6 @@
 import { createEmptyProject, createId, reviseProject } from '../engineering'
-import type { EngineeringProject, JsonObject, MeasurementDataset, ScalarMeasurement, WaveformChannel } from '../engineering'
+import type { AnalysisConfiguration, EngineeringProject, JsonObject, MeasurementDataset, ScalarMeasurement, WaveformChannel } from '../engineering'
+import type { ResultProvenance } from '../analysis'
 import { createInlineAsset, createProjectDocument, decodeInlineAsset } from '../project-format'
 import type { InlineAsset, ProjectDocumentV1 } from '../project-format'
 import { estimateFrequency, generateSamples, MAX_CHANNELS, sampleStatistics, SIGNAL_ENGINE, SignalError, validateAxis, validateSamples } from './numerics'
@@ -77,15 +78,15 @@ export async function appendGenerated(document: ProjectDocumentV1, options: Gene
   const project = reviseProject(document.project, document.project.revision, { analyses: [...document.project.analyses, configuration] })
   return appendWaveform(document, { project, title: `${options.kind} · ${options.frequencyHz} Hz`, axis: generated.axis, channels: [{ name: 'CH1', unit: 'V', values: generated.values }], source: { kind: 'simulated', engine: GENERATOR_ENGINE, projectRevision: project.revision, analysisId, inputDigest }, metadata: { generator: { ...options }, diagnostics: [...generated.diagnostics], amplitudeConvention: options.kind === 'pulse' ? '0..amplitude plus DC offset' : 'plus/minus amplitude around DC offset', sampleRateHz: 1 / generated.axis.intervalSeconds, captureSeconds: generated.axis.count * generated.axis.intervalSeconds } })
 }
-export async function appendSpectrum(document: ProjectDocumentV1, waveform: LoadedWaveform, channelId: string, spectrum: AmplitudeSpectrum): Promise<ProjectDocumentV1> {
+export async function appendSpectrum(document: ProjectDocumentV1, waveform: LoadedWaveform, channelId: string, spectrum: AmplitudeSpectrum, execution: { readonly configuration: AnalysisConfiguration; readonly provenance: ResultProvenance }): Promise<ProjectDocumentV1> {
   const channel = waveform.channels.find(c => c.channel.id === channelId)!.channel
   const axis = await createInlineAsset(float64Bytes(spectrum.frequencies), 'application/octet-stream'), amplitude = await createInlineAsset(float64Bytes(spectrum.amplitudes), 'application/octet-stream')
-  const options: JsonObject = { ...spectrum.options, channelId, scope: 'full-capture' }
+  const options = execution.configuration.options
   const metadata: JsonObject = { spectrumVersion: 1, normalization: spectrum.normalization, sampleCount: spectrum.sampleCount, sampleRateHz: spectrum.sampleRateHz, binSpacingHz: spectrum.binSpacingHz, captureSeconds: spectrum.captureSeconds, coherentGain: spectrum.coherentGain, window: spectrum.options.window, removeMean: spectrum.options.removeMean, inputChannelId: channelId, role: 'amplitude', zeroPadding: false }
   const dataset: MeasurementDataset = { id: createId(), title: `FFT · ${channel.name}`, kind: 'spectrum', source: { kind: 'derived', inputDatasetIds: [waveform.dataset.id], operation: SIGNAL_ENGINE, options }, axis: { kind: 'frequency', frequencies: { assetId: axis.entry.id, encoding: 'float64-le', count: spectrum.frequencies.length, unit: 'Hz' } }, channels: [{ id: createId(), name: `${channel.name} 单边峰值幅度`, samples: { assetId: amplitude.entry.id, encoding: 'float64-le', count: spectrum.amplitudes.length, unit: channel.samples.unit } }], metadata }
-  const analysis = { id: createId(), analysisType: 'signal.fft', preferredEngine: SIGNAL_ENGINE, scope: { kind: 'dataset' as const, datasetIds: [waveform.dataset.id] }, options }
-  const inputRevision = document.project.revision, inputDigest = await digestJson({ ...document.project, revision: null, results: [], analysis })
-  const artifact = await createInlineAsset(new TextEncoder().encode(JSON.stringify({ provenance: { engine: SIGNAL_ENGINE, projectId: document.project.id, inputRevision, inputDigest, analysisId: analysis.id, options }, outcome: { kind: 'success', datasetId: dataset.id, measurements: measurementsFor(waveform, channelId), metadata }, diagnostics: [] })), 'application/json')
+  const analysis = execution.configuration, { inputRevision, inputDigest } = execution.provenance
+  if (execution.provenance.projectId !== document.project.id || execution.provenance.analysisId !== analysis.id) throw new SignalError('analysis-source', '分析来源与当前工程或配置不一致，未保存派生结果。')
+  const artifact = await createInlineAsset(new TextEncoder().encode(JSON.stringify({ provenance: execution.provenance, outcome: { kind: 'success', datasetId: dataset.id, measurements: measurementsFor(waveform, channelId), metadata }, diagnostics: [] })), 'application/json')
   const staged = [axis, amplitude, artifact]
   const project = reviseProject(document.project, inputRevision, { measurements: [...document.project.measurements, dataset], analyses: [...document.project.analyses, analysis], assets: [...document.project.assets, ...staged.map(a => a.entry)], results: [...document.project.results, { id: createId(), analysisId: analysis.id, engine: SIGNAL_ENGINE, inputRevision, inputDigest, outcome: 'success', artifactAssetIds: [artifact.entry.id] }], extensions: { ...document.project.extensions, 'org.stray.signal': { activeDatasetId: waveform.dataset.id, fftOptions: { ...spectrum.options }, lastSpectrumId: dataset.id } } })
   return createProjectDocument(project, document.writer, [...document.inlineAssets, ...staged.map(a => a.asset)])

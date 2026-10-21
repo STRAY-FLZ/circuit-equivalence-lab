@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { amplitudeSpectrum, DEFAULT_GENERATOR, estimateFrequency, generateSamples, sampleStatistics, validateAxis } from './numerics'
+import { displayIndices } from './display'
 
 const options = { ...DEFAULT_GENERATOR }
 describe('sampled signal numerical methods', () => {
@@ -67,5 +68,12 @@ describe('sampled signal numerical methods', () => {
   })
   it('rejects non-power-of-two FFT without cropping or padding', () => {
     expect(() => amplitudeSpectrum([1, 2, 3], { kind: 'uniform-time', startSeconds: 0, intervalSeconds: 1, count: 3 }, { window: 'hann', removeMean: false })).toThrow(/未截断/)
+  })
+  it('reduces display points without dropping spikes or reducing numerical sample counts', () => {
+    const samples = new Float64Array(65536); samples[40001] = 10
+    const indices = displayIndices(samples, 0, samples.length - 1)
+    expect(indices).toContain(40001); expect(indices.length).toBeLessThanOrEqual(2048)
+    expect(sampleStatistics(samples).totalRms).toBeCloseTo(10 / 256, 14)
+    expect(samples.length).toBe(65536)
   })
 })

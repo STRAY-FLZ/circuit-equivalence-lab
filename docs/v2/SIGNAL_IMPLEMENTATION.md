@@ -2,7 +2,8 @@
 
 Authorized 2026-10-21. Baseline actual public **V2.0.2 `bd79d6a`**; branch
 `codex/v2.1-signal-lab`. No V2.2/V2.3, hardware transport or schematic solver.
-Status: numerical/data core checkpoint; UI and release pending.
+Status: **S01–S08 Verified**, final integrated checks/versioned preview/release
+pending. Core checkpoint `927b36b`; second UI checkpoint recorded separately.
 
 ## Data and numerical boundary
 
@@ -59,4 +60,55 @@ provenance/calibration, which portable project JSON retains with raw/derived ass
 Checkpoint evidence: focused numerical/data tests, including analytical 100Hz
 1V-peak/1024Hz/1024-sample sine, DC/Nyquist, Hann gain, independent direct DFT,
 seeded noise, error cases, source integrity and real schema-1 JSON/CSV round trips.
-Final counts and browser/release evidence will be updated at verified milestones.
+Focused count: **47** (23 numerical/display, 18 data/provider/CSV, 6 workbench UI).
+Development typecheck/lint passed. UI tests exercise actual project export/reopen,
+RMS/FFT updates, malformed import preservation and retained state across tabs.
+
+## Workbench and browser checkpoint
+
+`src/signal-ui`: independently mounted signal workspace, preserving existing
+editor/V1 states. Configurable generator feeds the same waveform descriptor and
+assets used by measurement/FFT. Generate/import updates all three views.
+Charts have real responsive viewBox sizing (12px desktop / ~14px narrow axis text),
+time zoom, horizontal sample navigation, keyboard/pointer sample cursor and
+synchronous multi-channel views with independently labeled unit scales.
+Min/max envelope bounds display work at 2048 points/channel; full captures remain
+the calculation/export source. No decorative/synthetic display-only curves.
+
+FFT uses the typed async engine; the exact execution configuration, source
+revision/digest/analysis ID and engine provenance are retained in its result asset.
+Project open reanalyzes verified samples using stored options without duplicating
+stored raw/derived datasets. CSV export loses source history; complete project
+export retains every descriptor, source/derived asset and inline checksum.
+Reports are documented `org.stray.signal.measurements` JSON version 1, containing
+full-capture axis/source, scalar method/units and last FFT parameters/peak.
+
+Actual local built-preview Chrome **155.0.8059.40** passed the replay
+`tests/browser/signal-workbench.js`: 100Hz / 1V peak / fs1024 / N1024 waveform,
+RMS 0.7071068V, 100Hz/1V FFT; 200Hz updates both views; exact sample cursor and
+zoom-only presentation; N65536 full analysis (227ms observed locally, not a latency
+guarantee); explicit ms/mV/mA import to s/V/A, two channels; Hann/DC removal;
+CSV/report/project downloads and actual reopen; invalid CSV leaves active capture;
+1440/390 × light/dark screenshots/axes inspected, no page overflow; existing
+editor one-shot placement and V1 series preview remain available. No console/HTTP
+failures. Evidence: ignored `output/playwright/signal-local-*`.
+
+Independent file inspection confirmed raw CSV byte-identical, 65536 original
+samples retained, and identical measurement/channel/asset/analysis/result IDs and
+contents after actual project export/reopen. The pre-release build still reports
+application 2.0.2; final candidate must use 2.1.0 before publication.
+
+## Current limitations
+
+CSV importer explicitly rejects irregular times; file format can represent them
+but this provider does not resample. FFT needs a power-of-two full capture and
+never crops or zero-pads; non-power-of-two data can still be viewed/measured.
+No spectral RMS/power/PSD, certified frequency/THD, cross-capture alignment,
+hardware acquisition, schematic simulation or filters. Time zoom and cursors do
+not change measurement/FFT scope. Limits are explicit and original samples are
+not silently discarded. Captures/derived analyses accumulate in the portable
+project until existing asset/file limits; export failures report incompleteness
+instead of emitting partial files. No autosave, cloud or external container.
+
+S09 final standard checks and versioned preview, S10 changelog/compatibility/
+rollback, Pages and real public acceptance remain required before Released.

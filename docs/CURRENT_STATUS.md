@@ -5,9 +5,13 @@ placement and the accepted V2.0.1 workflow are verified and publicly deployed.
 Active V2.1.0 development is tracked below.
 
 Active authorized module **V2.1.0 Signal Measurement & Analysis**, 2026-10-21,
-**In Progress, S01–S10: 2/10**. S01/S04 verified; 40 focused numerical/data tests
-and core typecheck/lint pass. Generator/FFT/CSV/persistence cores exist; actual
-workbench and browser acceptance remain pending. Actual baseline is V2.0.2 `bd79d6a`
+**In Progress, S01–S10: 8/10**. S01–S08 verified. 47 focused numerical/data/UI
+cases and development typecheck/lint pass. Actual local production-preview browser
+workflow passed: 100Hz sine/RMS/FFT, frequency changes, 65536-point capture,
+CSV two-channel explicit units, actual file exports/reopen, themes and navigation.
+Raw CSV bytes/IDs/assets/results preserved. Final standard checks, versioned
+candidate preview, production deployment and live acceptance remain pending.
+Actual baseline is V2.0.2 `bd79d6a`
 (the new brief's V2.0.1 baseline is historical). Branch
 `codex/v2.1-signal-lab`. Scope: synthetic/imported uniform captures, generator,
 oscilloscope, statistics/frequency, FFT, CSV and portable inline-asset persistence.

@@ -10,6 +10,7 @@ import { lessonSessionReducer } from './lesson-session'
 import type { PreviewSnapshot } from './lesson-session'
 import type { CircuitNetwork } from './domain'
 import { SchematicEditor } from './editor'
+import { SignalWorkbench } from './signal-ui'
 import packageText from '../package.json?raw'
 
 const appVersion = (JSON.parse(packageText) as { version: string }).version
@@ -26,8 +27,9 @@ function ElementInventory({ network }: { readonly network: CircuitNetwork }) {
 }
 
 export default function App() {
-  const [workspace, setWorkspace] = useState<'v1' | 'editor'>('v1')
+  const [workspace, setWorkspace] = useState<'v1' | 'editor' | 'signal'>('v1')
   const [editorVisited, setEditorVisited] = useState(false)
+  const [signalVisited, setSignalVisited] = useState(false)
   const [exampleId, setExampleId] = useState('series')
   const [candidateId, setCandidateId] = useState<string | null>(null)
   const [session, dispatch] = useReducer(lessonSessionReducer, { kind: 'idle' })
@@ -89,8 +91,9 @@ export default function App() {
     <a className="skip-link" href="#main-content">跳转到主要内容</a>
     <SiteHeader />
     <main id="main-content" className="shell">
-      <nav className="workspace-tabs" aria-label="实验工作区"><button aria-pressed={workspace === 'v1'} onClick={() => setWorkspace('v1')}>等效变换与课程</button><button aria-pressed={workspace === 'editor'} onClick={() => { setEditorVisited(true); setWorkspace('editor') }}>原理图编辑器</button></nav>
+      <nav className="workspace-tabs" aria-label="实验工作区"><button aria-pressed={workspace === 'v1'} onClick={() => setWorkspace('v1')}>等效变换与课程</button><button aria-pressed={workspace === 'editor'} onClick={() => { setEditorVisited(true); setWorkspace('editor') }}>原理图编辑器</button><button aria-pressed={workspace === 'signal'} onClick={() => { setSignalVisited(true); setWorkspace('signal') }}>信号实验室</button></nav>
       {editorVisited && <div className="workspace-panel" hidden={workspace !== 'editor'}><SchematicEditor /></div>}
+      {signalVisited && <div className="workspace-panel" hidden={workspace !== 'signal'}><SignalWorkbench /></div>}
       <div className="workspace-panel" hidden={workspace !== 'v1'}>
       <section className="intro"><p className="eyebrow">工具 / 电路学习</p><h1>电路等效变换实验室</h1><p>从连接关系出发，选择真实网络，逐步理解一次等效变换。</p></section>
       <div className="lab-grid">

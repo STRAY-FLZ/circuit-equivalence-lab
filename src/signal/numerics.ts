@@ -18,7 +18,7 @@ export function validateAxis(axis: UniformAxis): void {
   const { startSeconds: t, intervalSeconds: dt, count: n } = axis
   if (!Number.isSafeInteger(n) || n < 1 || n > MAX_SAMPLES) throw new SignalError('sample-limit', `采样点数须为 1–${MAX_SAMPLES} 的整数，不会截断数据。`)
   const end = t + (n - 1) * dt
-  if (!Number.isFinite(t) || !Number.isFinite(dt) || dt <= 0 || !Number.isFinite(1 / dt) || !Number.isFinite(end) || (n > 1 && (!(t + dt > t) || !(end > t + (n - 2) * dt)))) throw new SignalError('time-range', '采样起点、间隔、采样率和末端时间须有限且可区分。')
+  if (!Number.isFinite(t) || !Number.isFinite(dt) || dt <= 0 || !Number.isFinite(1 / dt) || !Number.isFinite(n * dt) || !Number.isFinite(end) || (n > 1 && (!(t + dt > t) || !(end > t + (n - 2) * dt)))) throw new SignalError('time-range', '采样起点、间隔、采样率、时长和末端时间须有限且可区分。')
 }
 export function validateSamples(values: ArrayLike<number>, count = values.length): void {
   if (values.length !== count || !Number.isSafeInteger(count) || count < 1 || count > MAX_SAMPLES) throw new SignalError('sample-count', '通道长度必须与采样轴一致，并符合点数限制。')

@@ -3,7 +3,7 @@ import { webcrypto } from 'node:crypto'
 import { createId } from '../engineering'
 import { deserializeProject, serializeProject } from '../project-format'
 import { appendGenerated, appendSpectrum, assetBytes, digestJson, emptySignalDocument, loadWaveform, measurementsFor } from './data'
-import { amplitudeSpectrum, DEFAULT_GENERATOR, SIGNAL_ENGINE } from './numerics'
+import { DEFAULT_GENERATOR, SIGNAL_ENGINE } from './numerics'
 import { csvSamples, decodeCsv, exportCsv, importCsv, parseCsv } from './csv'
 import type { CsvMapping } from './csv'
 import { signalFftEngine } from './engine'
@@ -70,12 +70,19 @@ describe('signal asset and analysis integration', () => {
   })
   it('retains raw input, derived spectrum parameters, finite bins and result provenance on reopen', async () => {
     const g = await appendGenerated(await emptySignalDocument(writer), DEFAULT_GENERATOR), w = loadWaveform(g.document, g.datasetId), c = w.channels[0]!
-    const s = amplitudeSpectrum(c.values, w.axis, { window: 'hann', removeMean: true }), result = await appendSpectrum(g.document, w, c.channel.id, s)
+    const configuration = { id: createId(), analysisType: 'signal.fft', preferredEngine: SIGNAL_ENGINE, scope: { kind: 'dataset' as const, datasetIds: [w.dataset.id] }, options: { channelId: c.channel.id, scope: 'full-capture', window: 'hann', removeMean: true } }
+    const inputDigest = await digestJson({ ...g.document.project, revision: null, results: [], configuration })
+    const executed = await signalFftEngine.run({ project: g.document.project, configuration, inputDigest }, { signal: new AbortController().signal, readAsset: id => Promise.resolve(assetBytes(g.document, id)), onProgress: () => {} })
+    if (executed.outcome.kind !== 'success') throw Error('Expected FFT success')
+    const result = await appendSpectrum(g.document, w, c.channel.id, executed.outcome.value.spectrum, { configuration, provenance: executed.provenance })
     expect(result.project.measurements).toHaveLength(2); const spectrum = result.project.measurements.find(d => d.kind === 'spectrum')!
     expect(spectrum.source).toMatchObject({ kind: 'derived', inputDatasetIds: [g.datasetId], options: { window: 'hann', removeMean: true } })
     expect(spectrum.metadata).toMatchObject({ normalization: 'one-sided-peak-amplitude', sampleCount: 1024, binSpacingHz: 1 })
     expect(spectrum.metadata.coherentGain).toBeCloseTo(0.5, 14)
     expect(result.project.results[0]!.outcome).toBe('success')
+    expect(result.project.results[0]!.analysisId).toBe(configuration.id)
+    const artifact = JSON.parse(new TextDecoder().decode(assetBytes(result, result.project.results[0]!.artifactAssetIds[0]!))) as { provenance: unknown }
+    expect(artifact.provenance).toEqual(executed.provenance)
     const parsed = await deserializeProject(await serializeProject(result)); expect(parsed.kind).toBe('ready')
     if (parsed.kind === 'ready') expect([...parsed.document.project.measurements].sort((a, b) => a.id.localeCompare(b.id))).toEqual([...result.project.measurements].sort((a, b) => a.id.localeCompare(b.id)))
   })
