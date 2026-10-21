@@ -1,5 +1,23 @@
 # 开发记录
 
+## 2026-10-21 · V2.0.2 component movement production release
+
+- Owner authorized publication of the verified local movement/placement fix.
+  Application/package/lock/writer 2.0.2; schema 1 and dependencies unchanged.
+  Prior 456 tests / 28 files plus typecheck/lint/build reused; versioned build
+  and changed replay lint passed. No repeated implementation/full historical audit.
+- Fast-forward main **`1c51e63`**, [workflow 39603301979](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39603301979)
+  build/deploy success. Built and real public Chrome each passed four 1440/390px
+  × light/dark movement cases, with a 650ms hold, stable UUID/count, undo/redo,
+  armed-placement cancellation and one new component per explicit palette click.
+  No console/resource failures. Public status: **Released**.
+- Resume audit confirmed this actual state and existing v2.0.1 publication; no
+  old tags/releases were recreated. Final documentation deployment and targeted
+  live confirmation precede the v2.0.2 tag. Exact final SHA/workflow and completed
+  4/4 handoff are retained in the [canonical release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.2).
+  [Evidence/compatibility/rollback](v2/V2_0_2_COMPONENT_MOVEMENT.md). No personal
+  website repository modification or V2.1 work.
+
 ## 2026-10-21 · Local component movement / placement correction
 
 - Fixed persistent placement mode: each palette activation inserts one component,

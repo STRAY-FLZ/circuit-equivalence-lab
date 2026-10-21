@@ -1,39 +1,38 @@
 # Current Development Status
 
-Updated **2026-10-21**. **V2.0.1: Released** — node drag-to-connect and the accepted
-V2.0.0 workflow are implemented, verified and publicly deployed. V2.1 remains
+Updated **2026-10-21**. **V2.0.2: Released** — component movement / one-shot
+placement and the accepted V2.0.1 workflow are verified and publicly deployed. V2.1 remains
 **Planned**, not started.
 
-Active authorized release **V2.0.2**, 2026-10-21, **In Progress**. The component
-movement / placement correction is **Verified, not yet Released**, branch
-`codex/fix-component-drag-placement`. Each palette activation
-places one component and returns to selection; dragging an existing body moves
-its stable instance even if placement was armed. Another new component requires
-another palette activation. Typecheck/lint/build and **456 tests / 28 files** passed;
-Chrome 1440/390px × light/dark verified 650ms held drags, unchanged count/UUID,
-undo/redo and explicit one-shot additions. Owner now authorizes public release;
-package/lock/writer target **2.0.2**, schema stays 1. Preserve prior verification;
-Versioned build/typecheck/replay lint and four built-preview cases passed;
-main push, Pages/public acceptance and tag remain pending (U01–U04: 1/4).
-Public release below is the previously verified V2.0.1 build.
+Each palette activation places one component and returns to selection. Dragging
+an existing body moves its stable instance, even when placement was armed;
+another insertion requires another palette activation. Original pin wire dragging
+remains. Preparation branch: `codex/fix-component-drag-placement`.
+
+Local typecheck/lint/build and **456 tests / 28 files** passed before release;
+unchanged implementation evidence was reused. Versioned 2.0.2 build/typecheck and
+replay lint passed; existing production CI passed all its checks. Built and actual
+public Chrome 1440/390px × light/dark verified 650ms held drags, stable count/UUID,
+undo/redo and explicit one-shot additions, without console/resource errors.
 
 ## Public release
 
 - Application: <https://stray-flz.github.io/circuit-equivalence-lab/>.
-- Application/package/lockfile/export writer: **2.0.1**; engineering file
+- Application/package/lockfile/export writer: **2.0.2**; engineering file
   `formatVersion: 1` and project revision remain independent.
-- First verified patch production commit: `ede35236aab0e80fbfd65fab150f12c0eb946c26`.
-  [Pages workflow 39553250543](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39553250543)
+- First verified patch production commit: `1c51e63ebc63717c4a3ed5b1b32bae03642ad34c`.
+  [Pages workflow 39603301979](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39603301979)
   completed successfully: build and deploy. Real public acceptance then passed.
-- Final release identity and P01–P06 completion: [v2.0.1 release record](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.1).
+- Final release identity and U01–U04 completion: [v2.0.2 release record](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.2).
   It records the exact final production SHA and workflow after this documentation
   commit is deployed and verified. The tag must point to that final verified
   production commit; this document does not predict its own SHA or a future run ID.
-- [Patch evidence and rollback](v2/V2_0_1_WIRE_INTERACTION.md), [changelog](../CHANGELOG.md),
+- [Patch evidence and rollback](v2/V2_0_2_COMPONENT_MOVEMENT.md), [changelog](../CHANGELOG.md),
   [scoped progress](DEVELOPMENT_PROGRESS.md). M0–M8 and earlier internal module
   handoffs remain historical records in [DEV_LOG.md](DEV_LOG.md).
 - Prior public V2.0.0: `c6e8a9f` / `v2.0.0`; [release evidence](v2/V2_0_0_RELEASE.md).
   This patch preserves its complete history and functionality.
+- Prior public V2.0.1: `5b900ef` / `v2.0.1`; [wire release evidence](v2/V2_0_1_WIRE_INTERACTION.md).
 
 ## Verified behavior
 
@@ -52,10 +51,11 @@ Public release below is the previously verified V2.0.1 build.
   non-mutating previews, independent numerical evidence and atomic verified
   writeback, undo/redo, and five-stage lessons. Existing observed boundaries are
   protected. Original V1 algorithms and owner-approved D05 are unchanged.
-- Final local typecheck/lint/build passed; **454 tests / 28 files passed**,
+- Final local typecheck/lint/build passed; **456 tests / 28 files passed**,
   including the preserved 315-test V1 baseline. Existing production workflow
   independently passed its required checks.
-- Local built preview and public Chrome **155.0.8059.40** each passed four
+- Inherited V2.0.1 evidence (not repeated for this release): local built preview
+  and public Chrome **155.0.8059.40** each passed four
   wire viewport/theme groups plus simulated pen input, explicitly checking three
   intermediate visible paths and snapping, zoom/pan, cancellation, movement,
   undo/redo and actual file reopen. This is browser simulation, not hardware.

@@ -3,19 +3,25 @@
 Updated: **2026-10-21**. Progress is measured per scoped module; no overall
 completion percentage is assigned to the evolving multi-year product.
 
-## Active release: V2.0.2 — component movement
+## Production release: V2.0.2 — component movement
 
-**In Progress, 1/4 (25%)**, authorized 2026-10-21. Reuse the verified local fix and
-456-test baseline; production still V2.0.1. No V2.1 work.
+Public status: **Released**, 2026-10-21. This documentation checkpoint is
+**3/4 (75%)** before final documentation deployment and tag. Subsequent U04 / 4/4
+completion, exact final SHA and successful workflow are retained in the
+[canonical v2.0.2 release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.2).
+Reused the verified fix and 456-test baseline. No V2.1 work.
 
 | ID | Deliverable | Status | Evidence |
 | --- | --- | --- | --- |
 | U01 | Version/release preparation and built preview | Verified | 2.0.2 package/lock/writer; no dependency change; rebuild/typecheck/replay lint and four actual built-browser cases passed |
-| U02 | Safe main integration and Pages deployment | In Progress | Candidate ready for fast-forward main; wait actual workflow |
-| U03 | Real public movement/new-component acceptance | Planned | 650ms hold, stable UUID/count, one placement per palette action, history and themes |
-| U04 | Final release records/tag/handoff | Planned | Only after final production workflow and live verification |
+| U02 | Safe main integration and Pages deployment | Released | Fast-forward main `1c51e63`, workflow 39603301979 build/deploy success |
+| U03 | Real public movement/new-component acceptance | Released | Real 2.0.2: four 1440/390px × light/dark cases, 650ms hold, stable UUID/count, one placement per palette action and history passed, no browser/resource failures |
+| U04 | Final release records/tag/handoff | In Progress at this checkpoint | Final docs prepared; final workflow/live confirmation/tag and 4/4 handoff recorded in canonical release |
 
-Blockers: none. [Release record](v2/V2_0_2_COMPONENT_MOVEMENT.md).
+Resume check confirmed main/remote `1c51e63`, clean tree, successful workflow and
+actual public log. Existing v2.0.1 is already published; no duplicate created.
+Only final records/deployment check/tag remain. Blockers: none.
+[Release record](v2/V2_0_2_COMPONENT_MOVEMENT.md).
 
 ## Verified local follow-up: component movement / one-shot placement
 
