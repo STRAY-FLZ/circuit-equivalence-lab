@@ -1,8 +1,9 @@
 # V2.2.0 — Circuit Atlas Release
 
-Authorized 2026-10-22. **Implementation Complete → Verified locally**.
-Documentation checkpoint **A01–A07 Verified, 7/8**; A08 release In Progress.
-Not yet publicly Released at this checkpoint.
+Authorized 2026-10-22. **Implementation Complete → Verified → Application Released**.
+Documentation checkpoint **A01–A07 Verified, 7/8**; A08 final records/tag/handoff
+being finalized. Subsequent 8/8 completion and exact final SHA/workflow are in the
+canonical Release below, after this documentation commit's deployment is confirmed.
 
 ## Identity and approved version decision
 
@@ -49,8 +50,20 @@ and actual JSON exports/screenshots.
 
 ## Publication and final handoff
 
-Integrate without history rewrite, push to main, monitor both actual build and
-deploy jobs and accept the real public workflow before claiming Released.
+- First production **`01e02b4df8af85ddd4d3de47b24d2974918b9f0b`** safely
+  fast-forwarded and pushed to main. [Workflow 39639505538](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39639505538)
+  completed successfully, build and deploy.
+- Actual public Chrome full replay passed: all 26 editor opens, same animation
+  traces/native keyboard/reduced motion, unsaved cancel/confirm, actual parameter
+  edit and file round trip, original recipe independence, retained signal/V1,
+  desktop/narrow light/dark and no page overflow or console/resource errors.
+- Independent public file check: edited/exported/reopened/re-exported bytes equal;
+  UUIDs/graph/geometry/parameter retained, writer 2.2.0/schema1/R1=1234. Public
+  screenshots inspected. Evidence ignored in `output/playwright/atlas-live-*`.
+- Final documentation commit receives a targeted public resource/version,
+  catalog/editor/edit/download/reopen, signal/V1 and return-home confirmation
+  after deployment, avoiding another unchanged full browser replay.
+
 Final records/deployment confirmation precede the annotated tag. Exact final
 SHA/workflow, tag and A08 / **8/8** handoff will be recorded in the
 [canonical v2.2.0 Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.2.0).

@@ -1,9 +1,9 @@
 # Production deployment
 
-Current application release: **V2.1.0**, publicly verified 2026-10-21. See the
-[dated signal evidence and range rollback](v2/V2_1_0_RELEASE.md),
+Current application release: **V2.2.0**, publicly verified 2026-10-22. See the
+[dated Atlas evidence and range rollback](v2/V2_2_0_RELEASE.md),
 [current status](CURRENT_STATUS.md), and
-[canonical final commit/workflow/tag record](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.1.0).
+[canonical final commit/workflow/tag record](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.2.0).
 The historical M8 evidence below remains unchanged.
 
 ## Repositories and URLs

@@ -105,6 +105,23 @@ emulated narrow viewports, not physical-phone/cross-browser certification.
 Evidence is ignored under `output/playwright/atlas-local-*`. Public acceptance,
 final SHA/workflow/tag and handoff are in [V2.2.0 release record](V2_2_0_RELEASE.md).
 
+### Actual public acceptance — 2026-10-22
+
+First production **`01e02b4df8af85ddd4d3de47b24d2974918b9f0b`**,
+[workflow 39639505538](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39639505538)
+completed successfully: build and deploy. Full same Chrome replay passed at the
+actual public URL: 12/89/26, all editor opens, animation intermediate frames,
+keyboard/reduced motion, native replacement protection, actual parameter/files,
+shared-instance independence, retained signal/V1 and all four size/theme groups.
+No console/resource errors. Public original/re-exported project files independently
+byte-identical, writer 2.2.0/schema1/R1=1234. Public screenshots inspected.
+Evidence: `output/playwright/atlas-live-verification.json`,
+`atlas-live-integrity.json` and actual downloads/screenshots (all ignored).
+
+Application **Released**; final docs deployment, targeted public confirmation,
+tag and A08 / **8/8** handoff follow in the canonical Release. This document
+preserves the truthful pre-tag checkpoint without predicting its own SHA.
+
 ## Compatibility, release and rollback
 
 Schema stays 1; no migrations, external assets or dependencies. Optional

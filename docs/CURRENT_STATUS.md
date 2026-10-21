@@ -1,7 +1,7 @@
 # Current Development Status
 
 Updated **2026-10-22**. Active authorized module: **Circuit Atlas / V2.2.0**,
-**Verified locally, release In Progress, 7/8**; branch `codex/v2.2-circuit-atlas`, baseline public
+**Application Released; finalization checkpoint 7/8**; branch `codex/v2.2-circuit-atlas`, baseline public
 `1b61a74` / v2.1.0 confirmed from remote main/tag/published Release. Clean baseline.
 Owner approved V2.2.0 release after acceptance and DC/filters/competition roadmap
 shift to V2.3/2.4/2.5, with V3–V6 unchanged. No later-module work authorized.
@@ -14,8 +14,17 @@ opens, native dirty cancel/confirm, real 100→1234 edit/export/reopen (byte-ide
 independent new instances, retained signal/V1 and 1440/390px light/dark. Screenshots
 inspected; no console/resource failures. JS `index-Bd8uTY76.js`, CSS
 `index-DmkpcxYZ.css`. Standard evidence reused after interruption; only missing
-browser acceptance completed. A08 production integration/deployment/live/tag/handoff
-remain. No V2.2 push/deployment yet. Package/writer 2.2.0, file schema 1.
+browser acceptance completed. First production **`01e02b4df8af85ddd4d3de47b24d2974918b9f0b`**,
+[workflow 39639505538](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39639505538)
+build/deploy succeeded. The same full real public workflow passed, including all
+26 editor opens, animation/keyboard/reduced motion, native replacement protection,
+file round trips and four size/theme groups. Independent public export/re-export
+is byte-identical; no console/resource errors. Package/writer 2.2.0, file schema 1.
+
+This documentation checkpoint precedes its own deployment confirmation/tag.
+Subsequent A08 / **8/8** completion, exact final SHA/workflow and annotated tag are
+recorded in the [canonical v2.2.0 Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.2.0).
+It avoids predicting this file's own SHA or claiming an uncreated tag.
 No new dependency, source algorithm, solver model or project schema. Blockers: none.
 See [per-version implemented/planned checklist](VERSION_CHECKLIST.md),
 [scoped progress](DEVELOPMENT_PROGRESS.md), [Atlas contracts/coverage](v2/CIRCUIT_ATLAS.md).

@@ -5,7 +5,7 @@ completion percentage is assigned to the evolving multi-year product.
 
 ## Active module: V2.2.0 — Circuit Atlas
 
-**Verified locally; release In Progress, 7/8 (87.5%)**, authorized 2026-10-22. Baseline main/tag/release
+**Application Released; finalization checkpoint 7/8 (87.5%)**, authorized 2026-10-22. Baseline main/tag/release
 `1b61a74` / v2.1.0 verified. Branch `codex/v2.2-circuit-atlas`.
 Owner confirmed V2.2.0 publication after acceptance and roadmap shift DC→2.3,
 filters→2.4, competition→2.5; V3–V6 unchanged. No later-module implementation.
@@ -19,7 +19,14 @@ filters→2.4, competition→2.5; V3–V6 unchanged. No later-module implementat
 | A05 | Initial valid templates | Verified | 26 actual projects; 30 focused catalog cases: nets, parameters, UUID independence, canonical file round trips, actual resistor evidence |
 | A06 | Editor integration/preservation | Verified | All 26 opened; actual dirty cancel/confirm, edited file download/reopen byte-identical, IDs/parameters retained; shared recipe unaffected; signal/V1 retained |
 | A07 | Tests/actual browser acceptance | Verified | Final typecheck/lint/test/build, 539 tests / 33 files; actual built 2.2.0 Chrome workflow/screenshots, no console/resource failures |
-| A08 | Docs/version/release/handoff | In Progress | Package/writer 2.2.0, schema 1; docs/changelog/rollback; accepted candidate awaiting main/Pages/public/tag/handoff |
+| A08 | Docs/version/release/handoff | Finalization at this checkpoint | Package/writer 2.2.0/schema1; main 01e02b4 / Pages 39639505538 succeeded; full public acceptance passed; final docs deployment/tag/8-of-8 handoff in canonical Release |
+
+First production `01e02b4df8af85ddd4d3de47b24d2974918b9f0b`,
+[workflow 39639505538](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39639505538)
+build/deploy success. Public Chrome full replay and byte-identical file round
+trip passed. Final documentation deployment receives a targeted live confirmation
+before tagging. Exact final SHA/workflow and A08 / **8/8** completion are in the
+[canonical v2.2.0 Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.2.0).
 
 Blockers: none. [Design and coverage](v2/CIRCUIT_ATLAS.md),
 [per-version checklist](VERSION_CHECKLIST.md). Stop after Atlas and its authorized release.
@@ -164,7 +171,7 @@ production code. Verified does not imply owner approval of proposed decisions.
 | V2.0-C schematic editor | Released | Implemented, verified and publicly available in V2.0.0 |
 | V2.0-D V1 integration | Released | Implemented, verified and publicly available in V2.0.0 |
 | V2.1 signal measurement | Released | v2.1.0 / 1b61a74, final 10/10 in canonical Release |
-| V2.2 circuit atlas | In Progress | Authorized 2026-10-22; no release yet |
+| V2.2 circuit atlas | Released | Public full acceptance passed; final SHA/tag/8-of-8 handoff in canonical Release |
 | V2.3 DC analysis | Planned | Owner-approved shift from former V2.2 |
 | V2.4 filters/frequency response | Planned | Owner-approved shift from former V2.3 |
 | V2.5 competition workspace | Planned | Owner-approved shift from former V2.4 |

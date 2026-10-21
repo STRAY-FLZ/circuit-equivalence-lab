@@ -21,7 +21,7 @@ complete intended feature scope; it does not authorize implementation or release
   and DEVELOPMENT_PROGRESS.md for later internal design completion or implementation.
 - The priorities and future version labels are planning targets, not release
   tags or promises of dates. Historical V1 package was `0.1.0`; current public
-  release is V2.1.0. Owner approved Atlas V2.2.0 on 2026-10-22 and shifted
+  release is V2.2.0 (Atlas public workflow verified). Owner approved Atlas on 2026-10-22 and shifted
   DC/filters/competition to V2.3/2.4/2.5. V3–V6 unchanged. See the actual
   [version checklist](VERSION_CHECKLIST.md); the unchecked original scope below
   is a planning inventory, not a current completion tracker.

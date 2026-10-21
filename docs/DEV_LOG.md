@@ -1,5 +1,25 @@
 # 开发记录
 
+## 2026-10-22 · Circuit Atlas V2.2.0 public acceptance
+
+- Preserved history and safely fast-forwarded accepted branch into main,
+  **`01e02b4df8af85ddd4d3de47b24d2974918b9f0b`**.
+  [Workflow 39639505538](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39639505538)
+  build/deploy completed successfully. Actual public V2.2.0 accepted in Chrome
+  155.0.8059.85: 12/89/26, all template opens, real animation intermediate
+  frames/reflow/fade/rotation, native keyboard/inert/ARIA/reduced motion,
+  dirty cancel/confirm, real parameter edit and project files, signal/V1 retained,
+  1440/390px light/dark. No console/resource errors; screenshots inspected.
+- Public actual export/re-export independently byte-identical; stable project/
+  component IDs, graph, geometry and R1=1234 retained, writer2.2.0/schema1.
+  Scope unchanged: 9 conditional resistor numerical/lesson templates, 17
+  schematic/edit-only; 69 planned families. No new solver/dependency or V2.3 work.
+- Application **Released**, this final documentation checkpoint **7/8** before
+  its own deployment confirmation/tag. Exact final SHA/workflow, annotated tag
+  and A08 / **8/8** handoff are in the
+  [canonical Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.2.0).
+  [Full version checklist](VERSION_CHECKLIST.md), [release/rollback](v2/V2_2_0_RELEASE.md).
+
 ## 2026-10-22 · Circuit Atlas local acceptance / resume
 
 - Recovered `codex/v2.2-circuit-atlas` / `a318ca2`, preserving all pending version,
