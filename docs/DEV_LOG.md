@@ -1,5 +1,29 @@
 # 开发记录
 
+## 2026-10-21 · V2.0.0 Production Release
+
+- Owner authorized the full production release. Confirmed remote baseline
+  `8fd6e9b`, successful existing Pages workflow and accepted A/B/C/D ancestry
+  through `4030e08`; integrated using fast-forward history without conflicts.
+  Candidate `6485006` was pushed to main; no force push or recreated history.
+- Application/package/lock/footer/export writer now 2.0.0; project schema remains
+  1. Dependencies, V1 algorithms, D05 and the existing workflow are unchanged.
+  Added changelog, compatibility/rollback notes and reusable public browser replay.
+- Final local typecheck/lint/build passed and **438 tests / 27 files passed**.
+  Seven local and seven real public Chrome integration workflows passed, including
+  all four transformations, five lesson stages, stable identities and byte-identical
+  JSON round trips. Desktop/narrow × light/dark checked; no phone certification.
+- [Production workflow 39541122926](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39541122926)
+  succeeded (build/deploy); public version and production resource paths verified.
+  Four actual website/tools/application/home round trips and a V1 MathML lesson
+  passed, without console/resource errors. Personal website repository unchanged.
+- Public B/C/D status is now **Released**, distinct from prior internal handoffs.
+  Final documentation deployment must also pass before tagging. Exact final SHA,
+  final workflow and completed R01–R09 handoff are recorded in the
+  [canonical v2.0.0 release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.0).
+  [Full evidence and rollback](v2/V2_0_0_RELEASE.md). Stop before V2.1; separate
+  module authorization remains required. No unresolved release blocker.
+
 ## 2026-10-21 · V2.0-D Editor / V1 Equivalence Integration
 
 - Completed **D-C01–D-C10, 10/10 Verified / Implementation Complete, not Released**.

@@ -3,10 +3,15 @@
 Updated: **2026-10-21**. Progress is measured per scoped module; no overall
 completion percentage is assigned to the evolving multi-year product.
 
-## Active release: V2.0.0 — R01–R09
+## Production release: V2.0.0 — R01–R09
 
-Status: **In Progress, 5/9 (56%)**, authorized 2026-10-21. Scope includes production
-integration/push, existing Pages deployment, live verification and tag/release.
+Production status: **Released**, verified 2026-10-21. Execution checkpoint before
+the final documentation deployment/tag: **7/9 (78%)**. R08/R09 final completion,
+the final production SHA and its successful workflow are recorded in the
+[canonical v2.0.0 GitHub Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.0)
+after this commit's deployment is verified. This preserves a truthful pre-tag
+checkpoint without predicting this document's own commit/run. Authorized scope
+includes production integration, Pages, public acceptance and tag/release.
 Do not begin V2.1. [Release evidence](v2/V2_0_0_RELEASE.md).
 
 | ID | Deliverable | Status | Evidence |
@@ -16,12 +21,14 @@ Do not begin V2.1. [Release evidence](v2/V2_0_0_RELEASE.md).
 | R03 | Version, visible information and release/compatibility notes | Verified | Package/lock/footer/writer 2.0.0; schema 1; changelog, compatibility and rollback documented |
 | R04 | Final integrated standard checks | Verified | Typecheck/lint/build passed; 438 tests / 27 files passed |
 | R05 | Actual local production browser preview | Verified | Chrome 155: seven workflow groups; real JSON round trip byte-identical; 1440/390px and both themes |
-| R06 | Main push and successful Pages workflow | In Progress | Verified candidate being committed; production push pending |
-| R07 | Actual public application / website navigation | Planned | Pending |
-| R08 | Tag/release and final persistent records | Planned | Only after successful public acceptance |
-| R09 | Final owner report and handoff | Planned | Stop before V2.1 |
+| R06 | Main push and successful Pages workflow | Released | `6485006`; build/deploy success, workflow 39541122926 |
+| R07 | Actual public application / website navigation | Released | Seven public workflows, four actual website round trips, V1 five-stage MathML lesson, no resource/console errors |
+| R08 | Tag/release and final persistent records | In Progress at this checkpoint | Persistent release records written; final documentation deployment, final tag/publication recorded in canonical release above |
+| R09 | Final owner report and handoff | Planned at this checkpoint | Final report follows verified final deployment and tag; also retained in canonical release; stop before V2.1 |
 
-Branch: `codex/release-v2.0.0`. No production push/tag yet. Blockers: none.
+Release preparation branch: `codex/release-v2.0.0`, fast-forwarded into production
+`main`; no history rewrite. Final tag must follow the final documentation workflow
+and live check. Blockers: none.
 Git uses the existing system proxy per command because direct GitHub access failed.
 
 ## Status vocabulary
@@ -42,11 +49,11 @@ production code. Verified does not imply owner approval of proposed decisions.
 
 | Version/module | Status | Release state |
 | --- | --- | --- |
-| V1, M0–M8 | Released | Last repository-recorded live verification 2026-10-11, `a7096c7`; actual package `0.1.0` |
+| V1, M0–M8 | Released | Preserved in V2.0.0; public previews/lesson/MathML/navigation reverified 2026-10-21; historical package was 0.1.0 |
 | V2.0-A architecture/interfaces | Verified | Internal design complete; no public release required or authorized |
-| V2.0-B engineering model/files | Verified | Internal foundation complete; not Released |
-| V2.0-C schematic editor | Verified | Internal editor complete; not Released |
-| V2.0-D V1 integration | Verified | Internal B/C/D workflow verified; not Released |
+| V2.0-B engineering model/files | Released | Implemented, verified and publicly available in V2.0.0 |
+| V2.0-C schematic editor | Released | Implemented, verified and publicly available in V2.0.0 |
+| V2.0-D V1 integration | Released | Implemented, verified and publicly available in V2.0.0 |
 | V2.1 signal measurement | Planned | Future usable feature release |
 | V2.2 DC analysis | Planned | Future usable feature release |
 | V2.3 filters/frequency response | Planned | Future usable feature release |

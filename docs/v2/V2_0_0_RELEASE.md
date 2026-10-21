@@ -1,6 +1,7 @@
 # V2.0.0 Production Release
 
-Release task authorized **2026-10-21**. Status: **In Progress**, not yet Released.
+Release task authorized **2026-10-21**. Public application status: **Released**,
+deployment and real public workflow verified on 2026-10-21.
 Application: <https://stray-flz.github.io/circuit-equivalence-lab/>.
 Scope: publish verified A/B/C/D, then stop before V2.1.
 
@@ -35,8 +36,38 @@ is byte-identical (SHA-256 `a639a4354e514263f878aaaffad630f971c0f6454cc2e2db8ee4
 Replay: `tests/browser/editor-transformations.js`; ignored local evidence:
 `output/playwright/release-local-*`. Narrow viewports are emulated, not physical phones.
 
-Actual production deployment and live acceptance are pending.
-No tag or public success is claimed by this checkpoint.
+Production candidate **`64850067fc0cf9344efd5e31be31fe3f954079d1`** was pushed
+to main using fast-forward history. [Workflow 39541122926](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39541122926)
+completed with **success**, both build and deploy. The existing required CI
+checks passed. No workflow, dependency or personal-website repository was changed.
+
+Actual public Chrome acceptance passed all seven integration replay groups with
+`errors: []`, `failed: []`, version 2.0.0. This includes creating a circuit, real
+wiring/ports, derived nets, all four transformation types, preview/numerical
+verification, transactional apply/undo/redo, save/reopen, five lesson stages,
+boundary protection and unsupported/inconclusive behavior. Public JSON round-trip
+SHA-256: `12f5ef2a018b755033200e16b1d19458fae4b34685eff0ce4e7417f6c7bdb2e0`.
+
+`tests/browser/release-navigation.js` passed four **actual** website homepage →
+tools entry → application → return-home journeys (1440/390px × light/dark), with
+shared theme preserved and no browser/resource failures. V1 Δ→Y five-stage lesson
+also passed: 19 visible native MathML expressions and all three terminal-pair
+comparisons. Production resources all returned 200 under the preserved base:
+`theme-init.js`, `favicon.svg`, JS/CSS fingerprints above. Public desktop/light
+and narrow/dark screenshots were visually inspected. Local/public evidence is
+retained in ignored `output/playwright/release-local-*` / `release-live-*` files.
+
+### Final production identity and tag
+
+The publication checkpoint is 7/9, before this final documentation commit is
+deployed. It requires its own successful Pages workflow and a fresh live version/
+asset check. **Only then** create `v2.0.0` on that final production commit, push
+the tag and publish the release notes. Do not move an existing published tag.
+
+The durable [v2.0.0 GitHub Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.0)
+is the canonical final record of R01–R09 completion, exact production SHA,
+final workflow URL/result and tag publication. [Tagged source](https://github.com/STRAY-FLZ/circuit-equivalence-lab/tree/v2.0.0)
+identifies the final verified commit without a self-referential SHA in this file.
 Track R01–R09 in [development progress](../DEVELOPMENT_PROGRESS.md).
 
 ## Compatibility and limits
