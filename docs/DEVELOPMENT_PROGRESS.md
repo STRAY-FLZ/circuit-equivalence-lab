@@ -3,6 +3,27 @@
 Updated: **2026-10-21**. Progress is measured per scoped module; no overall
 completion percentage is assigned to the evolving multi-year product.
 
+## Active module: V2.1.0 — Signal Measurement & Analysis
+
+**In Progress, 2/10 (20%)**, authorized 2026-10-21. Baseline: actual public V2.0.2
+`bd79d6a`, clean main equal to origin/main. Branch `codex/v2.1-signal-lab`.
+
+| ID | Deliverable | Status | Evidence |
+| --- | --- | --- | --- |
+| S01 | Signal data/processing foundation | Verified | Stable descriptors, verified float64 assets, async FFT provider, units/provenance and limits tested |
+| S02 | Configurable sampled generator | Implementation Complete | All five pure sampled generators/options verified; workbench controls pending |
+| S03 | Interactive oscilloscope | Planned | Actual samples, axes, scale/navigation/cursor, compatible channels |
+| S04 | Numerically defined measurements | Verified | Full-capture min/max/pp/mean/total RMS/AC RMS, conservative frequency availability, method/options/units tested |
+| S05 | FFT amplitude spectrum | Implementation Complete | Analytical/direct DFT, rectangular/periodic Hann/gain/DC/Nyquist verified; display pending |
+| S06 | CSV import/export | Implementation Complete | Explicit mapping/units, row/column diagnostics, source/round trips verified; file UI pending |
+| S07 | Integrated accessible workbench | Planned | Signal tab, retained dataset, education, themes/responsive |
+| S08 | Data integrity/project persistence | Implementation Complete | Schema 1 raw/derived assets, hash/source graph/settings round trips verified; workbench controls pending |
+| S09 | Numerical/UI/browser acceptance | In Progress | 40 core numerical/data tests pass; core typecheck/lint pass; actual workbench browser pending |
+| S10 | Docs/version/release/handoff | Planned | 2.1.0 only after checks, Pages and actual live acceptance |
+
+Blockers: none. Preserve latest movement fix and original V1/D05. Do not begin
+V2.2/V2.3 or claim hardware acquisition. Commit verified meaningful checkpoints.
+
 ## Production release: V2.0.2 — component movement
 
 Public status: **Released**, 2026-10-21. This documentation checkpoint is

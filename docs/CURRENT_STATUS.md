@@ -1,8 +1,18 @@
 # Current Development Status
 
 Updated **2026-10-21**. **V2.0.2: Released** — component movement / one-shot
-placement and the accepted V2.0.1 workflow are verified and publicly deployed. V2.1 remains
-**Planned**, not started.
+placement and the accepted V2.0.1 workflow are verified and publicly deployed.
+Active V2.1.0 development is tracked below.
+
+Active authorized module **V2.1.0 Signal Measurement & Analysis**, 2026-10-21,
+**In Progress, S01–S10: 2/10**. S01/S04 verified; 40 focused numerical/data tests
+and core typecheck/lint pass. Generator/FFT/CSV/persistence cores exist; actual
+workbench and browser acceptance remain pending. Actual baseline is V2.0.2 `bd79d6a`
+(the new brief's V2.0.1 baseline is historical). Branch
+`codex/v2.1-signal-lab`. Scope: synthetic/imported uniform captures, generator,
+oscilloscope, statistics/frequency, FFT, CSV and portable inline-asset persistence.
+No hardware acquisition, schematic simulation, V2.2 or V2.3. Publication of 2.1.0
+is authorized after acceptance; current production remains 2.0.2.
 
 Each palette activation places one component and returns to selection. Dragging
 an existing body moves its stable instance, even when placement was armed;
