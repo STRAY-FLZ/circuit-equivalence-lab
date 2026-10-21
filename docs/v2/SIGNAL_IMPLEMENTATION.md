@@ -105,7 +105,12 @@ Final standard checks: typecheck/lint/test/build passed, **504 tests / 31 files*
 (456 accepted baseline + 48 new). The final rerun followed a concrete canonical
 digest correction: recursively sort object keys, retain array order, SHA-256 the
 canonical JSON, and attach the exact engine execution's configuration/provenance.
-JS `index-CllZGzPr.js`, CSS `index-C8UEpovD.css`, 80 modules; no new dependencies.
+The subsequent concrete narrow-screen tick-spacing correction also passed the
+same standard checks (**504 / 31**) and complete local built-browser replay.
+Browser checks now measure the actual time/frequency label bounding boxes at
+1440/390px × light/dark and require a gap; all passed. Narrow charts retain grid
+lines with fewer x-axis labels. Final JS `index-C5L40b3w.js`, CSS
+`index-C8UEpovD.css`, 80 modules; no new dependencies.
 Actual legacy 2.0.1 file open → generate signal → full project export preserved
 the original project ID, sheets/geometry, definitions/symbols and prior extension
 metadata exactly, with writer 2.1.0 and schema 1.
@@ -130,7 +135,8 @@ build/deploy succeeded. The complete same browser replay passed against the real
 public V2.1.0 application: numerical outputs, 65536-point capture (226ms observed,
 not a performance guarantee), two-channel CSV, Hann/DC settings, actual downloads
 and reopen, both themes/viewport sizes and preserved circuit navigation. No
-console/resource failures. Public assets match the accepted final build above.
+console/resource failures. That first deployment used JS `index-CllZGzPr.js`;
+the final corrected build above requires public replay before the final tag.
 
 Independent Node SHA-256/byte-length checks passed for every asset in the actual
 public export (11 datasets / 27 assets for this replay). Original CSV byte-identical;

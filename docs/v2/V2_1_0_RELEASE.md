@@ -36,7 +36,11 @@ Final 2.1.0 built preview passed with no browser/resource errors. Raw source CSV
 and stable identities/results survived actual reopen. A real older 2.0.1 circuit
 project retained all graph/geometry/definitions/symbols/prior metadata after
 signal generation/export, now writer 2.1.0 / schema 1. Final assets:
-JS `index-CllZGzPr.js`, CSS `index-C8UEpovD.css`.
+JS `index-C5L40b3w.js`, CSS `index-C8UEpovD.css`. Visual inspection subsequently
+caught adjacent narrow-screen time labels overlapping; reduced x-label density,
+retaining grid/data, and added real bounding-box checks to the browser replay.
+Final corrected code again passed typecheck/lint/504 tests/build and complete
+local browser replay, all four size/theme groups with separated tick labels.
 
 ## Verified public deployment — 2026-10-21
 
@@ -49,7 +53,8 @@ JS `index-CllZGzPr.js`, CSS `index-C8UEpovD.css`.
   changed frequency, cursor/zoom, 65536 samples, ms/mV/mA → s/V/A two-channel CSV,
   Hann/DC removal, actual CSV/report/project downloads and actual project reopen,
   malformed import preservation, both themes at 1440/390px and editor/V1 navigation.
-  No console/resource errors; deployed JS/CSS fingerprints match the local build.
+  No console/resource errors; this first deployment matched its then-local build
+  (`index-CllZGzPr.js`). Final corrected assets above require a fresh public replay.
 - Independent public-file validation: original CSV byte-identical; every asset's
   SHA-256 and length valid; raw/derived data, stable IDs and analysis/result records
   equal after reopen; exact actual engine configuration/provenance retained.

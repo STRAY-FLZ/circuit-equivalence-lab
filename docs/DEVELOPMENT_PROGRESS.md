@@ -23,7 +23,7 @@ This preserves the actual pre-tag checkpoint rather than predicting its own SHA.
 | S06 | CSV import/export | Verified | Explicit confirmation/units, physical row/column diagnostics, real CSV download/reimport and JSON measurement report |
 | S07 | Integrated accessible workbench | Verified | Signal tab retains data across existing editor/V1 navigation; education and desktop/narrow themes verified |
 | S08 | Data integrity/project persistence | Verified | Raw CSV byte-identical; generated 65536-point capture retained; exact dataset/channel/assets/results restored; FFT parameters and actual engine provenance persisted |
-| S09 | Numerical/UI/browser acceptance | Verified | Final typecheck/lint/build and 504 tests / 31 files; built and actual public 2.1.0 workflows; 65536 samples, CSV/project round trips, all asset hashes, legacy 2.0.1 circuit preservation |
+| S09 | Numerical/UI/browser acceptance | Verified | Final typecheck/lint/build and 504 tests / 31 files; built and first public workflows; final tick-spacing fix locally replayed with actual label bounds at four size/theme groups; public corrected-build replay precedes tag |
 | S10 | Docs/version/release/handoff | Finalization at this checkpoint | Package/writer 2.1.0, schema 1; docs/changelog/rollback; main dfc5d78 and Pages 39614955343 success, full public acceptance; final deployment/tag/10-of-10 handoff in canonical release |
 
 Blockers: none. Preserve latest movement fix and original V1/D05. Do not begin

@@ -19,6 +19,10 @@ CSV, real exports/reopen, responsive charts and existing circuit navigation.
 Raw CSV bytes, all asset hashes and restored IDs/results independently verified.
 A real legacy 2.0.1 circuit project retained its graph/geometry/metadata after
 open/generate/export. No hardware acquisition, schematic simulation, V2.2 or V2.3.
+Final narrow-screen tick-spacing correction passed the same standard checks and
+complete local replay, including actual label bounding-box separation in four
+size/theme groups. Final JS `index-C5L40b3w.js`; its public replay/identity will
+be recorded in the canonical release before tagging.
 
 ## Public release
 

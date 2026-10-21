@@ -21,6 +21,12 @@
   65536 samples, two-channel CSV mapping, Hann/DC, actual downloads/reopen,
   invalid-input preservation, 1440/390px light/dark and editor/V1 navigation.
   No console/resource errors; independent hashes/raw CSV/identity/provenance pass.
+- Final screenshot inspection caught adjacent narrow time ticks overlapping.
+  Reduced x-axis label density while retaining data/grid; browser replay now
+  checks actual label bounds. Corrected code passed standard checks again
+  (504 tests / 31 files) and the full local replay, with non-overlapping labels
+  at 1440/390px × light/dark. Final JS `index-C5L40b3w.js`; corrected-build public
+  replay is required before tagging. Branch `codex/v2.1-chart-axis-spacing`.
 - Application **Released**; this final documentation checkpoint is 9/10 before
   its own deployment/tag. Final targeted public confirmation, exact production
   SHA/workflow and S10 / **10/10** handoff are retained in the

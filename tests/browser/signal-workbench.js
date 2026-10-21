@@ -47,7 +47,8 @@ async (page) => {
       await scope.screenshot({path:`output/playwright/${prefix}-scope-${width}-${theme}.png`});await fft.screenshot({path:`output/playwright/${prefix}-fft-${width}-${theme}.png`});
       assert(await page.evaluate(()=>globalThis.document.documentElement.scrollWidth<=globalThis.innerWidth),'no page-level horizontal overflow');
       const fontPixels=await page.getByRole('application',{name:'CH1_mV 时域波形'}).evaluate(svg=>Number.parseFloat(globalThis.getComputedStyle(svg.querySelector('text')).fontSize)*svg.getScreenCTM().a);assert(fontPixels>=10,'legible responsive chart axes');
-      journeys.push({width,theme,scopeAndSpectrum:'actual SVG samples/axes, no page overflow',axisFontPixels:fontPixels});
+      const separated=await page.locator('.signal-chart svg').evaluateAll(charts=>charts.every(svg=>{const labels=Array.from(svg.querySelectorAll('text')).filter(t=>t.getAttribute('y')==='202').map(t=>t.getBoundingClientRect()).sort((a,b)=>a.left-b.left);return labels.length>=2&&labels.every((label,i)=>i===0||labels[i-1].right+2<=label.left);}));assert(separated,'time/frequency tick labels must not overlap');
+      journeys.push({width,theme,scopeAndSpectrum:'actual SVG samples/axes, no page overflow',axisFontPixels:fontPixels,tickLabelsSeparated:separated});
     }
     await page.setViewportSize({width:1440,height:1100});
     await label('选择 CSV 文件').setInputFiles('output/playwright/signal-invalid.csv');await button('确认列与单位并导入').click();await page.getByRole('alert',{name:'信号处理状态'}).waitFor();
