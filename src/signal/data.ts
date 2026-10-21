@@ -1,5 +1,5 @@
-import { createEmptyProject, createId, reviseProject } from '../engineering'
-import type { AnalysisConfiguration, EngineeringProject, JsonObject, MeasurementDataset, ScalarMeasurement, WaveformChannel } from '../engineering'
+import { assertJsonData, createEmptyProject, createId, reviseProject } from '../engineering'
+import type { AnalysisConfiguration, EngineeringProject, JsonObject, JsonValue, MeasurementDataset, ScalarMeasurement, WaveformChannel } from '../engineering'
 import type { ResultProvenance } from '../analysis'
 import { createInlineAsset, createProjectDocument, decodeInlineAsset } from '../project-format'
 import type { InlineAsset, ProjectDocumentV1 } from '../project-format'
@@ -12,7 +12,13 @@ export interface LoadedWaveform {
   readonly channels: readonly { readonly channel: WaveformChannel; readonly values: Float64Array }[]
 }
 export async function digestJson(value: unknown): Promise<string> {
-  const bytes = new TextEncoder().encode(JSON.stringify(value)), hash = await crypto.subtle.digest('SHA-256', bytes)
+  assertJsonData(value)
+  const canonical = (input: JsonValue): JsonValue => {
+    if (Array.isArray(input)) return input.map((item: JsonValue) => canonical(item))
+    if (input !== null && typeof input === 'object') { const record = input as JsonObject; return Object.fromEntries(Object.keys(record).sort().map(key => [key, canonical(record[key]!)])) }
+    return input
+  }
+  const bytes = new TextEncoder().encode(JSON.stringify(canonical(value as JsonValue))), hash = await crypto.subtle.digest('SHA-256', bytes)
   return [...new Uint8Array(hash)].map(x => x.toString(16).padStart(2, '0')).join('')
 }
 export function float64Bytes(values: ArrayLike<number>): Uint8Array {

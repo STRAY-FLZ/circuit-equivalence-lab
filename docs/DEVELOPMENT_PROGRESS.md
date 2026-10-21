@@ -5,7 +5,7 @@ completion percentage is assigned to the evolving multi-year product.
 
 ## Active module: V2.1.0 — Signal Measurement & Analysis
 
-**In Progress, 8/10 (80%)**, authorized 2026-10-21. Baseline: actual public V2.0.2
+**In Progress, 9/10 (90%)**, authorized 2026-10-21. Baseline: actual public V2.0.2
 `bd79d6a`, clean main equal to origin/main. Branch `codex/v2.1-signal-lab`.
 
 | ID | Deliverable | Status | Evidence |
@@ -18,8 +18,8 @@ completion percentage is assigned to the evolving multi-year product.
 | S06 | CSV import/export | Verified | Explicit confirmation/units, physical row/column diagnostics, real CSV download/reimport and JSON measurement report |
 | S07 | Integrated accessible workbench | Verified | Signal tab retains data across existing editor/V1 navigation; education and desktop/narrow themes verified |
 | S08 | Data integrity/project persistence | Verified | Raw CSV byte-identical; generated 65536-point capture retained; exact dataset/channel/assets/results restored; FFT parameters and actual engine provenance persisted |
-| S09 | Numerical/UI/browser acceptance | In Progress | 47 focused cases pass; local built-browser workflow passed incl 65536 samples; final candidate standard checks/versioned preview pending |
-| S10 | Docs/version/release/handoff | Planned | 2.1.0 only after checks, Pages and actual live acceptance |
+| S09 | Numerical/UI/browser acceptance | Verified | Final typecheck/lint/build and 504 tests / 31 files passed; actual final 2.1.0 built-browser workflow, 65536-point capture, CSV/project round trips, legacy 2.0.1 circuit preservation |
+| S10 | Docs/version/release/handoff | In Progress | Version/package/writer 2.1.0, schema 1; changelog/methods/compatibility/rollback; publication gated on S09 and live checks |
 
 Blockers: none. Preserve latest movement fix and original V1/D05. Do not begin
 V2.2/V2.3 or claim hardware acquisition. Commit verified meaningful checkpoints.

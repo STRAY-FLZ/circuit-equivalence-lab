@@ -60,6 +60,10 @@ describe('CSV measurement contract', () => {
   })
 })
 describe('signal asset and analysis integration', () => {
+  it('hashes canonical object keys while retaining meaningful array order', async () => {
+    expect(await digestJson({ z: [1, 2], a: { y: 3, x: 4 } })).toBe(await digestJson({ a: { x: 4, y: 3 }, z: [1, 2] }))
+    expect(await digestJson([1, 2])).not.toBe(await digestJson([2, 1]))
+  })
   it('generates immutable waveform assets and records complete source configuration', async () => {
     const initial = await emptySignalDocument(writer), generated = await appendGenerated(initial, DEFAULT_GENERATOR), w = loadWaveform(generated.document, generated.datasetId)
     expect(initial.project.measurements).toHaveLength(0); expect(w.dataset.source.kind).toBe('simulated')

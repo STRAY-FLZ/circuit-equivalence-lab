@@ -2,8 +2,8 @@
 
 Authorized 2026-10-21. Baseline actual public **V2.0.2 `bd79d6a`**; branch
 `codex/v2.1-signal-lab`. No V2.2/V2.3, hardware transport or schematic solver.
-Status: **S01–S08 Verified**, final integrated checks/versioned preview/release
-pending. Core checkpoint `927b36b`; second UI checkpoint recorded separately.
+Status: **S01–S09 Verified**, production release pending. Core checkpoint
+`927b36b`; UI checkpoint `fa90724`. Final candidate is application 2.1.0.
 
 ## Data and numerical boundary
 
@@ -60,7 +60,8 @@ provenance/calibration, which portable project JSON retains with raw/derived ass
 Checkpoint evidence: focused numerical/data tests, including analytical 100Hz
 1V-peak/1024Hz/1024-sample sine, DC/Nyquist, Hann gain, independent direct DFT,
 seeded noise, error cases, source integrity and real schema-1 JSON/CSV round trips.
-Focused count: **47** (23 numerical/display, 18 data/provider/CSV, 6 workbench UI).
+Focused count at UI checkpoint: **47** (23 numerical/display, 18 data/provider/CSV,
+6 workbench UI), now **48** with canonical input-digest regression.
 Development typecheck/lint passed. UI tests exercise actual project export/reopen,
 RMS/FFT updates, malformed import preservation and retained state across tabs.
 
@@ -87,7 +88,7 @@ Actual local built-preview Chrome **155.0.8059.40** passed the replay
 `tests/browser/signal-workbench.js`: 100Hz / 1V peak / fs1024 / N1024 waveform,
 RMS 0.7071068V, 100Hz/1V FFT; 200Hz updates both views; exact sample cursor and
 zoom-only presentation; N65536 full analysis (227ms observed locally, not a latency
-guarantee); explicit ms/mV/mA import to s/V/A, two channels; Hann/DC removal;
+guarantee; final candidate observed 262ms); explicit ms/mV/mA import to s/V/A, two channels; Hann/DC removal;
 CSV/report/project downloads and actual reopen; invalid CSV leaves active capture;
 1440/390 × light/dark screenshots/axes inspected, no page overflow; existing
 editor one-shot placement and V1 series preview remain available. No console/HTTP
@@ -95,8 +96,18 @@ failures. Evidence: ignored `output/playwright/signal-local-*`.
 
 Independent file inspection confirmed raw CSV byte-identical, 65536 original
 samples retained, and identical measurement/channel/asset/analysis/result IDs and
-contents after actual project export/reopen. The pre-release build still reports
-application 2.0.2; final candidate must use 2.1.0 before publication.
+contents after actual project export/reopen. Earlier UI checkpoint reported 2.0.2;
+the final versioned build now reports **2.1.0** and passed the complete same
+workbench workflow without browser/resource errors.
+
+Final standard checks: typecheck/lint/test/build passed, **504 tests / 31 files**
+(456 accepted baseline + 48 new). The final rerun followed a concrete canonical
+digest correction: recursively sort object keys, retain array order, SHA-256 the
+canonical JSON, and attach the exact engine execution's configuration/provenance.
+JS `index-CllZGzPr.js`, CSS `index-C8UEpovD.css`, 80 modules; no new dependencies.
+Actual legacy 2.0.1 file open → generate signal → full project export preserved
+the original project ID, sheets/geometry, definitions/symbols and prior extension
+metadata exactly, with writer 2.1.0 and schema 1.
 
 ## Current limitations
 
@@ -110,5 +121,5 @@ not silently discarded. Captures/derived analyses accumulate in the portable
 project until existing asset/file limits; export failures report incompleteness
 instead of emitting partial files. No autosave, cloud or external container.
 
-S09 final standard checks and versioned preview, S10 changelog/compatibility/
-rollback, Pages and real public acceptance remain required before Released.
+S10 production integration, Pages, real public acceptance and final tag/handoff
+remain required before Released. Relevant release record: [V2.1.0](V2_1_0_RELEASE.md).

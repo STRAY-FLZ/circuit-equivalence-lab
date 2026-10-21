@@ -1,7 +1,7 @@
 {
   "name": "circuit-equivalence-lab",
   "private": true,
-  "version": "2.0.2",
+  "version": "2.1.0",
   "type": "module",
   "description": "大学本科电路课程的交互式电路等效变换实验室",
   "engines": { "node": "^24.15.0 || >=26.0.0", "npm": ">=11" },
