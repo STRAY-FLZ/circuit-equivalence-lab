@@ -1,15 +1,21 @@
 # Current Development Status
 
 Updated **2026-10-22**. Active authorized module: **Circuit Atlas / V2.2.0**,
-**In Progress, 3/8**; branch `codex/v2.2-circuit-atlas`, baseline public
+**Verified locally, release In Progress, 7/8**; branch `codex/v2.2-circuit-atlas`, baseline public
 `1b61a74` / v2.1.0 confirmed from remote main/tag/published Release. Clean baseline.
 Owner approved V2.2.0 release after acceptance and DC/filters/competition roadmap
 shift to V2.3/2.4/2.5, with V3–V6 unchanged. No later-module work authorized.
 
-A01/A02/A05 verified: existing editor integration design, twelve categories /
-89 families, 26 real templates; focused catalog 30 and UI 5 cases passed, typecheck
-passed. Navigation/animation/accessibility and guarded editor handoff implemented;
-real browser/standard checks and release remain pending. No V2.2 push/deployment.
+A01–A07 verified: twelve categories / 89 families / 26 real templates. Final
+typecheck/lint/test/build passed, **539 tests / 33 files** (35 new). Actual built
+V2.2.0 Chrome 155.0.8059.85 verified category/family animation intermediate frames,
+opacity/chevrons/reflow, native keyboard/reduced-motion/ARIA/inert, all 26 editor
+opens, native dirty cancel/confirm, real 100→1234 edit/export/reopen (byte-identical),
+independent new instances, retained signal/V1 and 1440/390px light/dark. Screenshots
+inspected; no console/resource failures. JS `index-Bd8uTY76.js`, CSS
+`index-DmkpcxYZ.css`. Standard evidence reused after interruption; only missing
+browser acceptance completed. A08 production integration/deployment/live/tag/handoff
+remain. No V2.2 push/deployment yet. Package/writer 2.2.0, file schema 1.
 No new dependency, source algorithm, solver model or project schema. Blockers: none.
 See [per-version implemented/planned checklist](VERSION_CHECKLIST.md),
 [scoped progress](DEVELOPMENT_PROGRESS.md), [Atlas contracts/coverage](v2/CIRCUIT_ATLAS.md).

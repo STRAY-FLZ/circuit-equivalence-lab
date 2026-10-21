@@ -1,5 +1,23 @@
 # 开发记录
 
+## 2026-10-22 · Circuit Atlas local acceptance / resume
+
+- Recovered `codex/v2.2-circuit-atlas` / `a318ca2`, preserving all pending version,
+  focus and browser-script work. Reused exact candidate standard results:
+  typecheck/lint/test/build, **539 tests / 33 files**; no dependency reinstall or
+  full-suite repetition. Already approved V2.2.0/roadmap decision retained.
+- Completed missing real built Chrome 155.0.8059.85 acceptance: 12/89/26 catalog,
+  category/family opening/closing with 38–51 intermediate frames, opacity/rotation/
+  downstream reflow, native keyboard/ARIA/inert and reduced motion; actual 26
+  editor opens, dirty cancel/confirm, real 100→1234 edit/download/reopen and
+  shared-template independence. Saved/re-exported files independently byte-identical.
+- 1440/390px light/dark screenshots inspected, no page overflow; signal RMS and
+  V1 preview retained. No browser/resource errors. JS `index-Bd8uTY76.js`, CSS
+  `index-DmkpcxYZ.css`. Browser replay now retains final output across CLI's early
+  native-dialog return; only changed replay lint rerun afterward.
+- **A01–A07 Verified, 7/8**; A08 production integration/Pages/public/tag/handoff
+  pending. No V2.2 remote publication yet. [Release/rollback](v2/V2_2_0_RELEASE.md).
+
 ## 2026-10-22 · Circuit Atlas implementation checkpoint
 
 - Owner authorized a real twelve-category expandable Atlas, not a simulator.

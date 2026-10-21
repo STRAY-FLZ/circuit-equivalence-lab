@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { EngineeringProject } from '../engineering'
 import { circuitCategories, circuitTemplates, instantiateTemplate, matchesTemplate, textbookReference } from '../atlas'
@@ -16,6 +16,7 @@ function Disclosure({ title, open, onToggle, children, marker, className = '' }:
 export function CircuitAtlas({ onOpen }: { readonly onOpen: (project: EngineeringProject) => boolean }) {
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set(['resistive', 'resistive.series-parallel']))
   const [selectedId, setSelectedId] = useState('resistor-series'), [query, setQuery] = useState(''), [libraryOpen, setLibraryOpen] = useState(false), [message, setMessage] = useState('')
+  const detailHeading = useRef<HTMLHeadingElement>(null)
   const selected = circuitTemplates.find(t => t.id === selectedId)!, preview = useMemo(() => instantiateTemplate(selectedId), [selectedId])
   const term = query.trim().toLocaleLowerCase(), toggle = (id: string) => setExpanded(previous => { const next = new Set(previous); if (next.has(id)) next.delete(id); else next.add(id); return next })
   const matches = circuitTemplates.filter(t => matchesTemplate(t.id, term)), familyMatches = (name: string, categoryName: string) => `${name} ${categoryName}`.toLocaleLowerCase().includes(term)
@@ -33,14 +34,14 @@ export function CircuitAtlas({ onOpen }: { readonly onOpen: (project: Engineerin
             const count = circuitTemplates.filter(t => t.categoryId === category.id).length
             return <li key={category.id}><Disclosure marker={category.id} className="atlas-category" open={expanded.has(category.id) || !!term} onToggle={() => { if (term) setQuery(''); toggle(category.id) }} title={<span><small>{String(index + 1).padStart(2, '0')}</small>{category.name}<em>{count ? `${count} 个模板` : '规划中'}</em></span>}>
               <ul className="atlas-families">{families.map(family => { const entries = circuitTemplates.filter(t => t.familyId === family.id && (!term || matches.includes(t))); return <li key={family.id}><Disclosure marker={family.id} className="atlas-family" open={expanded.has(family.id) || !!term} onToggle={() => { if (term) setQuery(''); toggle(family.id) }} title={<span>{family.name}<em>{circuitTemplates.some(t => t.familyId === family.id) ? `${entries.length} 个` : '规划中'}</em></span>}>
-                {entries.length ? <ul className="atlas-templates">{entries.map(t => <li key={t.id}><button aria-pressed={selectedId === t.id} data-template-id={t.id} onClick={() => { setSelectedId(t.id); setMessage(''); setLibraryOpen(false) }}>{t.name}</button></li>)}</ul> : <p className="atlas-planned">暂未提供可编辑模板。待元件、模型或内容完成后开放；当前不能启动此类仿真。</p>}
+                {entries.length ? <ul className="atlas-templates">{entries.map(t => <li key={t.id}><button aria-pressed={selectedId === t.id} data-template-id={t.id} onClick={() => { setSelectedId(t.id); setMessage(''); setLibraryOpen(false); detailHeading.current?.focus({ preventScroll: true }) }}>{t.name}</button></li>)}</ul> : <p className="atlas-planned">暂未提供可编辑模板。待元件、模型或内容完成后开放；当前不能启动此类仿真。</p>}
               </Disclosure></li> })}</ul>
             </Disclosure></li>
           })}</ul></nav>
         </div>
       </aside>
       <article className="atlas-detail" aria-label="所选电路详情">
-        <div className="atlas-detail-heading"><div><p className="eyebrow">{circuitCategories.find(c => c.id === selected.categoryId)!.name} / {selected.difficulty}</p><h2>{selected.name}</h2></div><button className="primary-button" onClick={() => { const opened = onOpen(instantiateTemplate(selected.id)); setMessage(opened ? '已在编辑器中打开独立工程。' : '已保留原工程；可先返回编辑器导出，再打开模板。') }}>在编辑器中打开</button></div>
+        <div className="atlas-detail-heading"><div><p className="eyebrow">{circuitCategories.find(c => c.id === selected.categoryId)!.name} / {selected.difficulty}</p><h2 ref={detailHeading} tabIndex={-1}>{selected.name}</h2></div><button className="primary-button" onClick={() => { const opened = onOpen(instantiateTemplate(selected.id)); setMessage(opened ? '已在编辑器中打开独立工程。' : '已保留原工程；可先返回编辑器导出，再打开模板。') }}>在编辑器中打开</button></div>
         <p>{selected.description}</p><p className="atlas-note">预览不会替换当前工程。打开时会创建独立副本；已有未导出的修改会先询问。</p>
         <div className="atlas-preview-scroll" tabIndex={0} role="region" aria-label="原理图预览滚动区"><SchematicPreview project={preview} /></div>
         <p className="atlas-note">窄屏可横向滚动查看完整标注；修改元件请在编辑器中打开。</p>

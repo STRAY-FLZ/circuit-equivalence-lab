@@ -5,7 +5,7 @@ completion percentage is assigned to the evolving multi-year product.
 
 ## Active module: V2.2.0 — Circuit Atlas
 
-**In Progress, 3/8 (37.5%)**, authorized 2026-10-22. Baseline main/tag/release
+**Verified locally; release In Progress, 7/8 (87.5%)**, authorized 2026-10-22. Baseline main/tag/release
 `1b61a74` / v2.1.0 verified. Branch `codex/v2.2-circuit-atlas`.
 Owner confirmed V2.2.0 publication after acceptance and roadmap shift DC→2.3,
 filters→2.4, competition→2.5; V3–V6 unchanged. No later-module implementation.
@@ -14,12 +14,12 @@ filters→2.4, competition→2.5; V3–V6 unchanged. No later-module implementat
 | --- | --- | --- | --- |
 | A01 | Integration inspection/design | Verified | Existing graph/editor/palette/file boundaries; independent recipe instances and guarded editor handoff |
 | A02 | Twelve-category hierarchy/metadata | Verified | 12 categories / 89 families, stable keys; publisher-checked secondary chapter metadata |
-| A03 | Three-level navigation | Implementation Complete | Independent disclosure/selection/search state; UI checks in progress |
-| A04 | Motion/responsive/accessibility | In Progress | CSS grid/opacity/chevron, inert/ARIA/reduced motion; real browser verification pending |
+| A03 | Three-level navigation | Verified | Independent disclosure/selection/search state; real browser 12/89/26 and workspace retention |
+| A04 | Motion/responsive/accessibility | Verified | Chrome intermediate height/opacity/chevron/reflow frames, native keyboard/inert/ARIA/reduced motion, 1440/390px light/dark |
 | A05 | Initial valid templates | Verified | 26 actual projects; 30 focused catalog cases: nets, parameters, UUID independence, canonical file round trips, actual resistor evidence |
-| A06 | Editor integration/preservation | Implementation Complete | Existing editor handoff and dirty confirmation; signal/V1 kept mounted; UI/browser acceptance pending |
-| A07 | Tests/actual browser acceptance | In Progress | Catalog passed; focused UI checks, final standard checks and real Chrome pending |
-| A08 | Docs/version/release/handoff | In Progress | Version arrangement authorized; methods/compatibility/rollback and version checklist; no V2.2 publication yet |
+| A06 | Editor integration/preservation | Verified | All 26 opened; actual dirty cancel/confirm, edited file download/reopen byte-identical, IDs/parameters retained; shared recipe unaffected; signal/V1 retained |
+| A07 | Tests/actual browser acceptance | Verified | Final typecheck/lint/test/build, 539 tests / 33 files; actual built 2.2.0 Chrome workflow/screenshots, no console/resource failures |
+| A08 | Docs/version/release/handoff | In Progress | Package/writer 2.2.0, schema 1; docs/changelog/rollback; accepted candidate awaiting main/Pages/public/tag/handoff |
 
 Blockers: none. [Design and coverage](v2/CIRCUIT_ATLAS.md),
 [per-version checklist](VERSION_CHECKLIST.md). Stop after Atlas and its authorized release.

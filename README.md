@@ -2,6 +2,12 @@
 
 STRAY Electronics Lab / 电路实验室 is an interactive circuit learning and engineering tool. V2.0.0 adds engineering projects, an editable SVG schematic, explicit wiring, undo/redo, portable JSON files, and verified resistor-network transformations with five-stage lessons based on the current circuit.
 
+V2.2.0 adds the Circuit Atlas: twelve circuit-type categories, 89 families,
+26 actual editable templates, animated three-level navigation and protected
+existing-editor integration. Planned families and unsupported analyses remain
+explicit. See [coverage and methods](docs/v2/CIRCUIT_ATLAS.md),
+[release status](docs/v2/V2_2_0_RELEASE.md) and the [per-version checklist](docs/VERSION_CHECKLIST.md).
+
 V2.1.0 adds a standalone signal laboratory: configurable sampled generation,
 interactive oscilloscope, full-capture RMS/statistics, amplitude FFT, explicit-unit
 multi-channel CSV and portable source/derived-data project files. It does not
@@ -15,7 +21,7 @@ See [patch verification and release status](docs/v2/V2_0_1_WIRE_INTERACTION.md).
 V2.0.2 makes each palette activation place one component; holding and dragging
 an existing component moves its original instance. See [movement patch evidence](docs/v2/V2_0_2_COMPONENT_MOVEMENT.md).
 
-The completed V1 M0–M8 foundation remains available at [Circuit Equivalence Lab](https://stray-flz.github.io/circuit-equivalence-lab/), linked from the [Stray tools page](https://stray-flz.github.io/stray-articles/tools/). See the [changelog](CHANGELOG.md), [V2.0.0 release record](docs/v2/V2_0_0_RELEASE.md), and [deployment and maintenance](docs/DEPLOYMENT.md). Transformations support eligible resistor-only sheets; mixed-circuit simulation remains outside this release. Application version 2.1.0 and project-file schema version 1 are independent.
+The completed V1 M0–M8 foundation remains available at [Circuit Equivalence Lab](https://stray-flz.github.io/circuit-equivalence-lab/), linked from the [Stray tools page](https://stray-flz.github.io/stray-articles/tools/). See the [changelog](CHANGELOG.md), [V2.0.0 release record](docs/v2/V2_0_0_RELEASE.md), and [deployment and maintenance](docs/DEPLOYMENT.md). Transformations support eligible resistor-only sheets; mixed-circuit simulation remains outside this release. Application version 2.2.0 and project-file schema version 1 are independent.
 
 ## 本地运行
 
@@ -56,6 +62,8 @@ src/
   analysis/       Typed asynchronous analysis provider contracts
   signal/         Sample generation, statistics, FFT, CSV and verified data assets
   signal-ui/      Responsive oscilloscope and integrated signal workbench
+  atlas/          Typed circuit taxonomy, immutable recipes and project instances
+  atlas-ui/       Animated searchable catalog and guarded editor entry
   domain/          电路类型、有限正电阻与网络完整性校验
   topology/        DSU、电气节点识别、支路与连通分量归一化
   solver/          节点电压法、等效电阻、数值检查与诊断
@@ -120,4 +128,4 @@ if (result.kind === 'finite') {
 
 结果区分 `finite`、`short-circuit`（明确为 0Ω）、`open-circuit` 和带错误代码的 `error`。有限结果含所选分量的节点电压、各电阻支路的电流/压降及残差诊断；以第二端子为参考，在第一端子注入 1 A。极端尺度、病态矩阵或结果溢出会返回数值失败，不会伪装为物理开路。稠密求解限制为最多 512 个未知节点。
 
-The V2.1.0 regression suite contains 504 tests in 31 files, including the preserved 315-test V1 baseline. See [architecture](docs/ARCHITECTURE.md), [development log](docs/DEV_LOG.md), and [M0–M8 roadmap](docs/ROADMAP.md). Tool configuration follows the official [Vite](https://vite.dev/guide/), [Vitest](https://vitest.dev/guide/), and [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files) documentation.
+The V2.2.0 regression suite contains 539 tests in 33 files, including 35 Atlas cases and the accepted 504-test V2.1.0 baseline. The original 315-test V1 baseline remains preserved. See [architecture](docs/ARCHITECTURE.md), [development log](docs/DEV_LOG.md), and [M0–M8 roadmap](docs/ROADMAP.md). Tool configuration follows the official [Vite](https://vite.dev/guide/), [Vitest](https://vitest.dev/guide/), and [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files) documentation.

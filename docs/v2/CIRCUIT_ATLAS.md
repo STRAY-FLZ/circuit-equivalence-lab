@@ -80,6 +80,31 @@ mapping, independent IDs, no shared mutation, schema-1 canonical file round trip
 and real numerical/lesson applicability. Unit/UI and browser acceptance continue;
 no claim of public V2.2.0 yet. Package still 2.1.0 at this checkpoint.
 
+Final local candidate: **A01–A07 Verified, 7/8**. Package/lock/writer 2.2.0,
+schema 1. Typecheck/lint/test/build passed: **539 tests / 33 files**, 35 new
+(30 catalog + 5 UI). JS `index-Bd8uTY76.js`, CSS `index-DmkpcxYZ.css`, 88 modules;
+no new dependency. Resume reused these exact-code results, without a repeated
+full test/build. Only browser script result retention changed afterward; scoped
+lint on that script passed. CLI may return early at native confirm dialogs, so
+the replay persists its final result in the browser and retrieves it separately.
+
+Real built Chrome **155.0.8059.85** passed `tests/browser/circuit-atlas.js`:
+four category/family opening/closing traces had 38–51 intermediate frames,
+actual 0↔546px / 0↔52px height, opacity/rotation and downstream reflow. Native
+Enter/Space/Tab, inert/ARIA and reduced-motion verified. All 26 templates opened
+into the existing editor. Native unsaved cancel retained the previous UUID;
+confirmed opens allocated independent projects. Real R1 100→1234 modification,
+download, replacement, file reopen and re-export retained IDs/connectivity/geometry
+and were independently byte-identical (writer 2.2.0 / schema 1). Reopening the
+catalog's original produced R1=100 with a fresh UUID. Signal RMS survived all
+navigation and V1 preview remained available. Four 1440/390px × light/dark layouts
+passed with no page overflow, ~13px desktop/~11.2px narrow preview values and
+inspected screenshots. No console or HTTP/resource errors. This is Chrome on
+emulated narrow viewports, not physical-phone/cross-browser certification.
+
+Evidence is ignored under `output/playwright/atlas-local-*`. Public acceptance,
+final SHA/workflow/tag and handoff are in [V2.2.0 release record](V2_2_0_RELEASE.md).
+
 ## Compatibility, release and rollback
 
 Schema stays 1; no migrations, external assets or dependencies. Optional
