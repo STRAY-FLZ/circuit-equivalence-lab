@@ -2,8 +2,9 @@
 
 Authorized 2026-10-21. Baseline actual public **V2.0.2 `bd79d6a`**; branch
 `codex/v2.1-signal-lab`. No V2.2/V2.3, hardware transport or schematic solver.
-Status: **S01–S09 Verified**, production release pending. Core checkpoint
-`927b36b`; UI checkpoint `fa90724`. Final candidate is application 2.1.0.
+Status: **S01–S09 Verified; application Released**, with S10 final records/tag
+at the documentation checkpoint described below. Core checkpoint `927b36b`;
+UI checkpoint `fa90724`; first public production `dfc5d78`, application 2.1.0.
 
 ## Data and numerical boundary
 
