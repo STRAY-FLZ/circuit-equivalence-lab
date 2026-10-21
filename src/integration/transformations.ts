@@ -56,10 +56,10 @@ export function candidateHighlight(session: TransformationSession, candidate: Tr
   const topology = analyzeTopology(session.projection.network)
   const nodes = new Set([...candidate.boundaryNodeIds, ...(candidate.internalNodeId ? [candidate.internalNodeId] : [])])
   const points = new Set(topology.nodes.filter(n => nodes.has(n.id)).flatMap(n => n.pointIds))
-  return {    
+  return {
 revision: session.projection.revision, sheetId: session.projection.sheetId,
     componentIds: session.projection.identities.elements.filter(p => candidate.elementIds.includes(p.v1Id)).map(p => p.projectId),
-    anchorIds: session.projection.identities.points.filter(p => points.has(p.v1Id)).map(p => p.projectId)  
+    anchorIds: session.projection.identities.points.filter(p => points.has(p.v1Id)).map(p => p.projectId)
 }
 }
 
@@ -153,11 +153,11 @@ function reconcile(project: EngineeringProject, projection: Projection, applied:
   })
   const next = reviseProject(project, projection.revision, { definitions, symbols, sheets: project.sheets.map(s => s.id === sheet.id ? { ...sheet, components: [...components, ...replacements], anchors, connections, geometry: { placements, anchorPositions: positions, connectionRoutes: routes } } : s) })
   deriveElectricalNets(next)
-  const record = {    
+  const record = {
 sourceRevision: project.revision, resultRevision: next.revision, sheetId: sheet.id, observedAnchorIds: observations,
     source: projection.network, transformed: applied.network, metadata: applied.metadata, verification: evidence,
     sourceIdentities: projection.identities, replacementIdentities: replacementPairs,
-    resultPointIdentities: applied.network.points.map(p => ({ v1Id: p.id, projectId: pointMap.get(p.id)! })), connectorIds  
+    resultPointIdentities: applied.network.points.map(p => ({ v1Id: p.id, projectId: pointMap.get(p.id)! })), connectorIds
 }
   const previous = project.extensions['org.stray.transformations']
   const serialized = JSON.parse(JSON.stringify(record)) as JsonValue

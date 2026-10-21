@@ -1,5 +1,63 @@
 # 开发记录
 
+## 2026-10-21 · V2.0-D Editor / V1 Equivalence Integration
+
+- Completed **D-C01–D-C10, 10/10 Verified / Implementation Complete, not Released**.
+  Confirmed clean accepted C `296c191`, then created focused local branch
+  `codex/v2-transform-integration`. Verified implementation: **`0f3dd6a`**;
+  final documentation handoff also removes formatting-only trailing whitespace.
+  No history rewrite, production merge, remote push, deployment, tag, dependency
+  install, package bump or personal-website change. Actual version stays `0.1.0`.
+- Added a React-free composition module using B projection and existing V1
+  discovery/application, independent numerical terminal verifier and five-stage
+  educational engine. All four transformation categories work on real drawn
+  resistor circuits. Mixed components/cross-sheet nets are rejected explicitly.
+  V1 domain/topology/solver/transformation/education and B API source are unchanged.
+- Added persistent-port/temporary-observation workflow, actual candidate-to-UUID
+  highlights, non-mutating before/after previews, pair-level numerical evidence,
+  verified apply and source-consistent guided study in the editor. Numerical
+  mismatch/inconclusive/computation failure remain separate from unsupported scope.
+  Fewer than two terminals produces the existing inconclusive result.
+- Writeback checks the exact source revision, rediscover/reapplies with the same
+  protected points and reruns the existing independent verifier. Only `equivalent`
+  permits a verified transaction. **D05 is unchanged**: no new proof requirement,
+  tolerance or post-mapping numerical gate, and no equation/algorithm rewrite.
+  Existing domain references must remain valid; PCB/component and analysis/pin
+  observations block removal until explicit rebind support exists.
+- Maps retained entities to existing UUIDs, preserves old wires/labels/ports and
+  other sheets/metadata, retains needed old pin anchors as free anchors, and
+  allocates new replacement component/pin/anchor/connector UUIDs. Preserves old
+  geometry, places new bodies below it and auto-fits. One history entry restores
+  the complete original/result with stable IDs on undo/redo and fresh revisions.
+- Optional `org.stray.transformations` command provenance stores source/result
+  revisions/networks, transform metadata/evidence and source/replacement/point
+  mappings. It travels through unchanged schema-v1 JSON/inline asset APIs. Runtime
+  preview/lesson and temporary selection state remain session-only.
+- Visual inspection found that stable UUIDs inflated V1 label-width measurement.
+  Added optional presentation labels to existing layout/diagram APIs without
+  changing identity or electrical data. Focused coverage includes prototype-like
+  legacy IDs. Existing V1 callers keep their prior presentation defaults and bounds.
+- Final standard checks passed: typecheck, zero-warning lint, **438 tests / 27
+  files** (404 baseline + 25 integration + 9 UI/display cases), build (69 modules).
+  Focused tests cover all four drawn categories, six imported examples including
+  residual wires/bridge, observation mappings, reference preservation, stale input,
+  metadata, history, round trips, lesson consistency and rejected/inconclusive
+  evidence. Rejected-verdict tests inject a verifier response; actual inconclusive,
+  extreme-value failure and successful cases use the existing real engines.
+- Installed Chrome **155.0.8059.40** passed seven local built-preview workflow
+  groups: complete draw→ports→discover→preview→verify→apply→undo→redo→save→reopen;
+  all five source-circuit lesson stages; three further drawn transform categories;
+  protected boundaries, both themes, 1440px/390px layouts, mixed/no-port outcomes
+  and existing V1 examples/previews/navigation. Zero page/console errors or HTTP
+  failures. Screenshots visually inspected. Download/re-export SHA-256 matches;
+  ignored local evidence remains under `output/playwright/integration-*`.
+  Browser and task-started preview service were closed after verification.
+- [D APIs/acceptance/limits](v2/TRANSFORMATION_INTEGRATION_IMPLEMENTATION.md),
+  [V2.0.0 readiness](v2/V2_0_0_RELEASE_READINESS.md), progress and status updated.
+  No material core implementation blocker remains. Next milestone is separately
+  authorized version/changelog/release integration, Pages deployment and actual
+  live acceptance with history-preserving rollback; no publication started here.
+
 ## 2026-10-21 · V2.0-C Interactive Schematic Editor
 
 - Completed C01–C10, **10/10 Verified / Implementation Complete, not Released**.

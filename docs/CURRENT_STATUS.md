@@ -1,6 +1,6 @@
 # Current Development Status
 
-Last development handoff: **2026-10-21**. V2.0-C is internally implemented and
+Last development handoff: **2026-10-21**. V2.0-D is internally implemented and
 verified; the public application was not changed or reverified live this round.
 
 ## Published baseline
@@ -27,36 +27,40 @@ verified; the public application was not changed or reverified live this round.
 
 ## Latest completed module and next task
 
-- Latest implementation: **V2.0-C — Interactive Schematic Editor: Verified,
-  C01–C10, 10/10 (100%)**, Implementation Complete, **not Released**.
-- Implemented actual B-model SVG editing: R/C/L/V/I palette, ground, placement,
-  move/rotate/delete, properties, explicit wires/junctions, scoped labels/ports,
-  separate solver references, derived net inspection, immutable undo/redo,
-  keyboard controls, zoom/pan and real UTF-8 JSON download/open.
-- Actual APIs, supported/deferred behavior and evidence:
-  [editor implementation/acceptance](v2/SCHEMATIC_EDITOR_IMPLEMENTATION.md).
-  B contracts and files remain compatible; V1 algorithms and educational
-  workflows are preserved. History: A **10/10**, owner review **4/4**, B **9/9 Verified**.
-- Final verification: typecheck/lint/build passed; **404 tests in 25 files passed**
-  (315 V1 + 60 B + 29 C). Local installed Chrome 155.0.8059.40 passed seven
-  workflow groups on the production preview, including actual save/reopen,
-  junctions, drag history, themes, all five V1 lesson stages and 390px layouts.
-  Browser errors/HTTP failures: zero. Screenshots visually inspected.
-- Branch: `codex/v2-schematic-editor`. Accepted A/B/context work was checkpointed
-  locally as `b7b53bc` before C; C implementation and handoff commits are recorded
-  in the C progress entry. No remote push, deployment, tag or version bump.
-- Limits: basic single selection, automatic orthogonal routes; edit wires by
-  deleting/reconnecting; no bend handles, autosave or persisted history. Imported
-  metadata/assets are retained, but this editor cannot edit every engineering
-  record. Narrow drawings use zoom/pan for detail; physical mobile/cross-browser
-  certification is outside this check. Unchanged dev-mode pre-theme request 404
-  and a CLI download-cache/dev-watcher EBUSY are recorded; built preview resources
-  pass. Task-started browser/dev/preview processes were closed after verification.
-- Next recommended module: separately authorize **V2.0-D** transactional V1
-  projection/writeback under unchanged D05. No material design blocker identified.
-  C is complete; no next phase is active. Public V2 requires usable verified B+C+D
-  and release/compatibility/rollback procedures. New engines, cloud/EDA/PCB and
-  external data packaging remain deferred.
+- Latest implementation: **V2.0-D — Editor, Equivalence and Lessons: Verified,
+  D-C01–D-C10, 10/10 (100%)**, Implementation Complete, **not Released**.
+- Integrated real eligible-sheet projection, protected ports/temporary observations,
+  four-category discovery/highlighting, immutable previews and independent V1
+  numerical evidence. Equivalent transformations write back as one history entry;
+  undo/redo, actual project export/reopen and all five lesson stages use real data.
+  Failed/inconclusive previews remain uncommittable; D05 is unchanged.
+- APIs, mappings, tests and actual limits:
+  [D implementation/acceptance](v2/TRANSFORMATION_INTEGRATION_IMPLEMENTATION.md).
+  B/C model/file/editor compatibility remains; original eight V1 examples and
+  symmetric-delta teaching input remain. V1 topology/solver/transforms/education
+  source is unchanged. A **10/10**, owner review **4/4**, B **9/9**, C **10/10 Verified**.
+- Final verification: typecheck/lint/build passed; **438 tests / 27 files passed**
+  (404 accepted C baseline + 34 D cases). Chrome **155.0.8059.40** passed seven
+  local built-preview workflow groups, including all four categories, real
+  save/reopen, one atomic undo/redo, five-stage user-circuit lesson, both themes,
+  1440px/390px layouts and V1 previews/navigation. Zero browser errors or resource
+  failures; screenshots visually inspected. Re-export is byte-identical.
+- Branch: `codex/v2-transform-integration`, clean baseline `296c191` preserved;
+  verified implementation `0f3dd6a`, final handoff committed separately. No remote
+  push, production merge, deployment, tag, dependency or version change.
+- Limits: complete eligible resistor sheets only; mixed devices/cross-sheet nets
+  unsupported. Basic replacement placement and existing single-selection routes;
+  V1 comparison bounds remain display-only, with full records available. Component/
+  pin-bound observations need explicit rebind before removal. No autosave,
+  persisted undo or resumed preview/lesson session; numerical evidence remains
+  boundary/tolerance-scoped. No physical-phone/cross-browser certification.
+  Prior C dev-mode observations remain recorded; D used built preview only.
+  Task-started browser/preview services were closed after verification.
+- Next: separately authorize **V2.0.0 release engineering and public acceptance**.
+  [Release-readiness assessment](v2/V2_0_0_RELEASE_READINESS.md) covers B/C/D status,
+  schema-v1 compatibility, version/changelog tasks, Pages verification and
+  history-preserving rollback. No core implementation blocker remains; actual
+  versioning/publication/live checks are pending. No next module is active.
 
 ## Architecture review outcomes and deferred questions
 
@@ -71,8 +75,8 @@ verified; the public application was not changed or reverified live this round.
   compatibility/rollback procedures established before release; no historical tags invented.
 - **Material unresolved architecture questions blocking B: none at this scope.**
   Specific external-data containers, autosave backend, EDA formats, simulation and
-  hardware backends remain deferred until needed. B/C are complete; separate
-  authorization for D or public release has not been granted.
+  hardware backends remain deferred until needed. B/C/D are complete; separate
+  authorization for public release has not been granted.
 
 Exact owner outcomes and remaining release conditions are recorded as D01–D09 in
 [v2/DECISIONS.md](v2/DECISIONS.md). No further original V2.0-A deliverable work remains. See

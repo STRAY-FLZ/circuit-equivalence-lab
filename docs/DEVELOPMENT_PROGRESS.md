@@ -25,7 +25,7 @@ production code. Verified does not imply owner approval of proposed decisions.
 | V2.0-A architecture/interfaces | Verified | Internal design complete; no public release required or authorized |
 | V2.0-B engineering model/files | Verified | Internal foundation complete; not Released |
 | V2.0-C schematic editor | Verified | Internal editor complete; not Released |
-| V2.0-D V1 integration | Planned | Integrated V2.0 release only after authorized acceptance |
+| V2.0-D V1 integration | Verified | Internal B/C/D workflow verified; not Released |
 | V2.1 signal measurement | Planned | Future usable feature release |
 | V2.2 DC analysis | Planned | Future usable feature release |
 | V2.3 filters/frequency response | Planned | Future usable feature release |
@@ -192,3 +192,44 @@ No V2.0-D writeback, new engine, dependency, personal-site change, push or deplo
 Verified C implementation is local commit **`290de9b`**; the final handoff documents
 are committed separately after lightweight documentation checks. A/B checkpoint
 `b7b53bc` remains intact; see local branch history for the handoff commit.
+
+## Completed module: V2.0-D — Editor, Equivalence and Lessons
+
+Status: **Verified, 10/10 (100%)**, authorized 2026-10-21. Verified C baseline
+`296c191` was clean; branch `codex/v2-transform-integration` preserves all history.
+
+| ID | Deliverable | Status | Evidence |
+| --- | --- | --- | --- |
+| D-C01 | Minimal integration architecture | Verified | React-free composition, typecheck and focused tests |
+| D-C02 | Eligible projection and stable mapping | Verified | Four drawn fixtures and six imported integration cases |
+| D-C03 | Observed terminals and protected boundaries | Verified | Ports, synthetic observations, probes, analysis and board references |
+| D-C04 | Four-category discovery and highlights | Verified | Actual engine discovery and SVG highlight UI tests |
+| D-C05 | Preview and independent numerical verification | Verified | Equivalent/inconclusive/different/failure and non-mutating previews |
+| D-C06 | Atomic verified writeback and history | Verified | Validated geometry, unchanged entities, stale snapshots, undo/redo and file round trip |
+| D-C07 | Existing five-stage lessons on user circuits | Verified | All five stages with real 100/220/320 values |
+| D-C08 | Integrated editor workflow and V1 compatibility | Verified | Actual Chrome four-category flow, V1 previews, themes and responsive layout |
+| D-C09 | Focused, standard and actual Chrome checks | Verified | 34 new cases; 438/438 full tests; typecheck/lint/build; seven Chrome workflow groups |
+| D-C10 | Documentation and release-readiness handoff | Verified | [D acceptance](v2/TRANSFORMATION_INTEGRATION_IMPLEMENTATION.md), [release readiness](v2/V2_0_0_RELEASE_READINESS.md), CURRENT_STATUS and DEV_LOG |
+
+Blockers: none. Next: separately authorized V2.0.0 release engineering/public
+acceptance; no new phase starts automatically. Core D implementation is complete.
+D05 remains unchanged. No new solver, dependency, version bump, push or deployment.
+
+Early checkpoint: 25 integration-domain + 8 editor workflow tests passed; 20 existing
+editor/App integration tests passed. Typecheck passed; initial lint reported four
+typing/style issues, corrected before the next check. No full historical run yet.
+
+Final integration checkpoint: after a ninth UI/display identity case and visual
+fixes, **438 tests in 27 files passed** (404 C baseline + 34 D cases). Typecheck,
+lint and build passed (69 modules). Chrome 155.0.8059.40 passed seven workflow
+groups at the built local preview with zero page/console errors or HTTP failures.
+The same downloaded transformed file reopens and re-exports byte-identically.
+Label measurement now uses presentation names, preserving UUID mappings; new
+replacement bodies sit below preserved original geometry and auto-fit the view.
+
+Final handoff: D-C01–D-C10 **10/10 Verified / Implementation Complete, not Released**.
+Verified source commit `0f3dd6a`; final documentation commit also trims four
+formatting-only trailing spaces/lines without semantic source changes. Five scoped
+handoff documents and 50 local file links/fences checked; actual exported-file
+hashes match and schema/package remain 1 / `0.1.0`. Task browser and preview service
+closed. No active next module, public push, production merge, release or deployment.
