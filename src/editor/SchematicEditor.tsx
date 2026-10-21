@@ -2,7 +2,7 @@ import { useId, useMemo, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import { ProjectValidationError, reviseProject } from '../engineering'
 import type { EngineeringProject, Position } from '../engineering'
-import { commitEdit, createHistory, emptySheet, newEditorProject, PALETTE, redoEdit, snap, undoEdit } from '../editing'
+import { commitEdit, commitSnapshot, createHistory, emptySheet, newEditorProject, PALETTE, redoEdit, snap, undoEdit } from '../editing'
 import type { EditOperation, Endpoint, PaletteKind, Selection } from '../editing'
 import { createProjectDocument, deserializeProject, serializeProject } from '../project-format'
 import type { InlineAsset } from '../project-format'
@@ -10,11 +10,21 @@ import packageText from '../../package.json?raw'
 import { buildEditorView, nearestAnchor, netInspection } from './view'
 import { SymbolBody } from './SymbolBody'
 import { ComponentProperties } from './Properties'
+import { TransformationPanel } from './TransformationPanel'
+import { writebackTransformation } from '../integration'
+import type { TransformationHighlight, TransformationPreview } from '../integration'
 import './editor.css'
 
 type Tool = 'select' | 'pan' | 'place' | 'wire' | 'junction' | 'ground' | 'label' | 'reference' | 'port'
 interface Viewport { readonly x: number; readonly y: number; readonly zoom: number }
 const INITIAL_VIEW: Viewport = { x: 0, y: 0, zoom: 1 }
+function fittedViewport(positions: Readonly<Record<string, Position>>): Viewport {
+  const points = Object.values(positions)
+  if (!points.length) return INITIAL_VIEW
+  const xs = points.map(p => p.x), ys = points.map(p => p.y), minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys)
+  const zoom = Math.min(2, 1000 / (maxX - minX + 160), 600 / (maxY - minY + 160))
+  return { x: (minX + maxX) / 2 - 500 / zoom, y: (minY + maxY) / 2 - 300 / zoom, zoom }
+}
 const writer = { name: 'STRAY Electronics Lab', version: (JSON.parse(packageText) as { version: string }).version }
 const tools: readonly [Tool, string][] = [['select', '选择 V'], ['pan', '平移'], ['wire', '接线 W'], ['junction', '结点 J'], ['ground', '接地 GND'], ['label', '网络标签'], ['port', '外部端口'], ['reference', '求解参考']]
 function errorMessage(error: unknown): string {
@@ -30,6 +40,7 @@ function errorMessage(error: unknown): string {
 
 export function SchematicEditor() {
   const [history, setHistory] = useState(() => createHistory(newEditorProject()))
+  const [transformHighlight, setTransformHighlight] = useState<TransformationHighlight | null>(null)
   const project = history.present
   const [activeSheet, setActiveSheet] = useState<string | null>(null), sheetId = activeSheet ?? project.sheets[0]!.id
   const [selection, setSelection] = useState<Selection>(null), [tool, setTool] = useState<Tool>('select'), [kind, setKind] = useState<PaletteKind>('resistor')
@@ -45,6 +56,7 @@ export function SchematicEditor() {
   const component = selection?.kind === 'component' ? view.sheet.components.find(c => c.id === selection.id) : undefined
   const anchorId = selection?.kind === 'anchor' ? selection.id : selection?.kind === 'connection' ? view.sheet.connections.find(c => c.id === selection.id)?.endpoints[0] : undefined
   const selectedNet = anchorId ? nets.anchorToNet[anchorId] : undefined, net = nets.nets.find(n => n.key === selectedNet)
+  const activeHighlight = transformHighlight?.revision === project.revision && transformHighlight.sheetId === sheetId ? transformHighlight : null
   const announce = (text: string, failed = false) => { setMessage(text); setError(failed) }
   function edit(operation: EditOperation) {
     if (busy) return
@@ -52,6 +64,16 @@ export function SchematicEditor() {
     catch (failure) { announce(errorMessage(failure), true); return undefined }
   }
   function chooseTool(next: Tool) { setTool(next); setWireStart(null); setDrag(undefined); gesture.current = null }
+  function commitTransformation(preview: TransformationPreview): boolean {
+    if (busy) return false
+    try {
+      const next = writebackTransformation(project, preview)
+      setHistory(commitSnapshot(history, project.revision, next)); setSelection(null); chooseTool('select'); setTransformHighlight(null)
+      setViewport(fittedViewport(next.sheets.find(s => s.id === sheetId)!.geometry.anchorPositions))
+      announce('数值验证通过的变换已作为一次工程事务应用；可撤销或重做。')
+      return true
+    } catch (failure) { announce(errorMessage(failure), true); return false }
+  }
   function undo() { if (busy) return; setHistory(undoEdit(history)); setSelection(null); setWireStart(null); announce('已撤销；恢复内容并生成新的工程修订。') }
   function redo() { if (busy) return; setHistory(redoEdit(history)); setSelection(null); setWireStart(null); announce('已重做。') }
   function world(event: { readonly clientX: number; readonly clientY: number }): Position {
@@ -107,11 +129,7 @@ export function SchematicEditor() {
   }
   function zoom(factor: number) { setViewport(v => { const next = Math.max(0.1, Math.min(8, v.zoom * factor)); return { x: v.x + 500 / v.zoom - 500 / next, y: v.y + 300 / v.zoom - 300 / next, zoom: next } }) }
   function fit() {
-    const points = Object.values(view.positions)
-    if (!points.length) { setViewport(INITIAL_VIEW); return }
-    const xs = points.map(p => p.x), ys = points.map(p => p.y), minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys)
-    const z = Math.min(2, 1000 / (maxX - minX + 160), 600 / (maxY - minY + 160))
-    setViewport({ x: (minX + maxX) / 2 - 500 / z, y: (minY + maxY) / 2 - 300 / z, zoom: z })
+    setViewport(fittedViewport(view.positions))
   }
   async function save() {
     if (busy) return; setBusy(true)
@@ -152,7 +170,7 @@ export function SchematicEditor() {
     if (key === 'w') chooseTool('wire'); else if (key === 'j') chooseTool('junction'); else if (key === 'v') chooseTool('select')
     if (event.key.startsWith('Arrow') && component) { event.preventDefault(); const at = sheet.geometry.placements.find(p => p.componentId === component.id)?.origin ?? { x: 200, y: 200 }; edit({ type: 'move', id: component.id, position: { x: at.x + (event.key === 'ArrowRight' ? 20 : event.key === 'ArrowLeft' ? -20 : 0), y: at.y + (event.key === 'ArrowDown' ? 20 : event.key === 'ArrowUp' ? -20 : 0) } }) }
   }}>
-    <div className="editor-heading"><div><p className="eyebrow">工程 / 自由编辑</p><h1>原理图编辑器</h1><p className="muted">连接来自工程数据。当前支持结构编辑与文件保存，尚不运行仿真。</p></div>
+    <div className="editor-heading"><div><p className="eyebrow">工程 / 自由编辑</p><h1>原理图编辑器</h1><p className="muted">编辑真实连接，预览电阻等效变换，验证后应用或分步学习。</p></div>
       <div className="editor-file-actions"><button disabled={busy} onClick={() => { if (mayReplace()) { reset(newEditorProject(), [], true); announce('已新建空白工程。') } }}>新建工程</button><button disabled={busy} onClick={() => fileInput.current?.click()}>打开工程</button><input hidden ref={fileInput} aria-label="打开工程文件" type="file" accept=".json,application/json" onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ''; if (file) void open(file) }} /><button disabled={busy} onClick={() => { void save() }}>导出工程</button></div>
     </div>
     <div className="editor-project-row"><form key={`title-${project.revision}`} onSubmit={event => { event.preventDefault(); const title = new FormData(event.currentTarget).get('title'); if (typeof title === 'string') edit({ type: 'title', title }) }}><label>工程名称<input name="title" aria-label="工程名称" defaultValue={project.title} /></label><button disabled={busy}>更新名称</button></form><span>{project.revision === savedRevision ? '已导出或未修改' : '有未导出的修改'}</span><label>当前图纸<select aria-label="当前图纸" value={sheetId} onChange={event => { setActiveSheet(event.target.value); setSelection(null); setWireStart(null) }}>{project.sheets.map(s => <option key={s.id} value={s.id}>{s.title || '未命名图纸'}</option>)}</select></label></div>
@@ -164,10 +182,10 @@ export function SchematicEditor() {
         <svg ref={svg} className={`editor-canvas tool-${tool}`} role="application" aria-label="原理图编辑画布" tabIndex={0} viewBox={`${viewport.x} ${viewport.y} ${1000 / viewport.zoom} ${600 / viewport.zoom}`} onClick={canvasClick} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={() => { gesture.current = null; setDrag(undefined) }}>
           <defs><pattern id={gridId} width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="0" cy="0" r="1" className="editor-grid-dot" /></pattern></defs><rect x={viewport.x} y={viewport.y} width={1000 / viewport.zoom} height={600 / viewport.zoom} fill={`url(#${gridId})`} />
           {view.wires.map(({ connection, route }) => { const path = route.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' '); return <g key={connection.id} className={`editor-wire ${selection?.kind === 'connection' && selection.id === connection.id ? 'selected' : ''} ${selectedNet && nets.anchorToNet[connection.endpoints[0]] === selectedNet ? 'net-highlight' : ''}`} data-connection-id={connection.id}><path d={path} className="wire-underlay" /><path d={path} className="wire-ink" /><path d={path} className="wire-hit" role="button" tabIndex={0} aria-label={`导线 ${sheet.connections.indexOf(connection) + 1}`} onClick={event => { event.stopPropagation(); if (tool === 'junction') edit({ type: 'junction', connectionId: connection.id, position: world(event) }); else setSelection({ kind: 'connection', id: connection.id }) }} onKeyDown={event => { if (event.key === 'Enter') { event.stopPropagation(); setSelection({ kind: 'connection', id: connection.id }) } }} /></g> })}
-          {view.components.map(({ component: c, definition, placement: p, symbol }) => <g key={c.id} className={`editor-component ${selection?.kind === 'component' && selection.id === c.id ? 'selected' : ''}`} role="button" tabIndex={0} aria-label={`${c.reference} 元件`} data-component-id={c.id} onPointerDown={event => beginComponent(event, c.id, p.origin)} onClick={event => { event.stopPropagation(); suppressClick.current = false; setSelection({ kind: 'component', id: c.id }) }} onKeyDown={event => { if (event.key === 'Enter') { event.stopPropagation(); setSelection({ kind: 'component', id: c.id }) } }}>
+          {view.components.map(({ component: c, definition, placement: p, symbol }) => <g key={c.id} className={`editor-component ${activeHighlight?.componentIds.includes(c.id) ? 'candidate-highlight' : ''} ${selection?.kind === 'component' && selection.id === c.id ? 'selected' : ''}`} role="button" tabIndex={0} aria-label={`${c.reference} 元件`} data-component-id={c.id} onPointerDown={event => beginComponent(event, c.id, p.origin)} onClick={event => { event.stopPropagation(); suppressClick.current = false; setSelection({ kind: 'component', id: c.id }) }} onKeyDown={event => { if (event.key === 'Enter') { event.stopPropagation(); setSelection({ kind: 'component', id: c.id }) } }}>
             <g transform={`translate(${p.origin.x} ${p.origin.y}) rotate(${p.rotationDegrees}) scale(${p.mirrored ? -1 : 1} 1)`}><rect className="component-hit" x="-65" y="-36" width="130" height="72" />{!Object.keys(PALETTE).includes(definition.kind) && Object.entries(symbol.pinPositions).map(([key, at]) => <path key={key} d={`M${at.x} ${at.y}H${at.x < 0 ? -45 : 45}`} />)}<SymbolBody kind={definition.kind} /></g><text x={p.origin.x} y={p.origin.y - 45} textAnchor="middle">{c.reference}</text><text className="component-value" x={p.origin.x} y={p.origin.y + 50} textAnchor="middle">{valueText(c.id)}</text>
           </g>)}
-          {sheet.anchors.map((a, i) => { const at = view.positions[a.id]; if (!at) return null; const owner = sheet.components.find(c => c.pins.some(p => p.anchorId === a.id)), pin = owner?.pins.find(p => p.anchorId === a.id), degree = sheet.connections.filter(c => c.endpoints.includes(a.id)).length; return <g key={a.id} className={`editor-anchor ${selection?.kind === 'anchor' && selection.id === a.id ? 'selected' : ''} ${selectedNet && nets.anchorToNet[a.id] === selectedNet ? 'net-highlight' : ''}`}><circle cx={at.x} cy={at.y} r={degree > 1 && !owner ? 5 : 4} data-anchor-id={a.id} className={degree > 1 && !owner ? 'junction-dot' : ''} role="button" tabIndex={0} aria-label={owner ? `${owner.reference}.${pin!.definitionPinKey} 引脚` : `连接点 ${i + 1}`} onClick={event => { event.stopPropagation(); activate({ anchorId: a.id }) }} onPointerDown={event => { if (tool !== 'pan') event.stopPropagation() }} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); activate({ anchorId: a.id }) } }} />{sheet.labels.filter(l => l.anchorId === a.id).map((l, j) => l.name === 'GND' ? <g key={l.id} className="editor-ground"><path d={`M${at.x} ${at.y}v16 m-12 0h24 m-20 5h16 m-12 5h8`} /><text x={at.x + 16} y={at.y + 28}>GND</text></g> : <text key={l.id} x={at.x + 8} y={at.y - 12 - j * 16}>{l.name}{l.scope === 'project' ? ' ↗' : ''}</text>)}{sheet.ports.filter(p => p.anchorId === a.id).map(p => <text key={p.id} x={at.x + 8} y={at.y + 20}>{p.label}</text>)}{sheet.references.filter(r => r.anchorId === a.id).map(r => <g key={r.id} className="editor-reference"><rect x={at.x - 9} y={at.y - 9} width="18" height="18" /><text x={at.x + 12} y={at.y - 24}>参考</text></g>)}</g> })}
+          {sheet.anchors.map((a, i) => { const at = view.positions[a.id]; if (!at) return null; const owner = sheet.components.find(c => c.pins.some(p => p.anchorId === a.id)), pin = owner?.pins.find(p => p.anchorId === a.id), degree = sheet.connections.filter(c => c.endpoints.includes(a.id)).length; return <g key={a.id} className={`editor-anchor ${activeHighlight?.anchorIds.includes(a.id) ? 'candidate-highlight' : ''} ${selection?.kind === 'anchor' && selection.id === a.id ? 'selected' : ''} ${selectedNet && nets.anchorToNet[a.id] === selectedNet ? 'net-highlight' : ''}`}><circle cx={at.x} cy={at.y} r={degree > 1 && !owner ? 5 : 4} data-anchor-id={a.id} className={degree > 1 && !owner ? 'junction-dot' : ''} role="button" tabIndex={0} aria-label={owner ? `${owner.reference}.${pin!.definitionPinKey} 引脚` : `连接点 ${i + 1}`} onClick={event => { event.stopPropagation(); activate({ anchorId: a.id }) }} onPointerDown={event => { if (tool !== 'pan') event.stopPropagation() }} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); activate({ anchorId: a.id }) } }} />{sheet.labels.filter(l => l.anchorId === a.id).map((l, j) => l.name === 'GND' ? <g key={l.id} className="editor-ground"><path d={`M${at.x} ${at.y}v16 m-12 0h24 m-20 5h16 m-12 5h8`} /><text x={at.x + 16} y={at.y + 28}>GND</text></g> : <text key={l.id} x={at.x + 8} y={at.y - 12 - j * 16}>{l.name}{l.scope === 'project' ? ' ↗' : ''}</text>)}{sheet.ports.filter(p => p.anchorId === a.id).map(p => <text key={p.id} x={at.x + 8} y={at.y + 20}>{p.label}</text>)}{sheet.references.filter(r => r.anchorId === a.id).map(r => <g key={r.id} className="editor-reference"><rect x={at.x - 9} y={at.y - 9} width="18" height="18" /><text x={at.x + 12} y={at.y - 24}>参考</text></g>)}</g> })}
           {wireStart && <text className="editor-wire-hint" x={viewport.x + 20 / viewport.zoom} y={viewport.y + 30 / viewport.zoom}>接线中：点击第二个端点 · Esc 取消</text>}
         </svg><p className="editor-legend">线间断＝无连接跨越 · 实心结点＝显式连接 · 位置重叠不等于导通</p>
         {(view.unplaced.length > 0 || view.missingAnchors.length > 0) && <div className="editor-unplaced"><p>尚有 {view.unplaced.length} 个未放置元件、{view.missingAnchors.length} 个无坐标连接点；电气数据已完整保留。</p>{view.unplaced.map((c, i) => <button key={c.id} onClick={() => edit({ type: 'move', id: c.id, position: { x: 160 + i * 160, y: 200 } })}>放置 {c.reference}</button>)}</div>}
@@ -180,5 +198,6 @@ export function SchematicEditor() {
         <details className="editor-shortcuts"><summary>操作提示与快捷键</summary><p>V 选择，W 接线，J 结点，R 旋转，方向键微移，Delete 删除。Ctrl / ⌘ Z 撤销，Shift Z 或 Y 重做，S 导出，O 打开。</p><p>结点工具会显式连接点击处经过的导线。平移、缩放、选中和拖动预览不改变工程修订。</p></details>
       </aside>
     </div>
+    <TransformationPanel key={`${project.id}:${sheetId}`} project={project} sheetId={sheetId} {...(anchorId ? { selectedAnchorId: anchorId } : {})} busy={busy} onCommit={commitTransformation} onHighlight={setTransformHighlight} />
   </section>
 }

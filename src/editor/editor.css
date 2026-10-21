@@ -64,5 +64,22 @@
 .editor-marker-entry { display:grid; gap:6px; margin-top:10px; font-size:.75rem; }
 .editor-unplaced { font-size:.8rem; line-height:1.7; padding:var(--space-3); background:var(--subtle); }
 .editor-unplaced button { margin:3px; }
+.editor-component.candidate-highlight .component-hit { stroke:var(--selected);stroke-width:2;stroke-dasharray:6 4; }
+.editor-anchor.candidate-highlight > circle { stroke:var(--selected);stroke-width:3; }
+.editor-transformations { margin-top:var(--space-6);border-top:1px solid var(--ink);padding-top:var(--space-4);min-width:0; }
+.editor-transformations h2 { font-size:1.2rem; }
+.editor-transformations p,.editor-transformations li { font-size:.85rem;line-height:1.8;overflow-wrap:anywhere; }
+.editor-transformation-heading { display:flex;justify-content:space-between;align-items:center;gap:var(--space-3); }
+.editor-observations { border-block:1px solid var(--line);padding:var(--space-3) 0;margin:var(--space-4) 0; }
+.editor-observations li button { margin:4px 8px; }
+.editor-transform-candidates,.editor-transform-actions { display:flex;flex-wrap:wrap;gap:8px;margin:var(--space-3) 0; }
+.editor-transform-candidates button { max-width:100%;overflow-wrap:anywhere; }
+.editor-comparison { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-4); }
+.editor-comparison > div { min-width:0; }
+.editor-transform-preview { border-top:1px solid var(--line);margin-top:var(--space-4);padding-top:var(--space-3); }
+.editor-transform-preview pre { font-size:.75rem;max-height:360px;overflow:auto;padding:var(--space-3);background:var(--subtle); }
+.editor-transformations .lesson-panel { margin-top:var(--space-4); }
+@media(max-width:960px) { .editor-comparison { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:700px) { .editor-transformation-heading { align-items:stretch;flex-direction:column; } }
 @media(max-width:1000px) { .editor-layout { grid-template-columns:110px minmax(0,1fr); } .editor-inspector { grid-column:1/-1; } .editor-inspector form { max-width:420px; } }
 @media(max-width:700px) { .editor-heading { flex-direction:column; } .editor-layout { grid-template-columns:minmax(0,1fr); } .editor-palette { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; } .editor-palette h2,.editor-palette p { grid-column:1/-1; } .editor-palette > button { margin:0; text-align:center; padding-inline:6px; } .editor-canvas { height:420px; } .editor-project-row form { width:100%; } .editor-project-row form label { min-width:0; flex:1; } .editor-project-row form button { flex-shrink:0; } .editor-file-actions { width:100%; } .editor-file-actions button { flex:1; } .editor-toolbar button { padding-inline:8px; } }

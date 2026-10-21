@@ -6,7 +6,7 @@ const order = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0
 const midpoint = (a: Position, b: Position): Position => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 })
 
 /** Bounded deterministic drawing, never used to infer electrical connectivity. */
-export function buildDrawing(network: CircuitNetwork, explicit?: CircuitLayout, transition?: LayoutTransition): DrawingResult {
+export function buildDrawing(network: CircuitNetwork, explicit?: CircuitLayout, transition?: LayoutTransition, elementLabels:Readonly<Record<string,string>> = {}): DrawingResult {
   const topology = analyzeTopology(network)
   if (network.points.length > 16 || network.elements.length > 24) return { kind: 'unsupported', message: '此布局支持最多 16 个连接点、24 个元件。请查看完整元件清单。' }
   const positions: Record<string, Position> = Object.create(null) as Record<string, Position>
@@ -69,7 +69,8 @@ export function buildDrawing(network: CircuitNetwork, explicit?: CircuitLayout, 
     const angle = Math.atan2(end.y - start.y, end.x - start.x) * 180 / Math.PI
     const vertical = Math.abs(Math.sin(angle * Math.PI / 180)) > 0.92
     const labelPosition = { x: center.x + (vertical ? 30 : 0), y: center.y + (vertical ? 5 : -23) }
-    const width = (element.id.length + (element.kind === 'wire' ? 14 : String(Number(element.resistance.toPrecision(6))).length + 8)) * 8
+    const displayId=Object.hasOwn(elementLabels,element.id)?elementLabels[element.id]??element.id:element.id
+    const width = (displayId.length + (element.kind === 'wire' ? 14 : String(Number(element.resistance.toPrecision(6))).length + 8)) * 8
     const labelBox = { x: labelPosition.x - (vertical ? 0 : width / 2), y: labelPosition.y, width }
     // Modest label separation is independent of routing and electrical meaning.
     while (labelBoxes.some(box => Math.abs(box.y - labelBox.y) < 22 && box.x < labelBox.x + width && labelBox.x < box.x + box.width)) {

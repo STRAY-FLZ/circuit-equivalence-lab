@@ -8,6 +8,12 @@ export function createHistory(project: EngineeringProject): EditorHistory { retu
 export function commitEdit(history: EditorHistory, sheetId: string, operation: EditOperation): EditorHistory {
   return { past: [...history.past, history.present], present: applyEdit(history.present, sheetId, operation), future: [] }
 }
+/** Commit an already prepared domain transaction as one history entry. */
+export function commitSnapshot(history: EditorHistory, expectedRevision: string, replacement: EngineeringProject): EditorHistory {
+  if (history.present.revision !== expectedRevision) throw new TypeError('工程已改变，请重新预览变换。')
+  if (replacement.id !== history.present.id || replacement.revision === history.present.revision) throw new TypeError('事务必须保留工程身份并产生新修订。')
+  return { past: [...history.past, history.present], present: createEngineeringProject(replacement), future: [] }
+}
 function restore(current: EngineeringProject, snapshot: EngineeringProject): EngineeringProject {
   const { id, revision, ...content } = snapshot
   if (id !== current.id) throw new TypeError('History cannot change project identity.')

@@ -1,8 +1,10 @@
 import { useId, useState } from 'react'
 import type { DrawingResult } from './types'
 
-interface Props { readonly drawing: DrawingResult; readonly title: string; readonly selectedIds?: readonly string[]; readonly replacementIds?: readonly string[]; readonly affectedNodeIds?: readonly string[]; readonly createdNodeIds?: readonly string[]; readonly removedNodeIds?: readonly string[]; readonly boundaryNodeIds?: readonly string[] }
-export function CircuitDiagram({ drawing, title, selectedIds = [], replacementIds = [], affectedNodeIds = [], createdNodeIds = [], removedNodeIds = [], boundaryNodeIds = [] }: Props) {
+function displayLabel(labels:Readonly<Record<string,string>>,id:string):string { return Object.hasOwn(labels,id)?labels[id]??id:id }
+
+interface Props { readonly drawing: DrawingResult; readonly title: string; readonly selectedIds?: readonly string[]; readonly replacementIds?: readonly string[]; readonly affectedNodeIds?: readonly string[]; readonly createdNodeIds?: readonly string[]; readonly removedNodeIds?: readonly string[]; readonly boundaryNodeIds?: readonly string[]; readonly elementLabels?:Readonly<Record<string,string>>;readonly pointLabels?:Readonly<Record<string,string>> }
+export function CircuitDiagram({ drawing, title, selectedIds = [], replacementIds = [], affectedNodeIds = [], createdNodeIds = [], removedNodeIds = [], boundaryNodeIds = [],elementLabels={},pointLabels={} }: Props) {
   const titleId = useId()
   const [inspected, setInspected] = useState<{ kind: 'element' | 'point'; id: string } | null>(null)
   if (drawing.kind === 'unsupported') return <p role="alert">{drawing.message}</p>
@@ -16,7 +18,8 @@ export function CircuitDiagram({ drawing, title, selectedIds = [], replacementId
       {model.elements.map(({ element, route, center, angle, shorted }) => {
         const state = replacementIds.includes(element.id) ? 'replacement' : selectedIds.includes(element.id) ? 'selected' : 'unaffected'
         const path = route.map((p, i) => `${i ? 'L' : 'M'} ${p.x} ${p.y}`).join(' ')
-        const label = element.kind === 'resistor' ? `${element.id} · ${Number(element.resistance.toPrecision(6))} Ω` : `${element.id} · 理想导线`
+        const displayId=displayLabel(elementLabels,element.id)
+        const label = element.kind === 'resistor' ? `${displayId} · ${Number(element.resistance.toPrecision(6))} Ω` : `${displayId} · 理想导线`
         return <g key={element.id} data-element-id={element.id} data-state={state} data-shorted={shorted} className={`circuit-element ${state}`} role="button" tabIndex={0}
           aria-label={`${label}${shorted ? '（已短接）' : ''}`} aria-pressed={inspected?.kind === 'element' && inspected.id === element.id}
           onClick={() => setInspected({ kind: 'element', id: element.id })} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setInspected({ kind: 'element', id: element.id }) } }}>
@@ -28,7 +31,7 @@ export function CircuitDiagram({ drawing, title, selectedIds = [], replacementId
       <g pointerEvents="none" aria-hidden="true">{model.elements.map(({ element, shorted, labelPosition, labelAnchor }) => {
         const state = replacementIds.includes(element.id) ? 'replacement' : selectedIds.includes(element.id) ? 'selected' : 'unaffected'
         return <text key={element.id} className={`element-label circuit-element ${state}`} x={labelPosition.x} y={labelPosition.y} textAnchor={labelAnchor}>
-          {element.id} · {element.kind === 'resistor' ? `${Number(element.resistance.toPrecision(6))} Ω${shorted ? ' · 短接' : ''}` : '理想导线'}
+          {displayLabel(elementLabels,element.id)} · {element.kind === 'resistor' ? `${Number(element.resistance.toPrecision(6))} Ω${shorted ? ' · 短接' : ''}` : '理想导线'}
         </text>
       })}</g>
       {model.network.points.map(point => {
@@ -45,7 +48,7 @@ export function CircuitDiagram({ drawing, title, selectedIds = [], replacementId
           <circle className="node-hit-target" cx={position.x} cy={position.y} r="16" />
           {state !== 'unaffected' && <circle className="lesson-node-ring" cx={position.x} cy={position.y} r="12" />}
           <circle cx={position.x} cy={position.y} r={terminals.length ? 7 : 4} className={terminals.length ? 'terminal-dot' : 'junction-dot'} />
-          <text className="node-label" x={position.x} y={position.y + 25} textAnchor="middle">{point.id}</text>
+          <text className="node-label" x={position.x} y={position.y + 25} textAnchor="middle">{displayLabel(pointLabels,point.id)}</text>
           {terminals.map((terminal, i) => <text key={terminal.id} data-terminal-id={terminal.id} className="terminal-label" x={position.x + 16} y={position.y - 16 - i * 23}>{terminal.label}</text>)}
         </g>
       })}

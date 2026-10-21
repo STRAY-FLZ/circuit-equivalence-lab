@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
-const layers = ['domain', 'topology', 'solver', 'transforms', 'visualization', 'education', 'components', 'engineering', 'project-format', 'compatibility', 'analysis', 'editing', 'editor']
+const layers = ['domain', 'topology', 'solver', 'transforms', 'visualization', 'education', 'components', 'engineering', 'project-format', 'compatibility', 'analysis', 'editing', 'integration', 'editor']
 const allowedDependencies = {
   domain: [],
   topology: ['domain'],
@@ -19,7 +19,8 @@ const allowedDependencies = {
   compatibility: ['engineering', 'domain'],
   analysis: ['engineering'],
   editing: ['engineering'],
-  editor: ['engineering', 'editing', 'project-format'],
+  integration: ['engineering', 'compatibility', 'transforms', 'education', 'topology', 'editing'],
+  editor: ['engineering', 'editing', 'project-format', 'integration', 'education', 'visualization'],
 }
 
 export default defineConfig([
