@@ -1,5 +1,25 @@
 # Current Development Status
 
+Updated **2026-10-22**. Active authorized module: **Circuit Atlas / V2.2.0**,
+**In Progress, 3/8**; branch `codex/v2.2-circuit-atlas`, baseline public
+`1b61a74` / v2.1.0 confirmed from remote main/tag/published Release. Clean baseline.
+Owner approved V2.2.0 release after acceptance and DC/filters/competition roadmap
+shift to V2.3/2.4/2.5, with V3–V6 unchanged. No later-module work authorized.
+
+A01/A02/A05 verified: existing editor integration design, twelve categories /
+89 families, 26 real templates; focused catalog 30 and UI 5 cases passed, typecheck
+passed. Navigation/animation/accessibility and guarded editor handoff implemented;
+real browser/standard checks and release remain pending. No V2.2 push/deployment.
+No new dependency, source algorithm, solver model or project schema. Blockers: none.
+See [per-version implemented/planned checklist](VERSION_CHECKLIST.md),
+[scoped progress](DEVELOPMENT_PROGRESS.md), [Atlas contracts/coverage](v2/CIRCUIT_ATLAS.md).
+
+## Previous release checkpoint — historical V2.1.0
+
+Final V2.1.0 **S01–S10 10/10 Released**, main/tag `1b61a74`, published Release
+confirmed 2026-10-22. The following pre-tag documentation snapshot is historical;
+its remaining finalization subsequently completed in the canonical Release.
+
 Updated **2026-10-21**. **V2.1.0 application: Released** — implementation complete,
 locally verified and actual public signal workflow accepted. Authorized module:
 **Signal Measurement & Analysis**, preparation branch `codex/v2.1-signal-lab`,

@@ -1,5 +1,24 @@
 # 开发记录
 
+## 2026-10-22 · Circuit Atlas implementation checkpoint
+
+- Owner authorized a real twelve-category expandable Atlas, not a simulator.
+  Actual local/remote main, tag and published latest Release confirm v2.1.0
+  `1b61a74`; clean baseline. Owner explicitly approved V2.2.0 publication after
+  acceptance and shifting DC/filters/competition to V2.3/2.4/2.5; V3–V6 unchanged.
+- Immutable stable catalog keys, 89 families and 26 original recipe templates;
+  reuse palette, engineering validation, explicit connectivity and independent
+  UUID instances. Nine resistor-only templates use existing numerical/lesson
+  capabilities conditionally; seventeen are schematic/edit/export only.
+- Thirty catalog cases pass, including all real net mappings/parameters/rotations,
+  canonical JSON round trips, independent IDs and actual V1 numerical evidence.
+  Five UI cases pass: independent disclosure/ARIA/inert/selection/search,
+  planned states, dirty cancel/confirm, history and signal/V1 preservation.
+  Typecheck passed. Real browser/standard checks/publication still pending.
+- Added guarded editor template handoff and preview reusing the existing SVG
+  projection/symbol renderer; no new device/solver/dependency or schema change.
+  [Version checklist](VERSION_CHECKLIST.md), [contracts/coverage](v2/CIRCUIT_ATLAS.md).
+
 ## 2026-10-21 · V2.1.0 Signal Measurement & Analysis production release
 
 - Authorized S01–S10 scope, actual baseline `bd79d6a` / v2.0.2 (the brief's

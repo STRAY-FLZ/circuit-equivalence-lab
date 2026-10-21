@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import type { PointerEvent as ReactPointerEvent } from 'react'
+import { useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import type { PointerEvent as ReactPointerEvent, Ref } from 'react'
 import { ProjectValidationError, reviseProject } from '../engineering'
 import type { EngineeringProject, Position } from '../engineering'
 import { commitEdit, commitSnapshot, createHistory, emptySheet, newEditorProject, PALETTE, redoEdit, snap, undoEdit, wireRoute } from '../editing'
@@ -44,7 +44,8 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : '操作失败，工程保持不变。'
 }
 
-export function SchematicEditor() {
+export interface SchematicEditorHandle { openTemplate: (project: EngineeringProject) => boolean }
+export function SchematicEditor({ ref }: { readonly ref?: Ref<SchematicEditorHandle> }) {
   const [history, setHistory] = useState(() => createHistory(newEditorProject()))
   const [transformHighlight, setTransformHighlight] = useState<TransformationHighlight | null>(null)
   const project = history.present
@@ -194,6 +195,13 @@ export function SchematicEditor() {
     setHistory(createHistory(projectToOpen)); setAssets(inlineAssets); setActiveSheet(null); setSelection(null); chooseTool('select'); setViewport(INITIAL_VIEW); setSavedRevision(saved ? projectToOpen.revision : '')
   }
   const mayReplace = () => project.revision === savedRevision || window.confirm('当前工程有未导出的修改，继续将替换当前工程。是否继续？')
+  useImperativeHandle(ref, () => ({ openTemplate(next) {
+    if (busy || !mayReplace()) return false
+    cancelGesture(); setTransformHighlight(null); setWireStart(null)
+    reset(next, [], false); setViewport(fittedViewport(next.sheets[0]!.geometry.anchorPositions))
+    announce('已打开独立模板工程，可编辑、撤销并导出保存。')
+    return true
+  } }))
   async function open(file: File) {
     if (busy || !mayReplace()) return; setBusy(true)
     try {

@@ -19,10 +19,12 @@ complete intended feature scope; it does not authorize implementation or release
   Persistent context setup does not implement an item or complete V2.0-A.
   Phase descriptions below preserve the V0.3 planning sequence; use CURRENT_STATUS.md
   and DEVELOPMENT_PROGRESS.md for later internal design completion or implementation.
-- The priorities and version labels below are planning targets, not release tags,
-  promises of dates, or claims of present support. The actual package baseline
-  is `0.1.0`; establish consistent semantic releases before the next public
-  feature release and version the project-file schema separately.
+- The priorities and future version labels are planning targets, not release
+  tags or promises of dates. Historical V1 package was `0.1.0`; current public
+  release is V2.1.0. Owner approved Atlas V2.2.0 on 2026-10-22 and shifted
+  DC/filters/competition to V2.3/2.4/2.5. V3–V6 unchanged. See the actual
+  [version checklist](VERSION_CHECKLIST.md); the unchecked original scope below
+  is a planning inventory, not a current completion tracker.
 - Work one approved module at a time. Keep measurement, instrumentation, filters,
   and signal processing first among competition-oriented expansions. Later order
   may change with learning progress, verified problems, dependencies, and feasibility.
@@ -283,7 +285,15 @@ Develop the first major competition-oriented feature:
 
 Integrate, release, and verify the public version.
 
-### V2.2 — DC Circuit Analysis
+### V2.2 — Circuit Atlas
+
+Owner-approved insertion, 2026-10-22: twelve circuit-type categories, three-level
+animated navigation, at least twenty validated editable project templates,
+honest capability states and guarded integration with the existing editor.
+Preserve signal/V1 workflows; do not implement a general simulator for the catalog.
+Release V2.2.0 only after scoped acceptance and actual public verification.
+
+### V2.3 — DC Circuit Analysis
 
 Introduce sources and general DC analysis.
 
@@ -291,13 +301,13 @@ Provide meaningful equation generation, actual calculations, and visualization.
 
 Release once usable.
 
-### V2.3 — Filters and Frequency Response
+### V2.4 — Filters and Frequency Response
 
 Introduce RLC frequency analysis, filtering, phase response, and Bode visualization.
 
 Release once usable.
 
-### V2.4 — Competition Project Workspace
+### V2.5 — Competition Project Workspace
 
 Introduce real past-problem indexing, measurable requirements, test records, and reports.
 

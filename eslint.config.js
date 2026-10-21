@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
-const layers = ['domain', 'topology', 'solver', 'transforms', 'visualization', 'education', 'components', 'engineering', 'project-format', 'compatibility', 'analysis', 'editing', 'integration', 'editor', 'signal', 'signal-ui']
+const layers = ['domain', 'topology', 'solver', 'transforms', 'visualization', 'education', 'components', 'engineering', 'project-format', 'compatibility', 'analysis', 'editing', 'integration', 'editor', 'signal', 'signal-ui', 'atlas', 'atlas-ui']
 const allowedDependencies = {
   domain: [],
   topology: ['domain'],
@@ -23,6 +23,8 @@ const allowedDependencies = {
   editor: ['engineering', 'editing', 'project-format', 'integration', 'education', 'visualization'],
   signal: ['engineering', 'project-format', 'analysis'],
   'signal-ui': ['signal', 'engineering', 'project-format'],
+  atlas: ['engineering', 'editing'],
+  'atlas-ui': ['atlas', 'engineering', 'editor'],
 }
 
 export default defineConfig([
@@ -52,7 +54,7 @@ export default defineConfig([
               .flatMap((other) => [`**/${other}`, `**/${other}/**`]),
             message: '此依赖违反模块方向；请通过 domain 类型或在 App 中组合模块。',
           },
-          ...(['components', 'visualization', 'editor', 'signal-ui'].includes(layer) ? [] : [{
+          ...(['components', 'visualization', 'editor', 'signal-ui', 'atlas-ui'].includes(layer) ? [] : [{
             group: ['react', 'react/*', 'react-dom', 'react-dom/*'],
             message: '计算与教学契约不依赖 React。',
           }]),

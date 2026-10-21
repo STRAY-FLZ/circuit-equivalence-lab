@@ -1,0 +1,5 @@
+export { circuitCategories, textbookReference } from './taxonomy'
+export type { CircuitCategory, CircuitFamily } from './taxonomy'
+export { circuitTemplates } from './catalog'
+export type { CircuitTemplate, CircuitRecipe, TemplatePart } from './catalog'
+export { instantiateTemplate, matchesTemplate } from './instantiate'

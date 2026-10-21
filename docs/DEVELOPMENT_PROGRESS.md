@@ -1,9 +1,33 @@
 # Development Progress
 
-Updated: **2026-10-21**. Progress is measured per scoped module; no overall
+Updated: **2026-10-22**. Progress is measured per scoped module; no overall
 completion percentage is assigned to the evolving multi-year product.
 
-## Active module: V2.1.0 — Signal Measurement & Analysis
+## Active module: V2.2.0 — Circuit Atlas
+
+**In Progress, 3/8 (37.5%)**, authorized 2026-10-22. Baseline main/tag/release
+`1b61a74` / v2.1.0 verified. Branch `codex/v2.2-circuit-atlas`.
+Owner confirmed V2.2.0 publication after acceptance and roadmap shift DC→2.3,
+filters→2.4, competition→2.5; V3–V6 unchanged. No later-module implementation.
+
+| ID | Deliverable | Status | Evidence |
+| --- | --- | --- | --- |
+| A01 | Integration inspection/design | Verified | Existing graph/editor/palette/file boundaries; independent recipe instances and guarded editor handoff |
+| A02 | Twelve-category hierarchy/metadata | Verified | 12 categories / 89 families, stable keys; publisher-checked secondary chapter metadata |
+| A03 | Three-level navigation | Implementation Complete | Independent disclosure/selection/search state; UI checks in progress |
+| A04 | Motion/responsive/accessibility | In Progress | CSS grid/opacity/chevron, inert/ARIA/reduced motion; real browser verification pending |
+| A05 | Initial valid templates | Verified | 26 actual projects; 30 focused catalog cases: nets, parameters, UUID independence, canonical file round trips, actual resistor evidence |
+| A06 | Editor integration/preservation | Implementation Complete | Existing editor handoff and dirty confirmation; signal/V1 kept mounted; UI/browser acceptance pending |
+| A07 | Tests/actual browser acceptance | In Progress | Catalog passed; focused UI checks, final standard checks and real Chrome pending |
+| A08 | Docs/version/release/handoff | In Progress | Version arrangement authorized; methods/compatibility/rollback and version checklist; no V2.2 publication yet |
+
+Blockers: none. [Design and coverage](v2/CIRCUIT_ATLAS.md),
+[per-version checklist](VERSION_CHECKLIST.md). Stop after Atlas and its authorized release.
+
+## Released module: V2.1.0 — Signal Measurement & Analysis
+
+Final S01–S10 **10/10 Released**, main/tag `1b61a74`, confirmed 2026-10-22 from
+the actual published Release. The pre-tag execution checkpoint below is historical.
 
 **Application Released; finalization checkpoint 9/10 (90%)**, authorized 2026-10-21.
 Baseline: actual public V2.0.2 `bd79d6a`. Branch `codex/v2.1-signal-lab` safely
@@ -139,10 +163,11 @@ production code. Verified does not imply owner approval of proposed decisions.
 | V2.0-B engineering model/files | Released | Implemented, verified and publicly available in V2.0.0 |
 | V2.0-C schematic editor | Released | Implemented, verified and publicly available in V2.0.0 |
 | V2.0-D V1 integration | Released | Implemented, verified and publicly available in V2.0.0 |
-| V2.1 signal measurement | Planned | Future usable feature release |
-| V2.2 DC analysis | Planned | Future usable feature release |
-| V2.3 filters/frequency response | Planned | Future usable feature release |
-| V2.4 competition workspace | Planned | Future usable feature release |
+| V2.1 signal measurement | Released | v2.1.0 / 1b61a74, final 10/10 in canonical Release |
+| V2.2 circuit atlas | In Progress | Authorized 2026-10-22; no release yet |
+| V2.3 DC analysis | Planned | Owner-approved shift from former V2.2 |
+| V2.4 filters/frequency response | Planned | Owner-approved shift from former V2.3 |
+| V2.5 competition workspace | Planned | Owner-approved shift from former V2.4 |
 | V3.x advanced circuits/analog | Planned | Incremental usable releases |
 | V4.x digital/embedded/control | Planned | Incremental usable releases |
 | V5.x PCB engineering | Planned | Incremental usable releases |
