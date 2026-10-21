@@ -32,7 +32,7 @@ async (page) => {
     await page.getByRole('status').filter({hasText:'工程已打开'}).waitFor();
   };
   await page.getByLabel('工程名称',{exact:true}).fill('Chrome 电阻连接实验');await button('更新名称').click();
-  await button('电阻 R').click();await clickWorld(240,200);await clickWorld(560,200);
+  await button('电阻 R').click();await clickWorld(240,200);await button('电阻 R').click();await clickWorld(560,200);
   const firstId=await button('R1 元件').getAttribute('data-component-id');
   const firstPin=await button('R1.2 引脚').getAttribute('data-anchor-id');
   await button('接线 W').click();await button('R1.2 引脚').click();await button('R2.1 引脚').click();

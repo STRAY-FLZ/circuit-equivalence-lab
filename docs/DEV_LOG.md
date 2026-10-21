@@ -1,5 +1,22 @@
 # 开发记录
 
+## 2026-10-21 · Local component movement / placement correction
+
+- Fixed persistent placement mode: each palette activation inserts one component,
+  then selects it. Dragging an existing component body also exits an armed
+  placement mode and moves that same stable component; another insertion requires
+  clicking the palette again. Existing pin wire-drag and graph semantics unchanged.
+- Added two meaningful regressions for inductor one-shot insertion/movement,
+  stable identity/count, undo/redo, and existing-body drag while placement is armed.
+  Updated editor integration fixtures/replays to activate the palette per insertion.
+- Typecheck/lint/build passed; **456 tests / 28 files** passed. Focused real Chrome
+  replay `tests/browser/component-movement.js` passed desktop/narrow × light/dark,
+  including 650ms held drags and explicit subsequent addition. No console/HTTP
+  errors. Local evidence: ignored `output/playwright/component-move-*` screenshots
+  and `component-movement-verification.txt`.
+- Local **Verified, not Released**, `codex/fix-component-drag-placement`, baseline
+  `5b900ef`. No dependency/version change, commit, push, tag or deployment.
+
 ## 2026-10-21 · V2.0.1 Drag-to-Connect Patch
 
 - Extended existing SVG pointer gestures: real pin/anchor drag, captured pointer,

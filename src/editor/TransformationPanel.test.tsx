@@ -13,8 +13,8 @@ const button = (name: string) => screen.getByRole('button', { name })
 const canvas = () => screen.getByRole('application', { name: '原理图编辑画布' })
 function draw(ports = true, values = ['100', '220']) {
   render(<SchematicEditor />)
-  fireEvent.click(button('电阻 R'))
   for (const [i, x] of [200, 440].entries()) {
+    fireEvent.click(button('电阻 R'))
     fireEvent.click(canvas(), { clientX: x, clientY: 200 })
     fireEvent.change(screen.getByLabelText('电阻值'), { target: { value: values[i] } }); fireEvent.click(button('应用属性'))
   }

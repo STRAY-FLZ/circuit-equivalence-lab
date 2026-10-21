@@ -4,6 +4,19 @@ Updated **2026-10-21**. **V2.0.1: Released** — node drag-to-connect and the ac
 V2.0.0 workflow are implemented, verified and publicly deployed. V2.1 remains
 **Planned**, not started.
 
+Active authorized release **V2.0.2**, 2026-10-21, **In Progress**. The component
+movement / placement correction is **Verified, not yet Released**, branch
+`codex/fix-component-drag-placement`. Each palette activation
+places one component and returns to selection; dragging an existing body moves
+its stable instance even if placement was armed. Another new component requires
+another palette activation. Typecheck/lint/build and **456 tests / 28 files** passed;
+Chrome 1440/390px × light/dark verified 650ms held drags, unchanged count/UUID,
+undo/redo and explicit one-shot additions. Owner now authorizes public release;
+package/lock/writer target **2.0.2**, schema stays 1. Preserve prior verification;
+Versioned build/typecheck/replay lint and four built-preview cases passed;
+main push, Pages/public acceptance and tag remain pending (U01–U04: 1/4).
+Public release below is the previously verified V2.0.1 build.
+
 ## Public release
 
 - Application: <https://stray-flz.github.io/circuit-equivalence-lab/>.

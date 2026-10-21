@@ -18,7 +18,7 @@ async (page) => {
     const worldPoint=async(x,y)=>canvas.evaluate((svg,at)=>{const p=svg.createSVGPoint();p.x=at.x;p.y=at.y;const out=p.matrixTransform(svg.getScreenCTM());return{x:out.x,y:out.y};},{x,y});
     const pinPoint=async name=>button(name).evaluate(circle=>{const p=circle.ownerSVGElement.createSVGPoint();p.x=circle.cx.baseVal.value;p.y=circle.cy.baseVal.value;const out=p.matrixTransform(circle.getScreenCTM());return{x:out.x,y:out.y,worldX:p.x,worldY:p.y};});
     const save=async name=>{const pending=page.waitForEvent('download');await button('导出工程').click();await(await pending).saveAs(`output/playwright/${prefix}-${name}.straylab.json`);};
-    const start=async()=>{await save('scratch');await button('新建工程').click();await button('电阻 R').click();await canvas.scrollIntoViewIfNeeded();for(const [x,y]of[[240,180],[760,400]]){const p=await worldPoint(x,y);await page.mouse.click(p.x,p.y);}await button('选择 V').click();};
+    const start=async()=>{await save('scratch');await button('新建工程').click();for(const [x,y]of[[240,180],[760,400]]){await button('电阻 R').click();await canvas.scrollIntoViewIfNeeded();const p=await worldPoint(x,y);await page.mouse.click(p.x,p.y);}await button('选择 V').click();};
     const dragStart=async()=>{await canvas.scrollIntoViewIfNeeded();const p=await pinPoint('R1.2 引脚');await page.mouse.move(p.x,p.y);await page.mouse.down();return p;};
     const checkPreview=async(source,end,target)=>{
       assert(await preview.isVisible(),'real visible wire path while pointer held');

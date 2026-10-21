@@ -116,7 +116,7 @@ export function SchematicEditor() {
     if (tool === 'place') {
       const next = edit({ type: 'add', kind, position: snap(point) })
       const added = next?.sheets.find(s => s.id === sheetId)?.components.at(-1)
-      if (added) setSelection({ kind: 'component', id: added.id })
+      if (added) { chooseTool('select'); setSelection({ kind: 'component', id: added.id }) }
     } else if (tool === 'wire' || ['ground', 'label', 'reference', 'port'].includes(tool)) activate(endpoint(point))
     else if (tool === 'select') setSelection(null)
   }
@@ -143,7 +143,8 @@ export function SchematicEditor() {
     return { sourceId: g.anchorId, source: g.source, end: targetId ? view.positions[targetId]! : point, targetId }
   }
   function beginComponent(event: ReactPointerEvent<SVGGElement>, id: string, origin: Position) {
-    if (event.button !== 0 || gesture.current || tool !== 'select' || busy) return
+    if (event.button !== 0 || gesture.current || (tool !== 'select' && tool !== 'place') || busy) return
+    if (tool === 'place') chooseTool('select')
     event.stopPropagation(); event.preventDefault(); setSelection({ kind: 'component', id })
     gesture.current = { kind: 'component', pointerId: event.pointerId, id, client: { x: event.clientX, y: event.clientY }, world: world(event), origin }
     svg.current?.setPointerCapture(event.pointerId)

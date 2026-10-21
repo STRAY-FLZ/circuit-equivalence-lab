@@ -3,6 +3,35 @@
 Updated: **2026-10-21**. Progress is measured per scoped module; no overall
 completion percentage is assigned to the evolving multi-year product.
 
+## Active release: V2.0.2 — component movement
+
+**In Progress, 1/4 (25%)**, authorized 2026-10-21. Reuse the verified local fix and
+456-test baseline; production still V2.0.1. No V2.1 work.
+
+| ID | Deliverable | Status | Evidence |
+| --- | --- | --- | --- |
+| U01 | Version/release preparation and built preview | Verified | 2.0.2 package/lock/writer; no dependency change; rebuild/typecheck/replay lint and four actual built-browser cases passed |
+| U02 | Safe main integration and Pages deployment | In Progress | Candidate ready for fast-forward main; wait actual workflow |
+| U03 | Real public movement/new-component acceptance | Planned | 650ms hold, stable UUID/count, one placement per palette action, history and themes |
+| U04 | Final release records/tag/handoff | Planned | Only after final production workflow and live verification |
+
+Blockers: none. [Release record](v2/V2_0_2_COMPONENT_MOVEMENT.md).
+
+## Verified local follow-up: component movement / one-shot placement
+
+**Verified, 3/3**, 2026-10-21; **not Released**. Branch
+`codex/fix-component-drag-placement`, baseline `5b900ef`. At this checkpoint no
+version change or remote publication had been requested; later release
+authorization and execution are tracked above.
+
+| ID | Deliverable | Status | Evidence |
+| --- | --- | --- | --- |
+| F01 | Move original; add only through palette | Verified | Placement returns to select after one insertion; existing-body drag cancels armed placement and retains identity |
+| F02 | Regression and real browser verification | Verified | Two new regressions; 456 tests / 28 files plus typecheck/lint/build passed; Chrome four viewport/theme cases with 650ms hold, count/UUID and undo/redo |
+| F03 | Accurate handoff and persistent records | Verified | Current status/log distinguish local changes from public 2.0.1; browser replay updated for explicit palette activation |
+
+Blockers: none. No commit/push/deployment or V2.1 work.
+
 ## Production patch: V2.0.1 — node drag-to-connect
 
 Public application status: **Released**, verified 2026-10-21. This final

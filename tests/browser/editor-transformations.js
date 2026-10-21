@@ -15,7 +15,7 @@ async (page) => {
   try {
     await page.setViewportSize({width:1440,height:1100});
     await page.goto(appUrl);
-    assert((await page.getByLabel('应用版本',{exact:true}).innerText()).includes('v2.0.1'),'published application version 2.0.1');
+    assert((await page.getByLabel('应用版本',{exact:true}).innerText()).includes('v2.0.2'),'published application version 2.0.2');
     await button('原理图编辑器').click();
     const canvas=page.getByRole('application',{name:'原理图编辑画布'});
     const summary=()=>page.getByTestId('editor-summary').innerText();
@@ -42,7 +42,7 @@ async (page) => {
     };
     const screenshot=async path=>{await page.evaluate(()=>globalThis.scrollTo(0,0));await page.screenshot({path:evidencePath(path.split('/').at(-1)),fullPage:true});};
     await page.getByLabel('工程名称',{exact:true}).fill('V2.0-D 串联集成验收');await button('更新名称').click();
-    await button('电阻 R').click();await clickWorld(240,200);await clickWorld(560,200);
+    await button('电阻 R').click();await clickWorld(240,200);await button('电阻 R').click();await clickWorld(560,200);
     await page.getByLabel('电阻值',{exact:true}).fill('220');await button('应用属性').click();
     const originalId=await button('R1 元件').getAttribute('data-component-id');
     await button('接线 W').click();await button('R1.2 引脚').click();await button('R2.1 引脚').click();
@@ -109,8 +109,8 @@ async (page) => {
       {name:'Y → Δ',groups:[['R1.2 引脚','R2.2 引脚'],['R1.2 引脚','R3.2 引脚']],ports:[['A','R1.1 引脚'],['B','R2.1 引脚'],['C','R3.1 引脚']],count:3},
     ];
     for(const fixture of categories){
-      await newProject();await button('电阻 R').click();
-      for(let i=0;i<fixture.count;i++)await clickWorld(180+i*280,200+i*100);
+      await newProject();
+      for(let i=0;i<fixture.count;i++){await button('电阻 R').click();await clickWorld(180+i*280,200+i*100);}
       await button('接线 W').click();for(const [a,b]of fixture.groups){await button(a).click();await button(b).click();}
       for(const [label,pin]of fixture.ports)await setPort(label,pin);
       await button('选择 V').click();await discover(fixture.name);
@@ -122,7 +122,7 @@ async (page) => {
       assert((await summary()).startsWith(fixture.count===2?'1 个元件':'3 个元件'),`${fixture.name} committed`);
       journeys.push(`${fixture.name}: drawn, observed, verified and committed`);
     }
-    await newProject();await button('电阻 R').click();await clickWorld(240,200);await clickWorld(560,200);
+    await newProject();await button('电阻 R').click();await clickWorld(240,200);await button('电阻 R').click();await clickWorld(560,200);
     await button('接线 W').click();await button('R1.2 引脚').click();await button('R2.1 引脚').click();
     await discover('串联化简');assert(await button('应用已验证变换').isDisabled(),'inconclusive no-port writeback disabled');
     assert(await page.getByText('无法确定：数值验证未能建立等效性',{exact:true}).isVisible(),'honest inconclusive evidence');
@@ -138,7 +138,7 @@ async (page) => {
     assert(await page.getByRole('link',{name:'返回首页',exact:true}).getAttribute('href')==='https://stray-flz.github.io/stray-articles/','home link');
     journeys.push('V1 examples/previews/navigation and return-home destination retained');
     assert(errors.length===0,`browser errors ${JSON.stringify(errors)}`);assert(failed.length===0,`HTTP failures ${JSON.stringify(failed)}`);
-    return {appUrl,applicationVersion:'2.0.1',evidencePrefix,browser:await page.context().browser().version(),journeys,errors,failed};
+    return {appUrl,applicationVersion:'2.0.2',evidencePrefix,browser:await page.context().browser().version(),journeys,errors,failed};
   } finally {
     page.off('pageerror',onError);page.off('console',onConsole);page.off('response',onResponse);page.off('requestfailed',onFailed);
   }
