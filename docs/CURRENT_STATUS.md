@@ -1,36 +1,36 @@
 # Current Development Status
 
-Updated **2026-10-21**. **V2.0.0: Released** — accepted A/B/C/D are implemented,
-verified and now publicly deployed. V2.1 remains **Planned**, not started.
+Updated **2026-10-21**. **V2.0.1: Released** — node drag-to-connect and the accepted
+V2.0.0 workflow are implemented, verified and publicly deployed. V2.1 remains
+**Planned**, not started.
 
 ## Public release
 
-Active task **V2.0.1 drag-to-connect**, **Implementation Complete / focused Verified,
-P01–P06: 5/6**. Sixteen new interaction tests and four actual Chrome viewport/theme
-flows passed, including visible intermediate wire paths and simulated pen input.
-Authorized implementation/tests/production patch on `codex/v2.0.1-wire-drag`.
-Extends the existing SVG pointer interaction with a real temporary wire and
-screen-space snapping; reuses the graph/history contracts. Current public version
-remains 2.0.0 until patch deployment and actual public verification pass.
-Local package/export writer target 2.0.1. Final typecheck/lint/build and **454 tests /
-28 files** passed; built wire and seven integration workflows passed without
-console/resource failures. Production deployment, live verification and tag pending.
-
 - Application: <https://stray-flz.github.io/circuit-equivalence-lab/>.
-- Application/package/lockfile/export writer: **2.0.0**; engineering file
+- Application/package/lockfile/export writer: **2.0.1**; engineering file
   `formatVersion: 1` and project revision remain independent.
-- First verified production commit: `64850067fc0cf9344efd5e31be31fe3f954079d1`.
-  [Pages workflow 39541122926](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39541122926)
+- First verified patch production commit: `ede35236aab0e80fbfd65fab150f12c0eb946c26`.
+  [Pages workflow 39553250543](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39553250543)
   completed successfully: build and deploy. Real public acceptance then passed.
-- Final release identity: [v2.0.0 release record](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.0).
+- Final release identity and P01–P06 completion: [v2.0.1 release record](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.1).
   It records the exact final production SHA and workflow after this documentation
   commit is deployed and verified. The tag must point to that final verified
   production commit; this document does not predict its own SHA or a future run ID.
-- [Detailed evidence and rollback](v2/V2_0_0_RELEASE.md), [changelog](../CHANGELOG.md),
+- [Patch evidence and rollback](v2/V2_0_1_WIRE_INTERACTION.md), [changelog](../CHANGELOG.md),
   [scoped progress](DEVELOPMENT_PROGRESS.md). M0–M8 and earlier internal module
   handoffs remain historical records in [DEV_LOG.md](DEV_LOG.md).
+- Prior public V2.0.0: `c6e8a9f` / `v2.0.0`; [release evidence](v2/V2_0_0_RELEASE.md).
+  This patch preserves its complete history and functionality.
 
 ## Verified behavior
+
+- Select/wire mode: press and drag a real pin or existing anchor. The SVG shows
+  an orthogonal dashed wire from the exact source to the continuously tracked
+  pointer; a 14px screen-space target snaps exactly and shows an explicit ring.
+  Valid release invokes one existing connect transaction; net derivation,
+  undo/redo and JSON persistence retain real stable endpoints. Invalid release,
+  Escape, cancellation/capture loss and focus/tool changes leave no drag preview.
+  Component-body movement and click/keyboard wire editing remain available.
 
 - Engineering projects with stable UUIDs, pinned component definitions, explicit
   connectivity/derived nets, separate SVG geometry, immutable editing history,
@@ -39,17 +39,22 @@ console/resource failures. Production deployment, live verification and tag pend
   non-mutating previews, independent numerical evidence and atomic verified
   writeback, undo/redo, and five-stage lessons. Existing observed boundaries are
   protected. Original V1 algorithms and owner-approved D05 are unchanged.
-- Final local typecheck/lint/build passed; **438 tests / 27 files passed**,
+- Final local typecheck/lint/build passed; **454 tests / 28 files passed**,
   including the preserved 315-test V1 baseline. Existing production workflow
   independently passed its required checks.
-- Local and public Chrome **155.0.8059.40** each passed seven editor/integration
-  workflow groups. Public save/reopen/re-export is byte-identical; writer 2.0.0,
+- Local built preview and public Chrome **155.0.8059.40** each passed four
+  wire viewport/theme groups plus simulated pen input, explicitly checking three
+  intermediate visible paths and snapping, zoom/pan, cancellation, movement,
+  undo/redo and actual file reopen. This is browser simulation, not hardware.
+  The same builds each passed seven editor/integration
+  workflow groups. Public save/reopen/re-export is byte-identical; writer 2.0.1,
   formatVersion 1. Both themes at 1440/390px; screenshots inspected.
-- Actual personal website → tools → V2.0.0 → return-home passed in four viewport/
+- Prior V2.0.0 release evidence: actual personal website → tools → V2.0.0 → return-home passed in four viewport/
   theme combinations, preserving shared theme. V1 examples/previews and a full
   five-stage Δ→Y lesson passed, including 19 visible native MathML expressions
   and three terminal-pair comparisons. No critical console/resource failures;
-  all production resources loaded under `/circuit-equivalence-lab/`.
+  all production resources loaded under `/circuit-equivalence-lab/`. This patch
+  did not repeat that historical website/MathML acceptance or edit its repository.
 
 ## Limits and next module
 

@@ -3,11 +3,14 @@
 Updated: **2026-10-21**. Progress is measured per scoped module; no overall
 completion percentage is assigned to the evolving multi-year product.
 
-## Active patch: V2.0.1 — node drag-to-connect
+## Production patch: V2.0.1 — node drag-to-connect
 
-Status: **Implementation Complete / focused Verified, 5/6 (83%)**. Authorized focused implementation and production
-patch; baseline `c6e8a9f` / `v2.0.0`, clean main equal to origin/main.
-Branch: `codex/v2.0.1-wire-drag`. Project schema remains 1. Do not begin V2.1.
+Public application status: **Released**, verified 2026-10-21. This final
+documentation checkpoint is **5/6 (83%)**, before its deployment and final tag.
+The [canonical v2.0.1 release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.1)
+records subsequent P06 completion / **6/6**, final production SHA and workflow.
+Authorized focused patch; baseline `c6e8a9f` / `v2.0.0`. Preparation branch
+`codex/v2.0.1-wire-drag` fast-forwarded into main. Schema remains 1. No V2.1 work.
 
 | ID | Deliverable | Status | Evidence |
 | --- | --- | --- | --- |
@@ -16,9 +19,13 @@ Branch: `codex/v2.0.1-wire-drag`. Project schema remains 1. Do not begin V2.1.
 | P03 | Continuous preview / snapping | Verified | Real SVG dashed orthogonal path; fixed source; 14px screen-space snap and explicit target rings |
 | P04 | Graph commit / cancellation / history | Verified | Existing connect transaction; Escape/cancel/lost capture/blur/tool/undo; real nets and stable file endpoints |
 | P05 | Focused tests / actual browser | Verified | 16 new UI tests; Chrome four viewport/theme groups explicitly assert intermediate preview paths, zoom/pan, undo/redo, actual file reopen and CDP pen |
-| P06 | Authorized patch release / records | In Progress | Version 2.0.1; typecheck/lint/build and 454 tests / 28 files passed; built wire and seven integration workflows passed; production deployment/public verification/tag pending |
+| P06 | Authorized patch release / records | Finalization at this checkpoint | 2.0.1 main `ede3523`, workflow 39553250543 success; actual public wire/pen and seven integration groups passed. Final documentation deployment, tag and 6/6 handoff recorded in canonical release |
 
-Blockers: none. Prior release checkpoints below remain historical.
+Resume audit: actual clean main/remote `ede3523`, prior standard checks and local/
+public browser evidence recovered; no tag/release existed. Reused all valid checks,
+did not restart implementation or repeat the historical seven-group replay.
+Only final records/deployment confirmation/tag remained. Blockers: none.
+Prior release checkpoints below remain historical.
 
 ## Production release: V2.0.0 — R01–R09
 

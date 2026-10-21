@@ -1,5 +1,32 @@
 # 开发记录
 
+## 2026-10-21 · V2.0.1 Drag-to-Connect Patch
+
+- Extended existing SVG pointer gestures: real pin/anchor drag, captured pointer,
+  inverse screen CTM, continuously rendered orthogonal dashed preview and 14px
+  screen-space snap with explicit target ring. Preserved component-body movement,
+  click/keyboard wire editing, separate graph/geometry and original D05 policy.
+- Valid release uses one existing connect transaction; real nets, history and
+  JSON persist stable endpoints. Invalid/self/duplicate releases do not edit;
+  Escape/cancel/lost capture/blur/tool and history paths discard drag preview.
+- 16 focused cases added. Final typecheck/lint/build passed; **454 tests / 28
+  files passed**. Built/public Chrome each passed four viewport/theme wire groups,
+  including explicit intermediate SVG paths, snapping, zoom/pan, cancellation,
+  component movement, undo/redo and actual export/reopen; simulated pen passed.
+  Seven existing editor integration groups also passed on local/public builds.
+- Implementation/first deployment **`ede3523`**, [workflow 39553250543](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39553250543)
+  build/deploy success. Actual public version 2.0.1 and wire preview verified;
+  no interaction console/resource failures. Production assets unchanged from
+  verified build. Schema stays 1; dependency records and V1 algorithms unchanged.
+- Resume audit confirmed existing clean main/remote and reliable evidence; no
+  patch tag/release existed. Only final records and publication remained. Reused
+  successful checks without rerunning full tests or historical browser acceptance.
+  Final documentation deployment requires a targeted live check before tagging.
+  Exact final SHA/workflow and completed P01–P06 handoff live in the
+  [canonical v2.0.1 release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.1).
+  [Details/limits/rollback](v2/V2_0_1_WIRE_INTERACTION.md). No website repository
+  edit or V2.1 work; pen/phone hardware and other browsers are not certified.
+
 ## 2026-10-21 · V2.0.0 Production Release
 
 - Owner authorized the full production release. Confirmed remote baseline

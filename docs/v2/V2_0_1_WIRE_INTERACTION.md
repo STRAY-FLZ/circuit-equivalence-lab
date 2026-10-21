@@ -1,8 +1,8 @@
 # V2.0.1 — Node drag-to-connect
 
 Authorized 2026-10-21. Baseline `c6e8a9f` / `v2.0.0`; branch
-`codex/v2.0.1-wire-drag`. **Implementation Complete / Verified**;
-production release is pending at this checkpoint.
+`codex/v2.0.1-wire-drag`. **Implementation Complete / Verified / Released**:
+production deployment and public visible-wire acceptance passed on 2026-10-21.
 
 ## Interaction contract
 
@@ -65,19 +65,45 @@ or D05 verification policy was introduced.
 
 ## Compatibility and release
 
-Application/package/lock/export writer target **2.0.1**; engineering file schema
+Application/package/lock/export writer **2.0.1**; engineering file schema
 remains **1**. Only version metadata changed in dependency records. Existing
 project content remains compatible; no migration is required. Undo history and
 temporary gestures remain session-only. Existing resistor-only transformation
 scope and editor selection/routing limitations remain unchanged.
 
-P06 still requires safe main integration/push, successful existing Pages workflow
-and actual public visible-
-preview verification before marking Released and tagging `v2.0.1`.
-If a final documentation production commit follows, verify its deployment and
-live build before tagging that final commit. Final exact SHA/workflow/tag state
-will be retained in the canonical GitHub Release to avoid predicting this file's
-own commit hash. Stop before V2.1.
+## Actual production evidence and resumed finalization
+
+- Implementation/first public patch: **`ede35236aab0e80fbfd65fab150f12c0eb946c26`**.
+  Fast-forwarded into main and pushed without rewriting history.
+  [Workflow 39553250543](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39553250543)
+  finished **success**, build and deploy both passed.
+- Actual public `wire-drag.js`: version 2.0.1, four 1440/390px × light/dark groups,
+  three visible intermediate pointer paths per group, target snapping/highlight,
+  real graph/net inspection, undo/redo, exported-file reopen, movement, zoom/pan,
+  Escape and invalid release passed. CDP simulated pen also passed. `errors: []`,
+  `failed: []`; public preview screenshots inspected visually.
+- Actual public existing editor integration replay passed its seven groups,
+  including all four transformations, current-circuit five-stage course, observed
+  boundaries, stable files and original V1 examples. Public exported wire file
+  confirms writer 2.0.1, formatVersion 1, two components and one real connection
+  using the existing stable anchor IDs. No project-schema migration.
+- Evidence: ignored `output/playwright/wire-built-verification.txt`,
+  `wire-live-verification.txt`, `patch-local-integration-verification.txt`,
+  `patch-live-integration-verification.txt`, `wire-local-*` / `wire-live-*` files
+  and screenshots. No generated output or dependency cache was committed.
+- Resume instruction arrived after these checks. Recovered clean main/remote
+  at `ede3523`, successful workflow and actual browser results; confirmed no
+  `v2.0.1` tag/release existed. Reused unchanged-code checks and completed only
+  missing final documentation/deployment confirmation/tag/release. No repeated
+  full suite, implementation or historical seven-group browser run after resume.
+
+This documentation checkpoint precedes its own production deployment/tag.
+After that workflow succeeds, freshly verify version 2.0.1, unchanged JS/CSS,
+an intermediate visible drag path, snapping/commit and return-home. Only then
+tag the final verified production commit. Exact final SHA, workflow URL and
+P01–P06 **6/6** completion are retained in the
+[canonical v2.0.1 GitHub Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.0.1).
+This avoids guessing this document's own commit/run. Stop before V2.1.
 
 Rollback: preserve exported files, review and revert the complete patch range
 `v2.0.0..v2.0.1` in reverse order with a new revert commit; run appropriate checks,
