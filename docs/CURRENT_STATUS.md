@@ -3,6 +3,13 @@
 Last development handoff: **2026-10-21**. V2.0-D is internally implemented and
 verified; the public application was not changed or reverified live this round.
 
+Active task: **V2.0.0 production release**, authorized 2026-10-21, **In Progress,
+5/9**. Remote baseline `8fd6e9b` confirmed, accepted V2 history integrated locally
+without conflicts. Release branch `codex/release-v2.0.0`; package/lock target
+`2.0.0`, file schema unchanged at 1. Final typecheck/lint/build and 438 tests passed;
+seven local production-preview browser workflows passed. Production push/deployment/live acceptance
+remain pending; [release record](v2/V2_0_0_RELEASE.md). V2.1 is not authorized here.
+
 ## Published baseline
 
 - Product: 电路实验室 / Circuit Equivalence Lab, the V1 foundation of
@@ -76,7 +83,8 @@ verified; the public application was not changed or reverified live this round.
 - **Material unresolved architecture questions blocking B: none at this scope.**
   Specific external-data containers, autosave backend, EDA formats, simulation and
   hardware backends remain deferred until needed. B/C/D are complete; separate
-  authorization for public release has not been granted.
+  authorization for V2.0.0 publication has now been granted; the active release
+  checklist above records actual execution, not an assumed deployment result.
 
 Exact owner outcomes and remaining release conditions are recorded as D01–D09 in
 [v2/DECISIONS.md](v2/DECISIONS.md). No further original V2.0-A deliverable work remains. See

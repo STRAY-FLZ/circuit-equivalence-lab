@@ -10,6 +10,9 @@ import { lessonSessionReducer } from './lesson-session'
 import type { PreviewSnapshot } from './lesson-session'
 import type { CircuitNetwork } from './domain'
 import { SchematicEditor } from './editor'
+import packageText from '../package.json?raw'
+
+const appVersion = (JSON.parse(packageText) as { version: string }).version
 
 const transformNames: Record<TransformType, string> = { series: '串联化简', parallel: '并联化简', 'delta-to-star': 'Δ → Y', 'star-to-delta': 'Y → Δ' }
 const verdictNames = { equivalent: '端口等效验证通过', different: '端口验证发现差异', inconclusive: '端口验证无法确定' }
@@ -119,6 +122,6 @@ export default function App() {
         </section>
       </div>
       </div>
-    </main><footer className="site-footer"><div className="shell footer-inner"><p>位置不决定电气连接 · 工程计算与呈现分离</p><span>STRAY Electronics Lab</span></div></footer>
+    </main><footer className="site-footer"><div className="shell footer-inner"><p>位置不决定电气连接 · 工程计算与呈现分离</p><span aria-label="应用版本">STRAY Electronics Lab · v{appVersion}</span></div></footer>
   </div>
 }

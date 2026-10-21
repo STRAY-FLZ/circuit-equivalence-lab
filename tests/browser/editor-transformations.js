@@ -1,16 +1,21 @@
-// Existing playwright-cli replay against the local built preview; no test-framework dependency.
+// Open the local preview or public application before running this existing CLI replay.
 async (page) => {
   const assert=(ok,message)=>{if(!ok)throw new Error(message);};
   const button=name=>page.getByRole('button',{name,exact:true});
   const errors=[],failed=[],journeys=[];
+  const appUrl=page.url();
+  const evidencePrefix=new URL(appUrl).hostname==='127.0.0.1'?'release-local':'release-live';
+  const evidencePath=name=>`output/playwright/${evidencePrefix}-${name}`;
   const onError=e=>errors.push(e.message);
   const onConsole=m=>{if(m.type()==='error')errors.push(m.text());};
   const onResponse=r=>{if(r.status()>=400)failed.push({url:r.url(),status:r.status()});};
-  page.on('pageerror',onError);page.on('console',onConsole);page.on('response',onResponse);
+  const onFailed=r=>failed.push({url:r.url(),failure:r.failure()?.errorText});
+  page.on('pageerror',onError);page.on('console',onConsole);page.on('response',onResponse);page.on('requestfailed',onFailed);
   page.setDefaultTimeout(10000);
   try {
     await page.setViewportSize({width:1440,height:1100});
-    await page.goto('http://127.0.0.1:4173/circuit-equivalence-lab/');
+    await page.goto(appUrl);
+    assert((await page.getByLabel('应用版本',{exact:true}).innerText()).includes('v2.0.0'),'published application version 2.0.0');
     await button('原理图编辑器').click();
     const canvas=page.getByRole('application',{name:'原理图编辑画布'});
     const summary=()=>page.getByTestId('editor-summary').innerText();
@@ -33,9 +38,9 @@ async (page) => {
     };
     const save=async filename=>{
       const pending=page.waitForEvent('download');await button('导出工程').click();const download=await pending;
-      await download.saveAs(`output/playwright/${filename}`);
+      await download.saveAs(evidencePath(filename));
     };
-    const screenshot=async path=>{await page.evaluate(()=>globalThis.scrollTo(0,0));await page.screenshot({path,fullPage:true});};
+    const screenshot=async path=>{await page.evaluate(()=>globalThis.scrollTo(0,0));await page.screenshot({path:evidencePath(path.split('/').at(-1)),fullPage:true});};
     await page.getByLabel('工程名称',{exact:true}).fill('V2.0-D 串联集成验收');await button('更新名称').click();
     await button('电阻 R').click();await clickWorld(240,200);await clickWorld(560,200);
     await page.getByLabel('电阻值',{exact:true}).fill('220');await button('应用属性').click();
@@ -43,6 +48,8 @@ async (page) => {
     await button('接线 W').click();await button('R1.2 引脚').click();await button('R2.1 引脚').click();
     await setPort('A','R1.1 引脚');await setPort('B','R2.2 引脚');
     await button('选择 V').click();
+    await button('R1.2 引脚').click();
+    assert(await page.getByText('2 个连接点 · 2 个元件引脚',{exact:true}).isVisible(),'derived electrical-net inspection');
     await discover('串联化简');
     assert(await page.getByText('已验证：外部端口行为在数值容差内一致',{exact:true}).isVisible(),'independent numerical equivalence');
     assert((await summary()).startsWith('2 个元件'),'preview must not mutate engineering project');
@@ -58,7 +65,7 @@ async (page) => {
         assert(await page.evaluate(expected=>globalThis.document.documentElement.dataset.theme===expected,theme),'shared theme');
         assert(await page.evaluate(()=>globalThis.document.documentElement.scrollWidth<=globalThis.innerWidth),'no page overflow');
         await screenshot(`output/playwright/integration-${width}-${theme}.png`);
-        await page.getByRole('region',{name:'工程等效变换与课程'}).screenshot({path:`output/playwright/integration-panel-${width}-${theme}.png`});
+        await page.getByRole('region',{name:'工程等效变换与课程'}).screenshot({path:evidencePath(`integration-panel-${width}-${theme}.png`)});
       }
     }
     await page.setViewportSize({width:1440,height:1100});
@@ -78,7 +85,7 @@ async (page) => {
     await button('重做').click();assert(await button('R3 元件').getAttribute('data-component-id')===replacementId,'redo replacement UUID');
     await save('integration-transformed.straylab.json');
     await newProject();assert((await summary()).startsWith('0 个元件'),'empty project');
-    await page.getByLabel('打开工程文件').setInputFiles('output/playwright/integration-transformed.straylab.json');
+    await page.getByLabel('打开工程文件').setInputFiles(evidencePath('integration-transformed.straylab.json'));
     await page.getByRole('status').filter({hasText:'工程已打开'}).waitFor();
     assert(await button('R3 元件').getAttribute('data-component-id')===replacementId,'saved transformation stable identity');
     await button('R3 元件').click();assert(Math.abs(Number(await page.getByLabel('电阻值',{exact:true}).inputValue())-320)<1e-8,'actual reopened resistance');
@@ -131,8 +138,8 @@ async (page) => {
     assert(await page.getByRole('link',{name:'返回首页',exact:true}).getAttribute('href')==='https://stray-flz.github.io/stray-articles/','home link');
     journeys.push('V1 examples/previews/navigation and return-home destination retained');
     assert(errors.length===0,`browser errors ${JSON.stringify(errors)}`);assert(failed.length===0,`HTTP failures ${JSON.stringify(failed)}`);
-    return {browser:await page.context().browser().version(),journeys,errors,failed};
+    return {appUrl,applicationVersion:'2.0.0',evidencePrefix,browser:await page.context().browser().version(),journeys,errors,failed};
   } finally {
-    page.off('pageerror',onError);page.off('console',onConsole);page.off('response',onResponse);
+    page.off('pageerror',onError);page.off('console',onConsole);page.off('response',onResponse);page.off('requestfailed',onFailed);
   }
 }

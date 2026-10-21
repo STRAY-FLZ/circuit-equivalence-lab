@@ -3,6 +3,27 @@
 Updated: **2026-10-21**. Progress is measured per scoped module; no overall
 completion percentage is assigned to the evolving multi-year product.
 
+## Active release: V2.0.0 — R01–R09
+
+Status: **In Progress, 5/9 (56%)**, authorized 2026-10-21. Scope includes production
+integration/push, existing Pages deployment, live verification and tag/release.
+Do not begin V2.1. [Release evidence](v2/V2_0_0_RELEASE.md).
+
+| ID | Deliverable | Status | Evidence |
+| --- | --- | --- | --- |
+| R01 | Release baseline and actual remote state | Verified | Remote main `8fd6e9b`, successful workflow 38141955598, push permission and Pages source checked |
+| R02 | History-preserving integration | Verified | A/B/C/D ancestry confirmed; local main fast-forwarded to `4030e08`, no conflict |
+| R03 | Version, visible information and release/compatibility notes | Verified | Package/lock/footer/writer 2.0.0; schema 1; changelog, compatibility and rollback documented |
+| R04 | Final integrated standard checks | Verified | Typecheck/lint/build passed; 438 tests / 27 files passed |
+| R05 | Actual local production browser preview | Verified | Chrome 155: seven workflow groups; real JSON round trip byte-identical; 1440/390px and both themes |
+| R06 | Main push and successful Pages workflow | In Progress | Verified candidate being committed; production push pending |
+| R07 | Actual public application / website navigation | Planned | Pending |
+| R08 | Tag/release and final persistent records | Planned | Only after successful public acceptance |
+| R09 | Final owner report and handoff | Planned | Stop before V2.1 |
+
+Branch: `codex/release-v2.0.0`. No production push/tag yet. Blockers: none.
+Git uses the existing system proxy per command because direct GitHub access failed.
+
 ## Status vocabulary
 
 | Status | Meaning |
