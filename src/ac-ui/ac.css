@@ -1,0 +1,23 @@
+.ac-panel { margin-block: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); min-width: 0; }
+.ac-panel header h2 { margin-block: .4rem; }
+.ac-controls { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,220px),1fr)); gap: 1rem; margin-block: 1rem; }
+.ac-controls label,.ac-bode label { display: grid; gap: .4rem; min-width: 0; }
+.ac-controls input,.ac-controls select { width: 100%; min-width: 0; }
+.ac-panel fieldset { min-width: 0; margin-block: 1rem; padding: 1rem; }
+.ac-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+.ac-scroll { max-width: 100%; overflow-x: auto; margin-block: 1rem; }
+.ac-scroll table { border-collapse: collapse; width: 100%; }
+.ac-scroll td,.ac-scroll th { text-align: left; white-space: nowrap; padding: .6rem; border-bottom: 1px solid var(--line); }
+.ac-panel pre { font-size: .85rem; }
+.ac-provenance { overflow-wrap: anywhere; }
+.ac-bode svg { width: 100%; display: block; color: var(--ink); }
+.ac-bode svg text { fill: currentColor; font-size: 12px; }
+.ac-grid { stroke: currentColor; opacity: .16; }
+.ac-trace,.ac-phase { fill: none; stroke: currentColor; stroke-width: 2; }
+.ac-phase { stroke-dasharray: 5 3; }
+.ac-cursor { stroke: currentColor; stroke-width: 1; stroke-dasharray: 2 4; }
+.ac-bode output { display: block; margin-block: .7rem; font-variant-numeric: tabular-nums; }
+
+.ac-panel button,.ac-controls input,.ac-controls select { min-height: 44px; padding: .5rem .7rem; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); }
+.ac-panel button { cursor: pointer; }
+.ac-panel button:focus-visible,.ac-panel input:focus-visible,.ac-panel select:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }

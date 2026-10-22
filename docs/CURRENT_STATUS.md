@@ -1,5 +1,43 @@
 # Current Development Status
 
+Updated **2026-10-23**. Active authorized module **V2.4.0 — AC, filters and frequency response**.
+**In Progress, F01–F10: 5/10**; only verified deliverables count.
+Baseline local/remote main and published v2.3.0 verified at
+`c7eca82e6d62c6479c1599d3cf1469e035054495`. Branch `codex/v2.4-ac-filters`.
+Owner explicitly authorizes implementation, numerical/built/public acceptance and
+production release of 2.4.0. No V2.5 work. No blocker.
+
+Checkpoint: 2026-10-23. Independent complex MNA and explicit RMS configuration,
+phasor/power/equation UI and defined sweeps verified by focused numerical/UI tests.
+RC cutoff, RLC resonance, four controlled families, per-point failure, zero transfer,
+stale edits, all five portable Atlas experiments and sampled RC data persistence
+pass. Focused verification: 77 tests passed across numerical/filter, AC UI/Atlas
+portability, catalog and navigation files (76 passed initially; obsolete Atlas text
+expectation updated and all 5 navigation tests then passed). Typecheck passed. Browser acceptance, final standard checks and release remain.
+No remote update made. Resume on current feature branch; preserve all edits.
+
+| ID | Deliverable | Status |
+| --- | --- | --- |
+| F01 | Independent AC/provider/configuration | Verified |
+| F02 | Complex MNA | Verified |
+| F03 | RLC and explicit RMS source models | Verified |
+| F04 | Phasors, complex power and equations | Verified |
+| F05 | Defined transfer and frequency sweep | Verified |
+| F06 | Actual interactive Bode plots | Implementation Complete |
+| F07 | Editable Atlas filter/resonance experiments | Implementation Complete |
+| F08 | Sampled RC filtering/provenance | Implementation Complete |
+| F09 | Numerical and actual browser acceptance | In Progress |
+| F10 | Docs/version/production release | In Progress |
+
+DC numerical semantics, V1/D05, schema1, original signal data and branding are
+preserved. AC uses positive-cosine RMS phasors and strictly positive frequencies;
+source settings never silently inherit DC values. Sampled RC processing is a
+separate declared ZOH operation, not a general transient circuit solver.
+
+Prior V2.3.0 is **Released (10/10)**; dated pre-tag checkpoint below is retained.
+
+---
+
 Updated **2026-10-23**. Authorized module **V2.3.0 General DC Analysis**:
 **Implementation Complete → Verified → Application Released**.
 Pre-tag documentation checkpoint **9/10**: DC01–DC09 Verified; DC10 final

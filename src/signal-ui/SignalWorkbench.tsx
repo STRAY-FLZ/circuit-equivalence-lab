@@ -3,8 +3,8 @@ import { createId, reviseProject } from '../engineering'
 import type { JsonObject, JsonValue } from '../engineering'
 import { createProjectDocument, deserializeProject, serializeProject } from '../project-format'
 import type { ProjectDocumentV1 } from '../project-format'
-import { appendGenerated, appendSpectrum, assetBytes, decodeCsv, DEFAULT_GENERATOR, digestJson, emptySignalDocument, exportCsv, importCsv, loadWaveform, measurementsFor, parseCsv, SIGNAL_ENGINE, signalFftEngine } from '../signal'
-import type { AmplitudeSpectrum, CsvMapping, CsvTable, GeneratorOptions, LoadedWaveform, SpectrumOptions, WaveKind } from '../signal'
+import { appendRcFilter, appendGenerated, appendSpectrum, assetBytes, decodeCsv, DEFAULT_GENERATOR, digestJson, emptySignalDocument, exportCsv, importCsv, loadWaveform, measurementsFor, parseCsv, SIGNAL_ENGINE, signalFftEngine } from '../signal'
+import type { RcFilterOptions, AmplitudeSpectrum, CsvMapping, CsvTable, GeneratorOptions, LoadedWaveform, SpectrumOptions, WaveKind } from '../signal'
 import packageText from '../../package.json?raw'
 import { Oscilloscope, SpectrumChart } from './SignalCharts'
 import { formatNumber } from './format'
@@ -25,6 +25,7 @@ function storedFftOptions(doc: ProjectDocumentV1): SpectrumOptions {
 }
 function isJsonObject(value: JsonValue | undefined): value is JsonObject { return value !== null && typeof value === 'object' && !Array.isArray(value) }
 export function SignalWorkbench() {
+  const [rcOptions, setRcOptions] = useState<RcFilterOptions>({ resistanceOhms: 1000, capacitanceFarads: 1e-6, initialOutput: 0, mode: 'lowpass' })
   const [document, setDocument] = useState<ProjectDocumentV1 | null>(null), [activeId, setActiveId] = useState<string | null>(null), [channelId, setChannelId] = useState<string | null>(null)
   const [generator, setGenerator] = useState<GeneratorOptions>({ ...DEFAULT_GENERATOR }), [fftOptions, setFftOptions] = useState<SpectrumOptions>({ window: 'rectangular', removeMean: false })
   const [spectrum, setSpectrum] = useState<AmplitudeSpectrum | null>(null), [fftError, setFftError] = useState(''), [busy, setBusy] = useState(false), [message, setMessage] = useState('先生成测试信号，或导入带明确时间列的 CSV。'), [failed, setFailed] = useState(false)
@@ -52,6 +53,11 @@ export function SignalWorkbench() {
     const loaded = loadWaveform(doc, datasetId), target = targetChannel ?? loaded.channels[0]!.channel.id
     const result = await analyze(doc, loaded, target, options)
     setDocument(result.document); setActiveId(datasetId); setChannelId(target); setSpectrum(result.spectrum); setFftError(result.error)
+  }
+  async function runRcFilter() {
+    if (busy || !document || !activeId || !selectedId) return; setBusy(true)
+    try { const filtered = await appendRcFilter(document, activeId, selectedId, rcOptions); await showCapture(filtered.document, filtered.datasetId, filtered.channelId); announce('RC 采样滤波完成：原始捕获保留，当前显示输入与派生输出，FFT 默认分析输出通道。') }
+    catch (e) { announce(messageFor(e), true) } finally { setBusy(false) }
   }
   async function generate() {
     if (busy) return; setBusy(true)
@@ -129,6 +135,7 @@ export function SignalWorkbench() {
         <div className="table-scroll"><table><caption>原始数据预览（前 5 行，未转换单位）</caption><thead><tr>{pendingCsv.table.headers.map(h => <th key={h}>{h}</th>)}</tr></thead><tbody>{pendingCsv.table.rows.slice(0, 5).map(row => <tr key={row.line}>{row.cells.map((v, i) => <td key={i}>{v}</td>)}</tr>)}</tbody></table></div><button disabled={busy} onClick={() => void confirmCsv()}>确认列与单位并导入</button></div>}
     </section>
     {document && <section className="signal-capture-row"><label>当前捕获<select aria-label="当前捕获" disabled={busy} value={activeId ?? ''} onChange={e => void selectDataset(e.target.value)}><option value="" disabled>选择时域捕获</option>{document.project.measurements.filter(d => d.kind === 'waveform').map(d => <option key={d.id} value={d.id}>{d.title} · {d.source.kind === 'simulated' ? '合成' : d.source.kind === 'imported' ? '导入' : d.source.kind}</option>)}</select></label>{waveform && <><p>来源：{waveform.dataset.source.kind === 'simulated' ? '合成采样' : waveform.dataset.source.kind === 'imported' ? `CSV 导入 · ${waveform.dataset.source.fileName}` : '已有工程数据'}<br />{waveform.axis.count} 点 · fs = {formatNumber(1 / waveform.axis.intervalSeconds)} Hz · Δt = {formatNumber(waveform.axis.intervalSeconds)} s · Nyquist = {formatNumber(1 / waveform.axis.intervalSeconds / 2)} Hz</p><details><summary>来源与数据身份</summary><pre>{JSON.stringify({ datasetId: waveform.dataset.id, source: waveform.dataset.source, metadata: waveform.dataset.metadata }, null, 2)}</pre></details></>}</section>}
+    {waveform && <section className="signal-section" aria-label="采样 RC 滤波"><h2>采样 RC 滤波</h2><p>对当前分析通道执行理想 RC 的零阶保持（ZOH）处理。输入 x[n] 在 [t[n], t[n+1]) 保持；电容电压 y[0] 为指定初值，y[n] = a y[n−1] + (1−a)x[n−1]，a = exp(−Δt/RC)。低通输出 y，高通输出 x−y。仅此采样模型，不是任意电路暂态或硬件采集。</p><div className="signal-form-grid">{([['resistanceOhms', '滤波电阻 / Ω'], ['capacitanceFarads', '滤波电容 / F'], ['initialOutput', '初始电容电压 / 输入单位']] as const).map(([key, label]) => <label key={key}>{label}<input aria-label={label} type="number" step="any" value={Number.isNaN(rcOptions[key]) ? '' : rcOptions[key]} onChange={e => setRcOptions(o => ({ ...o, [key]: e.target.value === '' ? NaN : Number(e.target.value) }))} /></label>)}<label>滤波方式<select aria-label="滤波方式" value={rcOptions.mode} onChange={e => setRcOptions(o => ({ ...o, mode: e.target.value as RcFilterOptions['mode'] }))}><option value="lowpass">RC 低通</option><option value="highpass">RC 高通</option></select></label></div><button disabled={busy} onClick={() => void runRcFilter()}>运行采样 RC 滤波</button><p className="signal-note">当前输入：{selected?.channel.name}。运行后生成包含原始输入和滤波输出的新捕获；在“分析通道”切换可比较测量与 FFT。处理来源、参数及完整采样随工程保存，CSV 导出两列波形。修改上述参数不改变已有结果，需再次运行。</p></section>}
     {waveform && <><Oscilloscope key={waveform.dataset.id} waveform={waveform} /><section className="signal-section" aria-label="信号测量结果"><div className="signal-section-heading"><h2>03 / 测量 · 全采样记录</h2><label>分析通道<select aria-label="分析通道" disabled={busy} value={selectedId ?? ''} onChange={e => void runFft(e.target.value)}>{waveform.channels.map(c => <option key={c.channel.id} value={c.channel.id}>{c.channel.name} / {c.channel.samples.unit}</option>)}</select></label></div>
       {measured.error && <p role="alert">测量不可用：{measured.error}</p>}<div className="table-scroll"><table><caption>全捕获采样测量（不随图形缩放改变）</caption><thead><tr><th>量</th><th>值 / 单位</th></tr></thead><tbody>{measured.items.map(m => <tr key={m.name}><th scope="row">{measureNames[m.name] ?? m.name}</th><td data-testid={`measurement-${m.name}`}>{m.kind === 'available' ? `${formatNumber(m.value.value)} ${m.value.unit}` : `不可用：${m.reason}`}</td></tr>)}</tbody></table></div><details><summary>测量方法与范围</summary><p>最小/最大值和峰峰值来自离散样本。总 RMS = √mean(x²)；交流 RMS = √mean((x−mean(x))²)。频率采用上升过均值插值，至少三个稳定完整周期，每周期至少 8 点；噪声、周期不稳定或采样不足时不报告频率。结果不是仪器精度认证。</p></details>
     </section><section className="signal-section" aria-label="FFT 频谱分析"><h2>04 / FFT 频谱</h2><div className="signal-inline-controls"><label>窗函数<select aria-label="窗函数" disabled={busy} value={fftOptions.window} onChange={e => setFftOptions(o => ({ ...o, window: e.target.value as SpectrumOptions['window'] }))}><option value="rectangular">矩形窗</option><option value="hann">周期 Hann 窗</option></select></label><label><input type="checkbox" disabled={busy} checked={fftOptions.removeMean} onChange={e => setFftOptions(o => ({ ...o, removeMean: e.target.checked }))} />FFT 前去均值</label><button disabled={busy} onClick={() => void runFft()}>运行 FFT</button></div><p className="signal-note">修改窗/去均值后点击运行；下方标明上次实际使用的设置。支持 2 的幂点数，不截断、不填零。图和测量基于完整原始采样；这里不计算 RMS 频谱、功率或 PSD。</p>
