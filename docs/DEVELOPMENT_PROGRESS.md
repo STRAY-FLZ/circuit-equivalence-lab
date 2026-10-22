@@ -1,25 +1,33 @@
 # Development Progress
 
-Updated **2026-10-23**. Active module: **V2.3.0 — General DC Analysis**.
-Authorized implementation, acceptance and public release; stop before V2.4.
-Baseline `41e342a` / v2.2.0 verified. Branch `codex/v2.3-dc-analysis`.
-**9/10 (90%)**; only verified deliverables counted.
+Updated **2026-10-23**. Active authorized module **V2.3.0 — General DC Analysis**.
+**Application Released; pre-tag finalization checkpoint 9/10 (90%)**.
+DC01–DC09 Verified. Final DC10 / **Released 10/10** status, exact final commit
+and workflow are in the [canonical v2.3.0 Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.3.0)
+following confirmation of this documentation deployment. No overall roadmap percentage.
 
 | ID | Deliverable | Status | Evidence |
 | --- | --- | --- | --- |
-| DC01 | Independent provider and capability diagnostics | Verified | Pure inspection; immutable revision/digest input; asynchronous typed outcomes |
-| DC02 | MNA numerical core | Verified | Complete pivoting, equilibration, rank/contradiction/conditioning/residual cases |
-| DC03 | Independent DC sources | Verified | V/I, zero and negative values, orientation and source power cases |
-| DC04 | Four linear dependent sources | Verified | VCVS/VCCS/CCVS/CCCS analytical values; stable voltage-defined control IDs |
-| DC05 | Reference/topology semantics | Verified | Missing/ambiguous/explicit reference, GND policy, floating and cross-sheet cases |
-| DC06 | Electrical results and checks | Verified | Node/branch outputs, passive sign, independent KCL and power recomputation |
-| DC07 | Actual equations and teaching display | Verified | Actual matrix/RHS rendered; UI assertions match real numerical values |
-| DC08 | Editor and Atlas integration | Verified | 16 compatible templates; explicit run, stale/rerun/highlight and stable controller UI cases |
-| DC09 | Scoped tests and real browser acceptance | Verified | 579 tests / 35 files; typecheck/lint/build pass; actual built Chrome, four source families, file round trips, 1440/390 light/dark, no errors |
-| DC10 | Documentation, version and production release | In Progress | No 2.3.0 deployment/tag yet; authorized after acceptance |
+| DC01 | Independent provider/capability | Verified | Versioned typed async provider, pure inspection, immutable revision/digest/provenance |
+| DC02 | MNA numerical core | Verified | Actual stamps; complete pivot/row-column scaling; rank, contradiction, conditioning, original-unit residuals |
+| DC03 | Independent V/I | Verified | Zero/negative values, supernode, multisource, orientation and power cases |
+| DC04 | Four dependent families | Verified | VCVS/VCCS/CCVS/CCCS analytical and actual browser cases; stable explicit sensing currents |
+| DC05 | Reference/topology | Verified | Explicit/marker/GND priority; no reference union; floating and cross-sheet diagnostics |
+| DC06 | Electrical results/checks | Verified | Stable node/branch maps, V/I/P, passive sign, independent all-node KCL/power checks |
+| DC07 | Equations/teaching display | Verified | Actual A/x/b and mapped values in UI/report; no separate mesh solver claim |
+| DC08 | Editor/Atlas | Verified | Four source controls, stale/rerun/highlight; sixteen eligible templates; ten unsupported C/L templates |
+| DC09 | Tests/real browser | Verified | 579 tests/35 files, standard checks and production CI; actual built/public Chrome 15 journeys, file equality, 1440/390 light/dark |
+| DC10 | Docs/version/release/handoff | Application Released; finalizing tag/records | 2.3.0/schema1; main 12275b3 / Pages 39817263066 success; full public pass; final tag/SHA/workflow/10-of-10 handoff in canonical Release |
 
-No blocker. Previous Atlas A01–A08 **Released (8/8)** confirmed at kickoff;
-historical pre-tag checkpoint below is retained as dated evidence.
+Branch `codex/v2.3-dc-analysis`, baseline `41e342a` / v2.2.0. Implementation
+checkpoints `4542174`, `e80bbf3`, `12275b3`. Full public acceptance saved in
+ignored `output/playwright/dc-live-verification.json`; native load/control file
+round trips byte-identical; no console/resource errors. Methods, limits and
+rollback are in [DC implementation](v2/DC_ANALYSIS_IMPLEMENTATION.md) and
+[release record](v2/V2_3_0_RELEASE.md). No V2.4 work; no blocker.
+
+Previous Atlas A01–A08 **Released (8/8)** confirmed from canonical release;
+historical pre-tag checkpoint below retained as dated evidence.
 
 ---
 

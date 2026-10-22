@@ -1,5 +1,18 @@
 # 开发记录
 
+## 2026-10-23 · V2.3.0 public acceptance
+
+Corrected production `12275b32cc9a0790eb11627d4326486741f2bf8e` and
+[workflow 39817263066](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39817263066)
+build/deploy passed. Actual public Chrome accepted all 15 DC/source/file/stale/
+error/theme and retained V1/signal journeys. Load/control files byte-identical;
+no console/resource errors. Narrow native table scrolling and screenshots checked.
+Final documentation deploy is confirmed separately before v2.3.0 tag/Release;
+that [canonical Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.3.0)
+records exact final SHA/workflow and DC01–DC10 Released / 10-of-10 completion.
+No V2.4 work. [Full evidence/rollback](v2/V2_3_0_RELEASE.md).
+
+
 ## 2026-10-23 · V2.3.0 implementation checkpoint
 
 Verified clean baseline `41e342a` / v2.2.0 on local/remote main and published

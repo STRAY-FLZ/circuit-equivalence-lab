@@ -3,9 +3,9 @@
 Authorized 2026-10-23: implement and publish after functional/numerical/browser
 acceptance. Branch `codex/v2.3-dc-analysis`; production starting point
 `41e342ac940a28319c1a7cef016f9889f75f6e70` / published v2.2.0, verified against
-remote main and GitHub Release. **Implementation Complete → Verified; public release pending**.
+remote main and GitHub Release. **Implementation Complete → Verified → Application Released**.
 
-**DC01–DC09 Verified, 9/10** at this checkpoint. Core checkpoint `4542174`.
+**DC01–DC09 Verified, pre-tag finalization 9/10** at this checkpoint. Core checkpoint `4542174`.
 Final typecheck/lint/test/build passed: **579 tests / 35 files**, 40 more cases
 than the accepted 539 baseline (32 core, 4 UI, 4 expanded palette cases).
 The first standard run exposed two obsolete two-pin assertions for VCVS/VCCS;
@@ -32,7 +32,7 @@ Browser replay: `tests/browser/dc-analysis.js`; synthetic artifacts under ignore
 Production assets: JS `index-CwIG9966.js`, CSS `index-dXs7vrqy.css`.
 The existing Vite classic theme-init informational warning is unchanged;
 actual theme script/resource loading and both themes pass browser acceptance.
-Actual public verification is pending; candidate version is not publication.
+Full actual public verification passed on the corrected build; final tag/records follow this documentation deployment.
 
 See [methods, public APIs, compatibility and limits](DC_ANALYSIS_IMPLEMENTATION.md).
 Application/package/export writer 2.3.0, project file schema 1; dependencies,
@@ -40,10 +40,30 @@ V1 algorithms, D05 and personal website unchanged. No V2.4 implementation.
 
 ## Acceptance and delivery record
 
-Pending: production commit/workflow, full public replay, final tag/Release identity.
+Production **`12275b32cc9a0790eb11627d4326486741f2bf8e`**, source guard after candidate
+`e80bbf3`; [workflow 39817263066](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39817263066)
+completed successfully with build/deploy and all standard checks.
+
+Actual root [public application](https://stray-flz.github.io/circuit-equivalence-lab/)
+verified after clearing the dedicated browser cache. Expected `index-CwIG9966.js`
+and `index-dXs7vrqy.css` loaded; full real Chrome replay **15 journeys passed**.
+All four controlled families output 6/−6/2/−6 V as analytically expected. Real
+matrix, passive power, reference, highlight, changed R/source stale/rerun/undo,
+native saved load/control projects, legacy/unknown binding and singularity
+boundaries, 1440/390 light/dark and existing signal/V1/lesson/home all passed.
+Public native files re-export byte-identically, writer 2.3.0/schema1. Console and
+resource errors **zero**. Public screenshots inspected; supplemental native
+ArrowRight scrolling of narrow result tables moves 80/116px within local overflow,
+without page overflow. No entity disappearance or invented numerical success.
+Evidence: `output/playwright/dc-live-verification.json`, `dc-live-*-report.json`,
+`dc-live-mobile-visual.txt` and screenshots (ignored synthetic artifacts).
+
+Pending at this dated checkpoint: final documentation deployment confirmation,
+tag and Release identity. Public application is Released; DC10 completion / 10-of-10
+handoff is finalized in the canonical Release after those remaining actions.
 Final verified SHA/workflow and completed DC01–DC10 handoff will be recorded in
 the [canonical v2.3.0 Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.3.0)
-only after actual publication; it does not exist at this checkpoint.
+after actual tag/Release publication; this document records the preceding application-release checkpoint.
 
 ## History-preserving rollback
 

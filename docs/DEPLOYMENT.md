@@ -1,6 +1,9 @@
 # Production deployment
 
-Current application release: **V2.2.0**, publicly verified 2026-10-22. See the
+Current application release: **V2.3.0**, publicly verified 2026-10-23.
+See [DC release evidence and rollback](v2/V2_3_0_RELEASE.md) and the
+[canonical final identity](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.3.0).
+Previous V2.2.0 was verified 2026-10-22. See the
 [dated Atlas evidence and range rollback](v2/V2_2_0_RELEASE.md),
 [current status](CURRENT_STATUS.md), and
 [canonical final commit/workflow/tag record](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.2.0).
@@ -124,8 +127,7 @@ unresolved deployment or integration defect was found in the verified scope.
 ## Authorized V2.3.0 DC release
 
 2026-10-23: owner authorized publication after numerical and real browser
-acceptance. Built candidate 2.3.0 is verified; public delivery remains pending
-at this checkpoint. [DC acceptance and exact release identity](v2/V2_3_0_RELEASE.md)
+acceptance. Public corrected build 2.3.0 is verified on main 12275b3 / workflow 39817263066; final documentation deployment/tag records are being finalized at this checkpoint. [DC acceptance and exact release identity](v2/V2_3_0_RELEASE.md)
 records the production run, public replay and final tag. Prior accepted baseline
 is `41e342ac940a28319c1a7cef016f9889f75f6e70` / v2.2.0. Revert only the reviewed
 V2.3 range, newest first, as described there; preserve history, Pages workflow

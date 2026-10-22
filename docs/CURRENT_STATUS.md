@@ -1,17 +1,37 @@
 # Current Development Status
 
-Updated **2026-10-23**. Active authorized module: **V2.3.0 General DC Analysis**.
-Branch `codex/v2.3-dc-analysis`, clean starting production baseline
-`41e342ac940a28319c1a7cef016f9889f75f6e70` / published `v2.2.0` verified
-against remote main and GitHub Release. Atlas A01–A08 are Released (8/8).
-Owner explicitly authorizes V2.3.0 publication after numerical and browser acceptance.
+Updated **2026-10-23**. Authorized module **V2.3.0 General DC Analysis**:
+**Implementation Complete → Verified → Application Released**.
+Pre-tag documentation checkpoint **9/10**: DC01–DC09 Verified; DC10 final
+records/tag/handoff are being finalized. Completed **Released / 10/10** state,
+exact final production commit and workflow are recorded in the
+[canonical v2.3.0 Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.3.0)
+after this documentation commit deploys and receives a targeted live confirmation.
 
-**DC01–DC09 Verified; 9/10**: independent versioned MNA provider, all scoped
-linear sources, reference semantics, actual electrical results and residual/KCL/
-power checks; 32 core and 4 new UI tests pass. DC07/08 integration verified;
-DC09 built Chrome accepted; DC10 public release remains unfinished.
-No deployment or V2.3.0 tag yet. No V2.4 work. No blocker.
-Schema 1, V1 algorithms and D05 unchanged. Final typecheck/lint/test/build passed: 579 tests / 35 files. Built Chrome replay passed, with zero console/resource errors; load/control files byte-identical on reopen. Core checkpoint 4542174.
+Production **`12275b32cc9a0790eb11627d4326486741f2bf8e`**;
+[workflow 39817263066](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39817263066)
+build/deploy succeeded. Actual public root entry and expected JS/CSS verified.
+Full Chrome replay passed 15 journeys: real MNA/V/I/P, all four controlled sources,
+reference/highlight, resistor/source edits, stale/rerun/undo, native save/reopen,
+legacy/unknown-binding boundaries, floating/contradictory/unsupported circuits,
+1440/390px light/dark and existing signal/V1/course/home. Zero console/resource
+errors; screenshots inspected and native narrow-table horizontal scrolling checked.
+Load and controlled-source public export/reopen/re-export are byte-identical.
+
+Final local standard checks passed: **579 tests / 35 files**. Subsequent precise
+legacy guard passed 32 scoped cases, lint/typecheck/build and full built/public
+Chrome; production CI repeated all standard checks successfully. Package/writer
+2.3.0, schema 1, JS `index-CwIG9966.js`, CSS `index-dXs7vrqy.css`.
+V1/D05/dependencies/personal website preserved. Core `4542174`, candidate
+`e80bbf3`, source guard `12275b3`; branch `codex/v2.3-dc-analysis` safely
+fast-forwarded into main. Prior accepted release `41e342a` / v2.2.0.
+
+Limits: single flat sheet, 192 unknowns / 512 components; R/V/I and four ideal
+linear controlled sources only. Results/reference dropdown are session-only;
+save circuit and rerun, or export full DC report. No AC/transient/nonlinear/SPICE.
+Blockers: none. Stop after this authorized release; **V2.4 not started**.
+[Methods/APIs/compatibility](v2/DC_ANALYSIS_IMPLEMENTATION.md),
+[release and rollback](v2/V2_3_0_RELEASE.md), [version checklist](VERSION_CHECKLIST.md).
 
 Historical V2.2.0 checkpoint follows; its final release identity was confirmed
 at V2.3 kickoff via the canonical Release.

@@ -21,7 +21,7 @@ complete intended feature scope; it does not authorize implementation or release
   and DEVELOPMENT_PROGRESS.md for later internal design completion or implementation.
 - The priorities and future version labels are planning targets, not release
   tags or promises of dates. Historical V1 package was `0.1.0`; current public
-  release is V2.2.0 (Atlas public workflow verified). Owner approved Atlas on 2026-10-22 and shifted
+  release is V2.3.0 (linear DC public workflow verified). Owner approved Atlas on 2026-10-22 and shifted
   DC/filters/competition to V2.3/2.4/2.5. V3–V6 unchanged. See the actual
   [version checklist](VERSION_CHECKLIST.md); the unchecked original scope below
   is a planning inventory, not a current completion tracker.
@@ -295,7 +295,7 @@ Release V2.2.0 only after scoped acceptance and actual public verification.
 
 ### V2.3 — DC Circuit Analysis
 
-V2.3.0 implementation is complete and under final acceptance/release. Adds
+V2.3.0 linear DC application is publicly released and verified; final identity is in its Release. Adds
 independent and four linear controlled sources through separate MNA; see
 [methods](v2/DC_ANALYSIS_IMPLEMENTATION.md) and [live release state](v2/V2_3_0_RELEASE.md).
 
