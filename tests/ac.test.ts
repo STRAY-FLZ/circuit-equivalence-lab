@@ -104,6 +104,8 @@ describe('complex AC MNA and defined transfer', () => {
     expect(acEngine.inspect(input).kind).toBe('supported'); expect(JSON.stringify(p)).toBe(before)
     const r = await acEngine.run({ ...input, configuration: { ...input.configuration, options: { ...input.configuration.options, frequencyHz: 300 } } }, host()); expect('diagnostics' in r.outcome && r.outcome.diagnostics[0]!.code).toBe('AC_DIGEST')
     const controller = new AbortController(); controller.abort(); expect((await acEngine.run(input, { ...host(), signal: controller.signal })).outcome.kind).toBe('cancelled')
+    const during = new AbortController(), sweeping = await createAcInput(p, p.sheets[0]!.id, sweep(p, 100))
+    expect((await acEngine.run(sweeping, { ...host(), signal: during.signal, onProgress: (n, total) => { if (n === total) during.abort() } })).outcome.kind).toBe('cancelled')
   })
   it('reports a balanced bridge zero transfer with undefined phase and logarithm', async () => {
     const p = dcFixture([{ ref: 'V1', kind: 'voltage-source', value: 1, nodes: ['a', 'g'] }, ...[['a', 'l'], ['l', 'g'], ['a', 'r'], ['r', 'g']].map((nodes, i) => ({ ref: `R${i}`, kind: 'resistor' as const, value: 1000, nodes }))])

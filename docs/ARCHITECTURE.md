@@ -1,5 +1,13 @@
 # Architecture
 
+## V2.4 AC/filter extension
+
+Independent complex MNA in `src/ac` consumes engineering/analysis contracts and
+explicit source settings. `src/ac-ui` displays immutable actual phasor/sweep data.
+`src/signal/filter.ts` implements separately scoped sampled RC ZOH processing.
+No DC/V1 numerical changes, schema bump or plugin framework. See
+[methods, portable settings, limits and provenance](v2/AC_FILTER_IMPLEMENTATION.md).
+
 ## V2.3 DC extension
 
 The independent `src/dc` module consumes only engineering/analysis contracts;

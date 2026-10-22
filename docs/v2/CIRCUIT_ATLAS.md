@@ -1,3 +1,12 @@
+# V2.4 extension checkpoint
+
+2026-10-23: 27 templates, twelve categories / 89 families. Five AC-ready editable
+experiments: RC low/highpass, RL lowpass, driven series RLC and resistor-output
+RLC bandpass. Existing RC/RLC recipes now include visible sources and explicit
+input/output presets; one RL template added. Sixteen DC entries and nine resistor
+transformation paths remain. [AC methods](AC_FILTER_IMPLEMENTATION.md) and
+[actual release state](V2_4_0_RELEASE.md) supersede the earlier AC limitations below.
+
 # Circuit Atlas — V2.2.0
 
 Authorized 2026-10-22. Baseline: public v2.1.0, main/tag

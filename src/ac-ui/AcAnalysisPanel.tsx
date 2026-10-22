@@ -4,7 +4,8 @@ import type { EngineeringProject, JsonObject, ComplexValue } from '../engineerin
 import { acEngine, createAcInput, parseAcSettings } from '../ac'
 import type { AcPhasor, AcResult, AcSettings, SweepOptions } from '../ac'
 import type { AnalysisResult } from '../analysis'
-import { BodeChart, fmt } from './BodeChart'
+import { BodeChart } from './BodeChart'
+import { fmt } from './format'
 import './ac.css'
 
 export interface AcHighlight { readonly revision: string; readonly sheetId: string; readonly anchorIds: readonly string[]; readonly componentId?: string; readonly text: string }
@@ -28,11 +29,11 @@ export function AcAnalysisPanel({ project, sheetId, onSave, onHighlight }: { rea
   function update(next: AcSettings) { setSettings(next); onHighlight(null) }
   function updateScan(next: SweepOptions) { update({ ...current, sweep: next }) }
   function describe(ids: readonly string[]) { return [...sheet.ports.filter(p => ids.includes(p.anchorId)).map(p => p.label), ...sheet.components.flatMap(c => c.pins.filter(p => ids.includes(p.anchorId)).map(p => `${c.reference}.${p.definitionPinKey}`))].join(' · ') }
-  function options() { return nets.map(n => <option key={n.key} value={n.anchorIds.find(id => sheet.ports.some(p => p.anchorId === id)) ?? n.anchorIds[0]}>N{topology.nets.indexOf(n) + 1} · {describe(n.anchorIds)}</option>) }
+  function options() { return nets.flatMap(n => { const preferred = n.anchorIds.find(id => sheet.ports.some(p => p.anchorId === id)) ?? n.anchorIds[0]!; const selected = [current.referenceAnchorId, ...scan.input, ...scan.output].filter((id): id is string => !!id && n.anchorIds.includes(id)); return [...new Set([preferred, ...selected])].map(id => <option key={id} value={id}>N{topology.nets.indexOf(n) + 1} · {describe(n.anchorIds)}{id === preferred ? '' : '（已保存探针）'}</option>) }) }
   const field = (label: string, value: number, change: (n: number) => void) => <label>{label}<input aria-label={label} type="number" step="any" value={Number.isNaN(value) ? '' : value} onChange={e => change(e.target.value === '' ? NaN : Number(e.target.value))} /></label>
   async function run(sweep: boolean) {
     setRunning(true); setError(''); onHighlight(null); const controller = new AbortController(); abort.current = controller
-    const { sweep: _sweep, ...single } = current
+    const single: AcSettings = { frequencyHz: current.frequencyHz, sources: current.sources, ...(current.referenceAnchorId ? { referenceAnchorId: current.referenceAnchorId } : {}) }
     try { const input = await createAcInput(project, sheetId, sweep ? { ...current, sweep: scan } : single); const result = await acEngine.run(input, { signal: controller.signal, readAsset: () => Promise.resolve(new Uint8Array()), onProgress: (n, total) => setProgress(`${n}/${total ?? '?'}`) }); setRecord({ result, controls }) }
     catch (e) { setError(e instanceof Error ? e.message : '交流分析失败。') }
     finally { setRunning(false); abort.current = null }
@@ -41,8 +42,8 @@ export function AcAnalysisPanel({ project, sheetId, onSave, onHighlight }: { rea
   function save() { try { parseAcSettings({ ...current }); onSave(current); setError('') } catch (e) { setError(e instanceof Error ? e.message : '保存失败。') } }
   function report() { if (!record || stale || !solution) return; const url = URL.createObjectURL(new Blob([JSON.stringify(record.result, null, 2)], { type: 'application/json;charset=utf-8' })), a = document.createElement('a'); a.href = url; a.download = 'stray-ac-report.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000) }
   return <section className="ac-panel" aria-label="交流分析面板">
-    <header><p className="eyebrow">相量 / 频率响应 / 滤波</p><h2>交流分析与滤波</h2><p>理想线性 RLC、独立电压/电流源与四类线性受控源。正余弦约定：v(t) = √2 |V| cos(2πft + φ)，相量为 RMS，采用 exp(+jωt)。</p></header>
-    <div className="ac-controls">{field('单频频率 / Hz', current.frequencyHz, frequencyHz => update({ ...current, frequencyHz }))}<label>交流参考节点<select aria-label="交流参考节点" value={current.referenceAnchorId ?? ''} onChange={e => { const { referenceAnchorId: _reference, ...rest } = current; update(e.target.value ? { ...rest, referenceAnchorId: e.target.value } : rest) }}><option value="">模拟参考标记 / 唯一 GND 网</option>{options()}</select></label></div>
+    <header><p className="eyebrow">相量 / 频率响应 / 滤波</p><h2>交流分析与滤波</h2><p>理想线性 RLC、独立电压/电流源与四类线性受控源。正弦稳态采用余弦参考：v(t) = √2 |V| cos(2πft + φ)，相量为 RMS，采用 exp(+jωt)。</p></header>
+    <div className="ac-controls">{field('单频频率 / Hz', current.frequencyHz, frequencyHz => update({ ...current, frequencyHz }))}<label>交流参考节点<select aria-label="交流参考节点" value={current.referenceAnchorId ?? ''} onChange={e => { const next = { ...current }; if (e.target.value) next.referenceAnchorId = e.target.value; else delete next.referenceAnchorId; update(next) }}><option value="">模拟参考标记 / 唯一 GND 网</option>{options()}</select></label></div>
     <p className="muted">参考只定义零电位，不连接网络。源的交流幅值须单独设置，未配置源为 0，不继承元件的直流数值。电流与电压正向 p → n（引脚 1 → 2）；正功率表示吸收。</p>
     <fieldset disabled={running}><legend>独立源 / RMS 激励</legend>{sources.length ? sources.map(source => { const value = current.sources.find(s => s.componentId === source.id)!; const edit = (delta: { magnitudeRms?: number; phaseDegrees?: number }) => update({ ...current, sources: current.sources.map(s => s.componentId === source.id ? { ...s, ...delta } : s) }); return <div className="ac-controls" key={source.id}>{field(`${source.reference} RMS / ${project.definitions.find(d => d.id === source.definitionId)!.kind === 'voltage-source' ? 'V' : 'A'}`, value.magnitudeRms, magnitudeRms => edit({ magnitudeRms }))}{field(`${source.reference} 相位 / °`, value.phaseDegrees, phaseDegrees => edit({ phaseDegrees }))}</div> }) : <p>当前图纸没有独立激励源。</p>}</fieldset>
     <details open><summary>频率扫描与电压传递比</summary><p>H = (Vout+ − Vout−)/(Vin+ − Vin−)。选择一个非零测试源，其余独立源须明确设为 0：电压源相当于短路，电流源相当于开路。输入接近零时不定义传递比。</p><div className="ac-controls">

@@ -8,9 +8,9 @@ export function solveComplex(matrix: readonly (readonly Complex[])[], rhs: reado
   if (!n) return { values: [], pivotRatio: 1 }
   if (matrix.some(row => row.some(v => !finite(v))) || rhs.some(v => !finite(v))) throw new AcError('AC_RANGE', '复数矩阵超出有限范围。', [], 'numerical')
   const rowScale = matrix.map(row => Math.max(...row.map(abs)) || 1)
-  const a = matrix.map((row, i) => row.map(v => div(v, c(rowScale[i]!)))), b = rhs.map((v, i) => div(v, c(rowScale[i]!)))
+  const a = matrix.map((row, i) => row.map(v => div(v, c(rowScale[i])))), b = rhs.map((v, i) => div(v, c(rowScale[i])))
   const colScale = Array.from({ length: n }, (_, j) => Math.max(...a.map(row => abs(row[j]!))) || 1)
-  for (const row of a) for (let j = 0; j < n; j++) row[j] = div(row[j]!, c(colScale[j]!))
+  for (const row of a) for (let j = 0; j < n; j++) row[j] = div(row[j]!, c(colScale[j]))
   const permutation = Array.from({ length: n }, (_, i) => i), pivots: number[] = [], tolerance = 64 * Number.EPSILON * n, rhsScale = Math.max(1, ...b.map(abs))
   for (let k = 0; k < n; k++) {
     let magnitude = 0, pi = k, pj = k
@@ -33,7 +33,7 @@ export function solveComplex(matrix: readonly (readonly Complex[])[], rhs: reado
   if (pivotRatio < 1e-10) throw new AcError('AC_ILL_CONDITIONED', '缩放复数主元差异过大，结果可能对舍入敏感。', [], 'numerical')
   const z = Array.from({ length: n }, () => c()), values = [...z]
   for (let i = n - 1; i >= 0; i--) { let sum = b[i]!; for (let j = i + 1; j < n; j++) sum = sub(sum, mul(a[i]![j]!, z[j]!)); z[i] = div(sum, a[i]![i]!) }
-  for (let i = 0; i < n; i++) values[permutation[i]!] = div(z[i]!, c(colScale[permutation[i]!]!))
+  for (let i = 0; i < n; i++) values[permutation[i]!] = div(z[i]!, c(colScale[permutation[i]!]))
   if (values.some(v => !finite(v))) throw new AcError('AC_RANGE', '复数解超出有限范围。', [], 'numerical')
   return { values, pivotRatio }
 }

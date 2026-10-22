@@ -40,6 +40,7 @@ export const acEngine: AnalysisEngine<AcResult> = {
       if (await analysisDigest({ project: input.project, configuration: input.configuration }) !== input.inputDigest) throw new AcError('AC_DIGEST', '工程/配置与输入摘要不一致，请重新运行。')
       if (host.signal.aborted) return finish({ kind: 'cancelled' })
       host.onProgress(0, total)
+      if (host.signal.aborted) return finish({ kind: 'cancelled' })
       const operatingPoint = solveAc(circuit, settings)
       if (!settings.sweep) { host.onProgress(1, 1); return finish({ kind: 'success', value: { operatingPoint } }) }
       const points: SweepPoint[] = []
@@ -50,6 +51,7 @@ export const acEngine: AnalysisEngine<AcResult> = {
         host.onProgress(index + 2, total)
         if (index % 8 === 7) await new Promise<void>(resolve => setTimeout(resolve, 0))
       }
+      if (host.signal.aborted) return finish({ kind: 'cancelled' })
       return finish({ kind: 'success', value: { operatingPoint, sweep: { options: settings.sweep, points, features: sweepFeatures(points, settings.sweep), analyticalReference: analyticalReference(circuit, settings) } } })
     } catch (error) {
       const diagnostics = [acDiagnostic(error)]

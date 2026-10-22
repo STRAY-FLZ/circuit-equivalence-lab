@@ -1,3 +1,10 @@
+# V2.4 sampled RC extension
+
+2026-10-23: sampled lowpass/highpass RC processing adds actual derived datasets,
+input/output comparison and method provenance. [Exact ZOH recurrence, boundaries
+and persistence](AC_FILTER_IMPLEMENTATION.md#sampled-rc-processing) define its
+scope. The V2.1 signal/FFT behavior and original datasets remain intact.
+
 # V2.1.0 Signal Measurement & Analysis
 
 Authorized 2026-10-21. Baseline actual public **V2.0.2 `bd79d6a`**; branch

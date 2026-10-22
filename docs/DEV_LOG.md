@@ -800,3 +800,14 @@ M2 can reuse `TopologyResult`, `NormalizedResistor`, `ElectricalNode`, and `Resi
 ### M1 接续入口
 
 复用 `CircuitNetwork`、`ConnectionPointId`、`IdealWire`、`CircuitElement`、`ExternalTerminal`，并通过 `createCircuitNetwork()` 与 `resistanceOhms()` 构造可信输入。实现已预留的 `TopologyAnalyzer` / `TopologyResult` / `ElectricalNode` 契约时保持 domain 无反向依赖、不读取 CircuitLayout。下一轮仅推进 M1，不顺带引入求解或变换算法。
+
+
+## 2026-10-23 — V2.4 AC/filter verified implementation
+
+Owner authorized release after acceptance. Added independent complex MNA, explicit
+RMS settings, phasor/matrix/power UI, actual sweep/Bode, five editable experiments
+and sampled RC ZOH provenance. See [methods](v2/AC_FILTER_IMPLEMENTATION.md) and
+[acceptance/release record](v2/V2_4_0_RELEASE.md). 621 tests/38 files, final scoped
+35 tests, lint/typecheck/build and built Chrome 13 journeys passed. Six downloaded
+reports/1206 frequency points checked analytically; samples/CSV/assets/reopen
+verified. No V1/D05/DC algorithm rewrite, new dependency or V2.5 work.

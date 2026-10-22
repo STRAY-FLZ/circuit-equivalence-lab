@@ -1,20 +1,25 @@
 # Current Development Status
 
 Updated **2026-10-23**. Active authorized module **V2.4.0 — AC, filters and frequency response**.
-**In Progress, F01–F10: 5/10**; only verified deliverables count.
+**Verified F01–F09; release In Progress, F01–F10: 9/10**; only verified deliverables count.
 Baseline local/remote main and published v2.3.0 verified at
 `c7eca82e6d62c6479c1599d3cf1469e035054495`. Branch `codex/v2.4-ac-filters`.
 Owner explicitly authorizes implementation, numerical/built/public acceptance and
 production release of 2.4.0. No V2.5 work. No blocker.
 
-Checkpoint: 2026-10-23. Independent complex MNA and explicit RMS configuration,
-phasor/power/equation UI and defined sweeps verified by focused numerical/UI tests.
-RC cutoff, RLC resonance, four controlled families, per-point failure, zero transfer,
-stale edits, all five portable Atlas experiments and sampled RC data persistence
-pass. Focused verification: 77 tests passed across numerical/filter, AC UI/Atlas
-portability, catalog and navigation files (76 passed initially; obsolete Atlas text
-expectation updated and all 5 navigation tests then passed). Typecheck passed. Browser acceptance, final standard checks and release remain.
-No remote update made. Resume on current feature branch; preserve all edits.
+Checkpoint: 2026-10-23. Implementation Complete → Verified, F01–F09 9/10.
+Full suite 621 tests / 38 files passed. Final scoped AC/UI 35 tests passed after
+cancellation and display corrections; final lint/typecheck/build passed. Chrome 155
+built preview: 13 journeys, 1440/390 light/dark, all five Atlas AC experiments,
+actual phasors/matrix/Bode, parameter stale/rerun, native settings/UUID reopen,
+real sampled filter/input/output/FFT/CSV and preserved DC/V1/lesson/MathML/home.
+Zero console/resource errors. Six downloaded reports / 1206 frequency points
+match analytical formulas; RC project byte-identical on reopen; signal assets,
+derived recurrence, original input and CSV exact. Screenshots inspected.
+Candidate assets index-DcMOX3og.js / index-BgWpMLp-.css. Release F10 in progress;
+authorized integration/push/Pages monitoring and public verification next.
+Remote main rechecked at baseline; no deployment yet at this checkpoint.
+
 
 | ID | Deliverable | Status |
 | --- | --- | --- |
@@ -23,10 +28,10 @@ No remote update made. Resume on current feature branch; preserve all edits.
 | F03 | RLC and explicit RMS source models | Verified |
 | F04 | Phasors, complex power and equations | Verified |
 | F05 | Defined transfer and frequency sweep | Verified |
-| F06 | Actual interactive Bode plots | Implementation Complete |
-| F07 | Editable Atlas filter/resonance experiments | Implementation Complete |
-| F08 | Sampled RC filtering/provenance | Implementation Complete |
-| F09 | Numerical and actual browser acceptance | In Progress |
+| F06 | Actual interactive Bode plots | Verified |
+| F07 | Editable Atlas filter/resonance experiments | Verified |
+| F08 | Sampled RC filtering/provenance | Verified |
+| F09 | Numerical and actual browser acceptance | Verified |
 | F10 | Docs/version/production release | In Progress |
 
 DC numerical semantics, V1/D05, schema1, original signal data and branding are

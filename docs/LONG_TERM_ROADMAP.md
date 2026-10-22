@@ -305,9 +305,11 @@ Release once usable.
 
 ### V2.4 — Filters and Frequency Response
 
-Introduce RLC frequency analysis, filtering, phase response, and Bode visualization.
-
-Release once usable.
+V2.4.0 implementation is complete: independent complex MNA, explicit RMS sources,
+actual voltage-ratio sweeps/Bode, five editable filter/resonance experiments and
+sampled RC ZOH processing. Acceptance/release status is maintained in
+[V2.4 evidence](v2/V2_4_0_RELEASE.md). Arbitrary transient/nonlinear simulation
+remains outside this scope; V2.5 has not started.
 
 ### V2.5 — Competition Project Workspace
 
