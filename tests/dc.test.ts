@@ -98,6 +98,7 @@ describe('independent DC MNA provider', () => {
     const p = dcFixture(load()), definitions = p.definitions.map(d => d.kind === 'voltage-source' ? { ...d, modelBindings: [] } : d)
     expect((await run(createEngineeringProject({ ...p, definitions }))).outcome.kind).toBe('success')
     await code(createEngineeringProject({ ...p, definitions: definitions.map(d => d.kind === 'voltage-source' ? { ...d, resource: { id: 'org.other.source', version: '1' } } : d) }), 'DC_MODEL_UNSUPPORTED')
+    await code(createEngineeringProject({ ...p, definitions: definitions.map(d => d.kind === 'voltage-source' ? { ...d, modelBindings: [{ analysisFamily: 'digital', model: { id: 'org.other.digital-source', version: '1' }, portMap: { p: '1', n: '2' } }] } : d) }), 'DC_MODEL_UNSUPPORTED')
   })
   it('rejects cross-sheet unions while permitting unrelated independent sheets', async () => {
     const p = dcFixture(load()), a = p.sheets[0]!, b = emptySheet(), anchor = createId()

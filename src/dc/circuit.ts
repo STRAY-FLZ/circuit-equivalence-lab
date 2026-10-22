@@ -39,7 +39,7 @@ export function resolveDcCircuit(input: AnalysisInput): DcCircuit {
       else for (const source of Object.keys(DC_SOURCES) as DcSourceKind[]) if (binding.model.id === `org.stray.model.dc.${source}`) { kind = source; ports = binding.portMap }
     }
     // Explicit adapter for the exact pre-2.3 built-in independent source definitions.
-    if (!bindings.length && (def.kind === 'voltage-source' || def.kind === 'current-source') && def.resource.id === `org.stray.component.${def.kind}` && def.resource.version === '1' && def.pins.length === 2 && def.pins.every(p => ['1', '2'].includes(p.key))) { kind = def.kind; ports = { p: '1', n: '2' } }
+    if (!def.modelBindings.length && (def.kind === 'voltage-source' || def.kind === 'current-source') && def.resource.id === `org.stray.component.${def.kind}` && def.resource.version === '1' && def.pins.length === 2 && def.pins.every(p => ['1', '2'].includes(p.key))) { kind = def.kind; ports = { p: '1', n: '2' } }
     if (!kind || !ports) throw new DcError('DC_MODEL_UNSUPPORTED', `${component.reference} 没有受支持的固定版本直流模型；电容、电感和非线性器件暂不支持。`, [component.id], 'unsupported')
     const expectedPorts = kind === 'vcvs' || kind === 'vccs' ? ['p', 'n', 'cp', 'cn'] : ['p', 'n']
     if (component.pins.length !== expectedPorts.length || Object.keys(ports).length !== expectedPorts.length || new Set(expectedPorts.map(port => ports[port])).size !== expectedPorts.length) throw new DcError('DC_PORT_MAP', `${component.reference} 的模型端口必须完整且一一对应。`, [component.id])

@@ -78,7 +78,10 @@ async (page) => {
       if (kind === 'cccs') { const savedControl = await save('controlled.straylab.json'); await page.getByLabel('打开工程文件', { exact: true }).setInputFiles(savedControl); await page.getByRole('status').filter({ hasText: '工程已打开' }).waitFor(); await button('直流分析').click(); await analyze(); await check('R1', -6, -.006, .036); await save('controlled-reopened.straylab.json'); }
       journeys.push(`${kind}: actual file/editor/result ${volts} V`);
     }
-    for (const [file, code] of [['floating', 'DC_UNDERDETERMINED'], ['contradiction', 'DC_INCONSISTENT']]) {
+    await page.getByLabel('打开工程文件', { exact: true }).setInputFiles('output/playwright/dc-legacy.straylab.json');
+    await page.getByRole('status').filter({ hasText: '工程已打开' }).waitFor(); await button('直流分析').click(); await analyze(); await check('R1', 10, .01, .1);
+    journeys.push('exact legacy empty-binding source adapter');
+    for (const [file, code] of [['floating', 'DC_UNDERDETERMINED'], ['contradiction', 'DC_INCONSISTENT'], ['unknown-binding', 'DC_MODEL_UNSUPPORTED']]) {
       await page.getByLabel('打开工程文件', { exact: true }).setInputFiles(`output/playwright/dc-${file}.straylab.json`);
       await page.getByRole('status').filter({ hasText: '工程已打开' }).waitFor(); await button('直流分析').click(); await button('运行直流分析').click();
       await page.getByRole('alert').filter({ hasText: code }).waitFor(); assert(await page.getByRole('region', { name: '支路结果表' }).count() === 0, 'no fabricated singular result');

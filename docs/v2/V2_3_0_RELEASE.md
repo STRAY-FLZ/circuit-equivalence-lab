@@ -22,10 +22,14 @@ All resources load from the existing base; **zero console/resource errors**.
 Load and controlled-source native save/reopen/re-export files are byte-identical;
 writer 2.3.0/schema1. Reports retain complete provenance, matrix and independent
 KCL/power checks. These are browser/emulated-viewport checks, not device tests.
+Legacy adapter was tightened to require completely empty bindings (including
+non-electrical binding rejection); 32 scoped tests, lint/typecheck/build and
+the full local Chrome replay passed again on the changed core boundary.
+Generate synthetic input with `node tests/browser/create-dc-fixtures.mjs`.
 Browser replay: `tests/browser/dc-analysis.js`; synthetic artifacts under ignored
 `output/playwright/dc-local-*`, completed `dc-local-verification.json`.
 
-Production assets: JS `index-BFZ33V-y.js`, CSS `index-dXs7vrqy.css`.
+Production assets: JS `index-CwIG9966.js`, CSS `index-dXs7vrqy.css`.
 The existing Vite classic theme-init informational warning is unchanged;
 actual theme script/resource loading and both themes pass browser acceptance.
 Actual public verification is pending; candidate version is not publication.
