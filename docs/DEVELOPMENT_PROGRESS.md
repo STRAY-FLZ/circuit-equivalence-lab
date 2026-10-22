@@ -1,24 +1,36 @@
 # Development Progress
 
 Updated **2026-10-23**. Active authorized module **V2.4.0 — AC, filters and frequency response**.
-**Verified F01–F09; release In Progress, F01–F10: 9/10**; only verified deliverables count.
+**Implementation Complete → Verified → Application Released**; dated pre-tag
+checkpoint **9/10**, final F10 identity/handoff in the canonical Release below.
 Baseline local/remote main and published v2.3.0 verified at
 `c7eca82e6d62c6479c1599d3cf1469e035054495`. Branch `codex/v2.4-ac-filters`.
 Owner explicitly authorizes implementation, numerical/built/public acceptance and
 production release of 2.4.0. No V2.5 work. No blocker.
 
-Checkpoint: 2026-10-23. Implementation Complete → Verified, F01–F09 9/10.
-Full suite 621 tests / 38 files passed. Final scoped AC/UI 35 tests passed after
-cancellation and display corrections; final lint/typecheck/build passed. Chrome 155
-built preview: 13 journeys, 1440/390 light/dark, all five Atlas AC experiments,
-actual phasors/matrix/Bode, parameter stale/rerun, native settings/UUID reopen,
-real sampled filter/input/output/FFT/CSV and preserved DC/V1/lesson/MathML/home.
-Zero console/resource errors. Six downloaded reports / 1206 frequency points
-match analytical formulas; RC project byte-identical on reopen; signal assets,
-derived recurrence, original input and CSV exact. Screenshots inspected.
-Candidate assets index-DcMOX3og.js / index-BgWpMLp-.css. Release F10 in progress;
-authorized integration/push/Pages monitoring and public verification next.
-Remote main rechecked at baseline; no deployment yet at this checkpoint.
+Public verification checkpoint **2026-10-23**: production candidate
+**`05cda58215d36bc8ad6c6e89e815302473ccdc47`**, [workflow 39825334987](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/39825334987)
+passed build/deploy including all standard checks. Actual public root loaded
+`index-DcMOX3og.js` / `index-BgWpMLp-.css`. Full real Chrome 155 replay passed
+13 journeys: all five AC experiments, real phasors/matrix/Bode, stale/rerun,
+R doubling halves cutoff, native settings/UUID save/reopen, sampled filtering with
+actual input/output/FFT, CSV/project persistence, DC, V1, lessons/MathML and home.
+1440/390px light/dark checked; screenshots inspected; zero console/resource errors.
+Six public downloaded reports / 1206 points match independent analytic formulas.
+RC project reopen is byte-identical; signal datasets/assets, recurrence and CSV
+samples match exactly. Writer 2.4.0, schema1; no new dependencies or V1/DC rewrites.
+
+Local full suite: **621 tests / 38 files**; final scoped AC/UI 35 tests passed
+after cancellation/display corrections; final lint/typecheck/build passed. Public
+CI repeated standard checks successfully. Browser viewport emulation is not a
+physical iPad or cross-browser certification.
+
+This is a dated **pre-tag 9/10** documentation checkpoint. F01–F09 are Verified;
+F10 final tag/identity/handoff follows the documentation deployment and targeted
+live confirmation. The final **Released 10/10**, exact production commit and
+workflow are recorded in the [canonical v2.4.0 Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.4.0).
+No V2.5 work; next planned module is the competition project workspace. No blocker.
+
 
 
 | ID | Deliverable | Status |

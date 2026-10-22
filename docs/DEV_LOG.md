@@ -811,3 +811,13 @@ and sampled RC ZOH provenance. See [methods](v2/AC_FILTER_IMPLEMENTATION.md) and
 35 tests, lint/typecheck/build and built Chrome 13 journeys passed. Six downloaded
 reports/1206 frequency points checked analytically; samples/CSV/assets/reopen
 verified. No V1/D05/DC algorithm rewrite, new dependency or V2.5 work.
+
+
+## 2026-10-23 — V2.4 public acceptance and finalization
+
+Candidate `05cda58215d36bc8ad6c6e89e815302473ccdc47`, workflow `39825334987`,
+passed build/deploy. Real public Chrome replay 13 journeys and download validator
+1206 frequency points passed; zero errors. See [release record](v2/V2_4_0_RELEASE.md)
+for actual artifacts, sample integrity, limits and rollback. This documentation
+checkpoint precedes the final tag; the canonical Release records final 10/10,
+exact SHA and workflow following its deployment/targeted live confirmation.
