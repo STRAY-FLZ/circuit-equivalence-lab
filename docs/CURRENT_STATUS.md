@@ -1,5 +1,23 @@
 # Current Development Status
 
+Updated **2026-10-23**. Active authorized module: **V2.3.0 General DC Analysis**.
+Branch `codex/v2.3-dc-analysis`, clean starting production baseline
+`41e342ac940a28319c1a7cef016f9889f75f6e70` / published `v2.2.0` verified
+against remote main and GitHub Release. Atlas A01–A08 are Released (8/8).
+Owner explicitly authorizes V2.3.0 publication after numerical and browser acceptance.
+
+**DC01–DC08 Verified; 8/10**: independent versioned MNA provider, all scoped
+linear sources, reference semantics, actual electrical results and residual/KCL/
+power checks; 32 core and 4 new UI tests pass. DC07/08 integration verified;
+DC09 real built/public browser verification and DC10 release remain unfinished.
+No deployment or V2.3.0 tag yet. No V2.4 work. No blocker.
+Schema 1, V1 algorithms and D05 unchanged. Full test/build milestone pending.
+
+Historical V2.2.0 checkpoint follows; its final release identity was confirmed
+at V2.3 kickoff via the canonical Release.
+
+---
+
 Updated **2026-10-22**. Active authorized module: **Circuit Atlas / V2.2.0**,
 **Application Released; finalization checkpoint 7/8**; branch `codex/v2.2-circuit-atlas`, baseline public
 `1b61a74` / v2.1.0 confirmed from remote main/tag/published Release. Clean baseline.

@@ -23,7 +23,9 @@ describe('engineering editing transactions', () => {
     expect(initial.sheets[0]!.components).toHaveLength(0)
     expect(p.id).toBe(initial.id); expect(p.revision).not.toBe(initial.revision)
     expect(p.definitions[0]!.resource.version).toBe('1')
-    expect(c.pins).toHaveLength(2); expect(new Set(c.pins.map(pin => pin.anchorId)).size).toBe(2)
+    const pinCount = kind === 'vcvs' || kind === 'vccs' ? 4 : 2
+    expect(c.pins).toHaveLength(pinCount); expect(new Set(c.pins.map(pin => pin.anchorId)).size).toBe(pinCount)
+    if (pinCount === 4) expect(s.geometry.anchorPositions[c.pins[2]!.anchorId]).toEqual({ x: 160, y: 260 })
     expect(s.geometry.placements[0]!.origin).toEqual({ x: 200, y: 200 })
     expect(s.geometry.anchorPositions[c.pins[0]!.anchorId]).toEqual({ x: 160, y: 200 })
   })

@@ -37,7 +37,7 @@ describe('atlas navigation and existing workspaces', () => {
     const capability = within(screen.getByRole('region', { name: '模板能力' }))
     expect(capability.getAllByText('暂未提供')).toHaveLength(2)
     expect(capability.getByText('可编辑 · 可导出重开')).toBeInTheDocument()
-    expect(screen.getByText(/尚无此电路的 DC \/ AC \/ 暂态/)).toBeInTheDocument()
+    expect(screen.getByText(/电容、电感尚无 DC \/ AC \/ 暂态/)).toBeInTheDocument()
   })
   it('searches secondary metadata while retaining selection and previous expansion when cleared', () => {
     render(<CircuitAtlas onOpen={() => true} />)

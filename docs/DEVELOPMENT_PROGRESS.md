@@ -1,5 +1,28 @@
 # Development Progress
 
+Updated **2026-10-23**. Active module: **V2.3.0 — General DC Analysis**.
+Authorized implementation, acceptance and public release; stop before V2.4.
+Baseline `41e342a` / v2.2.0 verified. Branch `codex/v2.3-dc-analysis`.
+**8/10 (80%)**; only verified deliverables counted.
+
+| ID | Deliverable | Status | Evidence |
+| --- | --- | --- | --- |
+| DC01 | Independent provider and capability diagnostics | Verified | Pure inspection; immutable revision/digest input; asynchronous typed outcomes |
+| DC02 | MNA numerical core | Verified | Complete pivoting, equilibration, rank/contradiction/conditioning/residual cases |
+| DC03 | Independent DC sources | Verified | V/I, zero and negative values, orientation and source power cases |
+| DC04 | Four linear dependent sources | Verified | VCVS/VCCS/CCVS/CCCS analytical values; stable voltage-defined control IDs |
+| DC05 | Reference/topology semantics | Verified | Missing/ambiguous/explicit reference, GND policy, floating and cross-sheet cases |
+| DC06 | Electrical results and checks | Verified | Node/branch outputs, passive sign, independent KCL and power recomputation |
+| DC07 | Actual equations and teaching display | Verified | Actual matrix/RHS rendered; UI assertions match real numerical values |
+| DC08 | Editor and Atlas integration | Verified | 16 compatible templates; explicit run, stale/rerun/highlight and stable controller UI cases |
+| DC09 | Scoped tests and real browser acceptance | In Progress | 32 core + 4 UI cases pass; final standard/build/public checks pending |
+| DC10 | Documentation, version and production release | In Progress | No 2.3.0 deployment/tag yet; authorized after acceptance |
+
+No blocker. Previous Atlas A01–A08 **Released (8/8)** confirmed at kickoff;
+historical pre-tag checkpoint below is retained as dated evidence.
+
+---
+
 Updated: **2026-10-22**. Progress is measured per scoped module; no overall
 completion percentage is assigned to the evolving multi-year product.
 

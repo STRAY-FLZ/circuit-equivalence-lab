@@ -1,9 +1,9 @@
 import type { ComponentDefinition, ComponentInstance, ParameterValue } from '../engineering'
 import type { EditOperation } from '../editing'
 
-const parameterNames: Readonly<Record<string, string>> = { resistance: '电阻', capacitance: '电容', inductance: '电感', voltage: '电压', current: '电流' }
+const parameterNames: Readonly<Record<string, string>> = { resistance: '电阻', capacitance: '电容', inductance: '电感', voltage: '电压', current: '电流', gain: '增益', controlBranchId: '控制电流支路' }
 const unitNames: Readonly<Record<string, string>> = { ohm: 'Ω', F: 'F', H: 'H', V: 'V', A: 'A' }
-export function ComponentProperties({ component, definition, onEdit }: { readonly component: ComponentInstance; readonly definition: ComponentDefinition; readonly onEdit: (op: EditOperation) => void }) {
+export function ComponentProperties({ component, definition, controllers = [], onEdit }: { readonly component: ComponentInstance; readonly definition: ComponentDefinition; readonly controllers?: readonly ComponentInstance[]; readonly onEdit: (op: EditOperation) => void }) {
   return <form onSubmit={event => {
     event.preventDefault()
     const data = new FormData(event.currentTarget), parameters: Record<string, ParameterValue> = {}
@@ -25,10 +25,11 @@ export function ComponentProperties({ component, definition, onEdit }: { readonl
       if (value.kind === 'quantity') return <label key={p.key}>{name} / {unitNames[value.quantity.unit] ?? value.quantity.unit}<input aria-label={`${name}值`} name={key} type="number" step="any" required defaultValue={value.quantity.value} /></label>
       if (value.kind === 'complex') return <fieldset key={p.key}><legend>{name} / {value.unit}</legend><label>实部<input name={`${key}:real`} type="number" step="any" required defaultValue={value.value.real} /></label><label>虚部<input name={`${key}:imaginary`} type="number" step="any" required defaultValue={value.value.imaginary} /></label></fieldset>
       if (value.kind === 'boolean') return <label key={p.key}>{name}<input name={key} type="checkbox" defaultChecked={value.value} /></label>
+      if (p.key === 'controlBranchId') return <label key={p.key}>{name}<select name={key} aria-label="控制电流支路" defaultValue={value.value}><option value="">请选择电压定义支路</option>{value.value && !controllers.some(c => c.id === value.value) && <option value={value.value}>引用已失效：{value.value}</option>}{controllers.map(c => <option key={c.id} value={c.id}>{c.reference} · I(1 → 2)</option>)}</select><small>可添加 0 V 电压源测量控制电流。引用采用稳定 ID，修改标识不影响控制关系。</small></label>
       return <label key={p.key}>{name}<input name={key} defaultValue={value.value} /></label>
     })}
     <button type="submit">应用属性</button>
-    <p className="muted">标识可更改，内部身份保持不变。当前仅编辑，不运行仿真。</p>
+    <p className="muted">标识可更改，内部身份保持不变。参数修改后请显式重新运行直流分析。</p>
     <details><summary>身份与定义</summary><p className="editor-id">{component.id}</p><p>{definition.resource.id} · {definition.resource.version}</p></details>
   </form>
 }

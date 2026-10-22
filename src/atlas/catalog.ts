@@ -8,7 +8,7 @@ export interface CircuitRecipe { readonly nodes: Readonly<Record<string, Positio
 export interface CircuitTemplate {
   readonly id: string; readonly categoryId: string; readonly familyId: string; readonly name: string; readonly description: string
   readonly difficulty: '入门' | '进阶'; readonly components: readonly string[]; readonly topics: readonly string[]; readonly methods: readonly string[]; readonly chapters: readonly number[]
-  readonly status: 'implemented'; readonly capabilities: { readonly schematic: true; readonly editable: true; readonly numerical: boolean; readonly experiment: boolean }
+  readonly status: 'implemented'; readonly capabilities: { readonly schematic: true; readonly editable: true; readonly numerical: boolean; readonly dc: boolean; readonly experiment: boolean }
   readonly actions: readonly ['view', 'edit', 'export']; readonly note: string; readonly recipe: CircuitRecipe
 }
 const at = (x: number, y: number): Position => ({ x, y })
@@ -43,7 +43,7 @@ const piNetwork = recipe({ a: at(120, 100), b: at(680, 100), g: at(400, 500) }, 
 
 function template(id: string, familyId: string, name: string, description: string, recipe: CircuitRecipe, chapters: readonly number[], methods: readonly string[], difficulty: CircuitTemplate['difficulty'] = '入门'): CircuitTemplate {
   const resistive = recipe.parts.every(p => p.kind === 'resistor')
-  return { id, categoryId: familyId.split('.')[0]!, familyId, name, description, recipe, chapters, methods, difficulty, topics: [name, ...methods], components: [...new Set(recipe.parts.map(p => PALETTE[p.kind].title))], status: 'implemented', capabilities: { schematic: true, editable: true, numerical: resistive, experiment: resistive }, actions: ['view', 'edit', 'export'], note: resistive ? '可使用现有电阻等效变换、端口数值核对与五阶段课程，具体操作取决于当前结构和候选条件；不提供一般直流求解。' : '当前可查看、编辑与保存拓扑；方法标签是学习主题，不表示已有求解。尚无此电路的 DC / AC / 暂态求解或波形；无开关、激励时序或初始状态模型。' }
+  return { id, categoryId: familyId.split('.')[0]!, familyId, name, description, recipe, chapters, methods, difficulty, topics: [name, ...methods], components: [...new Set(recipe.parts.map(p => PALETTE[p.kind].title))], status: 'implemented', capabilities: { schematic: true, editable: true, dc: recipe.parts.every(p => ['resistor', 'voltage-source', 'current-source'].includes(p.kind)), numerical: resistive, experiment: resistive }, actions: ['view', 'edit', 'export'], note: resistive ? '可使用现有电阻等效变换、端口数值核对与五阶段课程，具体操作取决于当前结构和候选条件；可使用独立 MNA 直流分析；纯电阻无激励时电压与电流为零。' : recipe.parts.every(p => ['resistor', 'voltage-source', 'current-source'].includes(p.kind)) ? '可使用 MNA 直流工作点分析；方法标签仍是学习索引，不代表已单独实现叠加、等效源或网孔求解。' : '当前可查看、编辑与保存拓扑；电容、电感尚无 DC / AC / 暂态模型，不生成虚拟结果。' }
 }
 
 export const circuitTemplates: readonly CircuitTemplate[] = freezeSnapshot([
