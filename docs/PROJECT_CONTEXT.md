@@ -212,3 +212,12 @@ does not imply a verified public release.
 V2 design outputs are indexed in [v2/ARCHITECTURE.md](v2/ARCHITECTURE.md);
 [v2/DECISIONS.md](v2/DECISIONS.md) distinguishes recommendations requiring owner
 review from confirmed requirements. These documents do not authorize V2.0-B.
+
+## V2.3.0 authorization — 2026-10-23
+
+Owner authorized general linear DC MNA development, focused acceptance and
+production release as DC01–DC10. Scope includes independent and four controlled
+sources, actual equations/results and editor/Atlas integration. Preserve V1/D05,
+schema 1, signal data and deployment history. No V2.4 work. Actual progress and
+publication are tracked in CURRENT_STATUS/DEVELOPMENT_PROGRESS and
+[v2/V2_3_0_RELEASE.md](v2/V2_3_0_RELEASE.md).

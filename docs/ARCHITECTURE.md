@@ -1,5 +1,14 @@
 # Architecture
 
+## V2.3 DC extension
+
+The independent `src/dc` module consumes only engineering/analysis contracts;
+`src/dc-ui` renders its actual result snapshot inside the existing editor.
+It supports the versioned linear DC models and 16 existing Atlas templates.
+See [the implemented equations, contracts, references and numerical limits](v2/DC_ANALYSIS_IMPLEMENTATION.md).
+The V1 solver/transformation path remains independent and unchanged. Geometry
+never creates connectivity, and solver reference selection never joins nets.
+
 ## Current scope
 
 M0 provides the React/TypeScript/Vite project, domain types and validation, module contracts, and a presentation shell with theme switching. M1 adds a deterministic, UI-independent topology engine. M2 adds a component-aware DC nodal solver with explicit physical states and numerical diagnostics. M3 adds explicit series, parallel, delta-to-star and star-to-delta rewrites with independent terminal-equivalence verification. M4 adds real SVG circuit diagrams and single-operation transformation previews. M5 adds five-stage guided lessons, grounded numerical substitutions and cached port-verification evidence. M6 verifies representative integration workflows and fixes a measured text-contrast defect without changing module APIs or computation/state architecture. M7 aligns presentation and theme behavior with Stray's actual website while preserving circuit and lesson implementations.

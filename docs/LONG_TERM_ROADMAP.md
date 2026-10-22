@@ -295,7 +295,9 @@ Release V2.2.0 only after scoped acceptance and actual public verification.
 
 ### V2.3 — DC Circuit Analysis
 
-Introduce sources and general DC analysis.
+V2.3.0 implementation is complete and under final acceptance/release. Adds
+independent and four linear controlled sources through separate MNA; see
+[methods](v2/DC_ANALYSIS_IMPLEMENTATION.md) and [live release state](v2/V2_3_0_RELEASE.md).
 
 Provide meaningful equation generation, actual calculations, and visualization.
 

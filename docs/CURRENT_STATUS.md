@@ -6,12 +6,12 @@ Branch `codex/v2.3-dc-analysis`, clean starting production baseline
 against remote main and GitHub Release. Atlas A01–A08 are Released (8/8).
 Owner explicitly authorizes V2.3.0 publication after numerical and browser acceptance.
 
-**DC01–DC08 Verified; 8/10**: independent versioned MNA provider, all scoped
+**DC01–DC09 Verified; 9/10**: independent versioned MNA provider, all scoped
 linear sources, reference semantics, actual electrical results and residual/KCL/
 power checks; 32 core and 4 new UI tests pass. DC07/08 integration verified;
-DC09 real built/public browser verification and DC10 release remain unfinished.
+DC09 built Chrome accepted; DC10 public release remains unfinished.
 No deployment or V2.3.0 tag yet. No V2.4 work. No blocker.
-Schema 1, V1 algorithms and D05 unchanged. Full test/build milestone pending.
+Schema 1, V1 algorithms and D05 unchanged. Final typecheck/lint/test/build passed: 579 tests / 35 files. Built Chrome replay passed, with zero console/resource errors; load/control files byte-identical on reopen. Core checkpoint 4542174.
 
 Historical V2.2.0 checkpoint follows; its final release identity was confirmed
 at V2.3 kickoff via the canonical Release.

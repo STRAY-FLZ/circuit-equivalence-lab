@@ -135,3 +135,12 @@ actual public browser acceptance and then an annotated tag/Release. Record exact
 final SHA and workflow there. Roll back with reviewed reverse-order reverts of
 the full `v2.1.0..v2.2.0` range, appropriate checks/deployment/live confirmation,
 preserving history and exported user files; never force-push/move a public tag.
+
+## V2.3.0 capability extension
+
+The original 12/89/26 inventory is preserved. A distinct `capabilities.dc`
+flag exposes `使用直流分析` for the sixteen R/V/I-only recipes; it does not
+change the nine `numerical`/`experiment` flags for the V1 resistor path.
+Ten storage-element templates still explicitly reject DC calculation. The
+protected editor handoff can open DC mode with a visible COM/B reference;
+analysis waits for explicit run. [DC methods and coverage](DC_ANALYSIS_IMPLEMENTATION.md).

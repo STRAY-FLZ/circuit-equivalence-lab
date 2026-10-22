@@ -1,5 +1,15 @@
 # 开发记录
 
+## 2026-10-23 · V2.3.0 implementation checkpoint
+
+Verified clean baseline `41e342a` / v2.2.0 on local/remote main and published
+Release, then created `codex/v2.3-dc-analysis`. Independent typed MNA core and
+editor/Atlas integration implemented; 32 core and 4 UI focused cases now cover
+the new module. A duplicate React sibling key found by integration testing was
+fixed; stale results and annotations are hidden after edits. Final typecheck/lint/test/build passed (579 tests / 35 files); built Chrome full DC workflow accepted, including four families and byte-identical load/control file round trips. Public checks and release are pending at this checkpoint.
+No V1/D05/schema/dependency/website changes. [Methods](v2/DC_ANALYSIS_IMPLEMENTATION.md).
+
+
 ## 2026-10-22 · Circuit Atlas V2.2.0 public acceptance
 
 - Preserved history and safely fast-forwarded accepted branch into main,

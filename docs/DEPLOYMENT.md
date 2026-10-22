@@ -120,3 +120,13 @@ the built application. See the M8 entry in `DEV_LOG.md` for actual checks.
 Browser coverage is Chrome/Chromium at 1440x1100 and an emulated 390x844 mobile
 viewport in both themes; it is not a full cross-browser certification. No
 unresolved deployment or integration defect was found in the verified scope.
+
+## Authorized V2.3.0 DC release
+
+2026-10-23: owner authorized publication after numerical and real browser
+acceptance. Built candidate 2.3.0 is verified; public delivery remains pending
+at this checkpoint. [DC acceptance and exact release identity](v2/V2_3_0_RELEASE.md)
+records the production run, public replay and final tag. Prior accepted baseline
+is `41e342ac940a28319c1a7cef016f9889f75f6e70` / v2.2.0. Revert only the reviewed
+V2.3 range, newest first, as described there; preserve history, Pages workflow
+and project base. Do not force-push, move tags, or edit the personal website.

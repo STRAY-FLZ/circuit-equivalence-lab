@@ -3,7 +3,7 @@
 Updated **2026-10-23**. Active module: **V2.3.0 — General DC Analysis**.
 Authorized implementation, acceptance and public release; stop before V2.4.
 Baseline `41e342a` / v2.2.0 verified. Branch `codex/v2.3-dc-analysis`.
-**8/10 (80%)**; only verified deliverables counted.
+**9/10 (90%)**; only verified deliverables counted.
 
 | ID | Deliverable | Status | Evidence |
 | --- | --- | --- | --- |
@@ -15,7 +15,7 @@ Baseline `41e342a` / v2.2.0 verified. Branch `codex/v2.3-dc-analysis`.
 | DC06 | Electrical results and checks | Verified | Node/branch outputs, passive sign, independent KCL and power recomputation |
 | DC07 | Actual equations and teaching display | Verified | Actual matrix/RHS rendered; UI assertions match real numerical values |
 | DC08 | Editor and Atlas integration | Verified | 16 compatible templates; explicit run, stale/rerun/highlight and stable controller UI cases |
-| DC09 | Scoped tests and real browser acceptance | In Progress | 32 core + 4 UI cases pass; final standard/build/public checks pending |
+| DC09 | Scoped tests and real browser acceptance | Verified | 579 tests / 35 files; typecheck/lint/build pass; actual built Chrome, four source families, file round trips, 1440/390 light/dark, no errors |
 | DC10 | Documentation, version and production release | In Progress | No 2.3.0 deployment/tag yet; authorized after acceptance |
 
 No blocker. Previous Atlas A01–A08 **Released (8/8)** confirmed at kickoff;

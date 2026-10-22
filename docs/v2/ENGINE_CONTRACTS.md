@@ -208,3 +208,14 @@ records in one command; retaining a result is not permission to save dangling ID
    requests an explicit resampling operation with provenance.
 4. Two source revisions finish out of order: only matching current input can attach
    as current evidence; cancellation and historical results remain distinguishable.
+
+## Implemented V2.3.0 DC provider
+
+`dc.operating-point` is now implemented separately by
+`org.stray.engine.dc-mna` v1. Single-sheet scope, optional stable
+`referenceAnchorId`, explicit model/control validation and SHA-256 input snapshots.
+`DcSolution` extends `DcOutput` with actual MNA matrix/RHS/unknowns, node/branch
+results and original-unit residual/KCL/power evidence. Session-only UI results
+require exact revision/reference; project schema stays 1. See
+[actual APIs and numerical contract](DC_ANALYSIS_IMPLEMENTATION.md), including
+reference precedence, legacy source adaptation, limits and diagnostic semantics.

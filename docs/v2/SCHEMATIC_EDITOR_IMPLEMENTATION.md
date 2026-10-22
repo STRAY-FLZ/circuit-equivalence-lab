@@ -189,3 +189,13 @@ V2.0-D module.** D should add transactional projection/writeback and preserve
 ports, observations, IDs and history according to the existing D05 contract.
 Begin it only after separate owner authorization. The eventual public V2 gate
 remains usable and verified B+C+D plus release/compatibility/rollback procedures.
+
+## V2.3.0 DC integration
+
+The palette adds four ideal controlled-source kinds with pinned DC bindings;
+VCVS/VCCS have separate 3/4 control pins. Current-controlled sources select a
+stable voltage-defined component ID in properties. The editor embeds a separate
+explicit-run DC panel; old results/highlights disappear on revision/reference
+changes. Project open/reset clears session analysis. Atlas can request optional
+`'dc'` mode through the guarded `openTemplate(project, mode?)` handle.
+[Implementation and compatibility details](DC_ANALYSIS_IMPLEMENTATION.md).
