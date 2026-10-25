@@ -5,7 +5,10 @@ import type { EngineeringProject, Position } from '../engineering'
 import { commitEdit, commitSnapshot, createHistory, emptySheet, newEditorProject, PALETTE, redoEdit, snap, undoEdit, wireRoute } from '../editing'
 import type { EditOperation, Endpoint, PaletteKind, Selection } from '../editing'
 import { createProjectDocument, deserializeProject, serializeProject } from '../project-format'
-import type { InlineAsset } from '../project-format'
+import type { InlineAsset, ProjectDocumentV1 } from '../project-format'
+import type { AnalysisCapture } from '../analysis'
+import type { DcSolution } from '../dc'
+import type { AcResult } from '../ac'
 import packageText from '../../package.json?raw'
 import { buildEditorView, nearestAnchor, netInspection } from './view'
 import { SymbolBody } from './SymbolBody'
@@ -48,8 +51,8 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : '操作失败，工程保持不变。'
 }
 
-export interface SchematicEditorHandle { openTemplate: (project: EngineeringProject, mode?: 'dc' | 'ac') => boolean }
-export function SchematicEditor({ ref }: { readonly ref?: Ref<SchematicEditorHandle> }) {
+export interface SchematicEditorHandle { openDocument: (document: ProjectDocumentV1, mode?: 'dc' | 'ac') => boolean; openTemplate: (project: EngineeringProject, mode?: 'dc' | 'ac') => boolean }
+export function SchematicEditor({ ref, onCapture, onSync, onSourceRevision }: { readonly ref?: Ref<SchematicEditorHandle>; readonly onCapture?: ((document: ProjectDocumentV1, capture: AnalysisCapture<DcSolution> | AnalysisCapture<AcResult>) => Promise<boolean>) | undefined; readonly onSync?: ((document: ProjectDocumentV1) => Promise<boolean>) | undefined; readonly onSourceRevision?: (projectId: string, revision: string) => void }) {
   const [history, setHistory] = useState(() => createHistory(newEditorProject()))
   const [transformHighlight, setTransformHighlight] = useState<TransformationHighlight | null>(null)
   const [acOpen, setAcOpen] = useState(false)
@@ -87,7 +90,7 @@ export function SchematicEditor({ ref }: { readonly ref?: Ref<SchematicEditorHan
   const announce = (text: string, failed = false) => { setMessage(text); setError(failed) }
   function edit(operation: EditOperation) {
     if (busy) return
-    try { const next = commitEdit(history, sheetId, operation); setHistory(next); announce('编辑已保存到当前工程。'); if (operation.type === 'delete') setSelection(null); return next.present }
+    try { const next = commitEdit(history, sheetId, operation); setHistory(next); onSourceRevision?.(next.present.id, next.present.revision); announce('编辑已保存到当前工程。'); if (operation.type === 'delete') setSelection(null); return next.present }
     catch (failure) { announce(errorMessage(failure), true); return undefined }
   }
   function chooseTool(next: Tool) { cancelGesture(); setTool(next); setWireStart(null) }
@@ -95,14 +98,14 @@ export function SchematicEditor({ ref }: { readonly ref?: Ref<SchematicEditorHan
     if (busy) return false
     try {
       const next = writebackTransformation(project, preview)
-      setHistory(commitSnapshot(history, project.revision, next)); setSelection(null); chooseTool('select'); setTransformHighlight(null)
+      setHistory(commitSnapshot(history, project.revision, next)); onSourceRevision?.(next.id, next.revision); setSelection(null); chooseTool('select'); setTransformHighlight(null)
       setViewport(fittedViewport(next.sheets.find(s => s.id === sheetId)!.geometry.anchorPositions))
       announce('数值验证通过的变换已作为一次工程事务应用；可撤销或重做。')
       return true
     } catch (failure) { announce(errorMessage(failure), true); return false }
   }
-  function undo() { if (busy) return; cancelGesture(); setHistory(undoEdit(history)); setSelection(null); setWireStart(null); announce('已撤销；恢复内容并生成新的工程修订。') }
-  function redo() { if (busy) return; cancelGesture(); setHistory(redoEdit(history)); setSelection(null); setWireStart(null); announce('已重做。') }
+  function undo() { if (busy) return; cancelGesture(); const next = undoEdit(history); setHistory(next); onSourceRevision?.(next.present.id, next.present.revision); setSelection(null); setWireStart(null); announce('已撤销；恢复内容并生成新的工程修订。') }
+  function redo() { if (busy) return; cancelGesture(); const next = redoEdit(history); setHistory(next); onSourceRevision?.(next.present.id, next.present.revision); setSelection(null); setWireStart(null); announce('已重做。') }
   function world(event: { readonly clientX: number; readonly clientY: number }): Position {
     const matrix = svg.current?.getScreenCTM()
     if (!matrix) return { x: 0, y: 0 }
@@ -205,7 +208,10 @@ export function SchematicEditor({ ref }: { readonly ref?: Ref<SchematicEditorHan
     setHistory(createHistory(projectToOpen)); setAssets(inlineAssets); setActiveSheet(null); setSelection(null); chooseTool('select'); setViewport(INITIAL_VIEW); setSavedRevision(saved ? projectToOpen.revision : '')
   }
   const mayReplace = () => project.revision === savedRevision || window.confirm('当前工程有未导出的修改，继续将替换当前工程。是否继续？')
-  useImperativeHandle(ref, () => ({ openTemplate(next, mode) {
+  useImperativeHandle(ref, () => ({ openDocument(document, mode) {
+    if (busy || !mayReplace()) return false
+    cancelGesture(); setTransformHighlight(null); setWireStart(null); reset(document.project, document.inlineAssets, true); setAcOpen(mode === 'ac'); setDcOpen(mode === 'dc'); setDcReference(mode === 'dc' ? document.project.sheets[0]?.ports.find(p => ['COM', 'B'].includes(p.label))?.anchorId ?? '' : ''); setViewport(fittedViewport(document.project.sheets[0]!.geometry.anchorPositions)); announce('已载入电赛工程；运行后可关联真实结果，或回传编辑后的工程。'); return true
+  }, openTemplate(next, mode) {
     if (busy || !mayReplace()) return false
     cancelGesture(); setTransformHighlight(null); setWireStart(null)
     reset(next, [], false); setAcOpen(mode === 'ac'); setDcOpen(mode === 'dc'); setDcReference(mode === 'dc' ? next.sheets[0]?.ports.find(p => ['COM', 'B'].includes(p.label))?.anchorId ?? '' : ''); setDcHighlight(null); setViewport(fittedViewport(next.sheets[0]!.geometry.anchorPositions))
@@ -242,6 +248,7 @@ export function SchematicEditor({ ref }: { readonly ref?: Ref<SchematicEditorHan
       <div className="editor-file-actions"><button disabled={busy} onClick={() => { if (mayReplace()) { reset(newEditorProject(), [], true); announce('已新建空白工程。') } }}>新建工程</button><button disabled={busy} onClick={() => fileInput.current?.click()}>打开工程</button><input hidden ref={fileInput} aria-label="打开工程文件" type="file" accept=".json,application/json" onChange={event => { const file = event.currentTarget.files?.[0]; event.currentTarget.value = ''; if (file) void open(file) }} /><button disabled={busy} onClick={() => { void save() }}>导出工程</button></div>
     </div>
     <div className="editor-project-row"><form key={`title-${project.revision}`} onSubmit={event => { event.preventDefault(); const title = new FormData(event.currentTarget).get('title'); if (typeof title === 'string') edit({ type: 'title', title }) }}><label>工程名称<input name="title" aria-label="工程名称" defaultValue={project.title} /></label><button disabled={busy}>更新名称</button></form><span>{project.revision === savedRevision ? '已导出或未修改' : '有未导出的修改'}</span><label>当前图纸<select aria-label="当前图纸" value={sheetId} onChange={event => { cancelGesture(); setActiveSheet(event.target.value); setSelection(null); setWireStart(null) }}>{project.sheets.map(s => <option key={s.id} value={s.id}>{s.title || '未命名图纸'}</option>)}</select></label></div>
+    {onSync && <button disabled={busy} onClick={() => { setBusy(true); void createProjectDocument(project, writer, assets).then(onSync).then(ok => { if (!ok) announce('回传未完成，当前工程保留，请检查电赛工作台。', true) }).catch(e => announce(errorMessage(e), true)).finally(() => setBusy(false)) }}>回传当前工程到电赛</button>}
     <div className="editor-toolbar" aria-label="编辑工具"><button disabled={!history.past.length || busy} onClick={undo}>撤销</button><button disabled={!history.future.length || busy} onClick={redo}>重做</button><span className="editor-divider" />{tools.map(([key, name]) => <button key={key} disabled={busy} aria-pressed={tool === key} onClick={() => chooseTool(key)}>{name}</button>)}<span className="editor-divider" /><button onClick={() => zoom(1.25)} aria-label="放大画布">＋</button><button onClick={() => zoom(0.8)} aria-label="缩小画布">−</button><button onClick={fit}>适合视图</button><button onClick={() => setViewport(INITIAL_VIEW)}>重置视图</button><span>{Math.round(viewport.zoom * 100)}%</span><button aria-pressed={dcOpen} onClick={() => { setDcOpen(!dcOpen); setDcHighlight(null) }}>直流分析</button><button aria-pressed={acOpen} onClick={() => { setAcOpen(!acOpen); setDcHighlight(null) }}>交流分析与滤波</button></div>
     {(tool === 'label' || tool === 'port') && <div className="editor-marker-options"><label>标注名称<input aria-label="标注名称" value={label} onChange={e => setLabel(e.target.value)} /></label>{tool === 'label' && <label>标签作用域<select value={labelScope} onChange={e => setLabelScope(e.target.value as 'sheet' | 'project')}><option value="sheet">当前图纸</option><option value="project">整个工程</option></select></label>}</div>}
     <p role={error ? 'alert' : 'status'} className={`editor-message ${error ? 'error' : ''}`}>{message}</p>
@@ -268,8 +275,8 @@ export function SchematicEditor({ ref }: { readonly ref?: Ref<SchematicEditorHan
         <details className="editor-shortcuts"><summary>操作提示与快捷键</summary><p>V 选择，W 接线，J 结点，R 旋转，方向键微移，Delete 删除。Ctrl / ⌘ Z 撤销，Shift Z 或 Y 重做，S 导出，O 打开。</p><p>结点工具会显式连接点击处经过的导线。平移、缩放、选中和拖动预览不改变工程修订。</p></details>
       </aside>
     </div>
-    {acOpen && <AcAnalysisPanel key={`ac:${project.id}:${sheetId}`} project={project} sheetId={sheetId} onHighlight={setDcHighlight} onSave={settings => { const stored = project.extensions['org.stray.ac']; const sheets = stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {}; const next = reviseProject(project, project.revision, { extensions: { ...project.extensions, 'org.stray.ac': { ...sheets, [sheetId]: { ...settings } } } }); setHistory(commitSnapshot(history, project.revision, next)); setDcHighlight(null); announce('交流配置已保存到当前工程；请导出工程文件以保留。') }} />}
-    {dcOpen && <DcAnalysisPanel key={`dc:${project.id}:${sheetId}`} project={project} sheetId={sheetId} initialReference={dcReference} onHighlight={setDcHighlight} />}
+    {acOpen && <AcAnalysisPanel key={`ac:${project.id}:${sheetId}`} project={project} sheetId={sheetId} onHighlight={setDcHighlight} onCapture={onCapture ? async capture => onCapture(await createProjectDocument(capture.project, writer, assets), capture) : undefined} onSave={settings => { const stored = project.extensions['org.stray.ac']; const sheets = stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {}; const next = reviseProject(project, project.revision, { extensions: { ...project.extensions, 'org.stray.ac': { ...sheets, [sheetId]: { ...settings } } } }); setHistory(commitSnapshot(history, project.revision, next)); onSourceRevision?.(next.id, next.revision); setDcHighlight(null); announce('交流配置已保存到当前工程；请导出工程文件以保留。') }} />}
+    {dcOpen && <DcAnalysisPanel key={`dc:${project.id}:${sheetId}`} project={project} sheetId={sheetId} initialReference={dcReference} onHighlight={setDcHighlight} onCapture={onCapture ? async capture => onCapture(await createProjectDocument(capture.project, writer, assets), capture) : undefined} />}
     <TransformationPanel key={`${project.id}:${sheetId}`} project={project} sheetId={sheetId} {...(anchorId ? { selectedAnchorId: anchorId } : {})} busy={busy} onCommit={commitTransformation} onHighlight={setTransformHighlight} />
   </section>
 }

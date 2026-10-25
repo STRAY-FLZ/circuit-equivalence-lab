@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
-const layers = ['domain', 'topology', 'solver', 'transforms', 'visualization', 'education', 'components', 'engineering', 'project-format', 'compatibility', 'analysis', 'editing', 'integration', 'editor', 'signal', 'signal-ui', 'atlas', 'atlas-ui', 'dc', 'dc-ui', 'ac', 'ac-ui']
+const layers = ['domain', 'topology', 'solver', 'transforms', 'visualization', 'education', 'components', 'engineering', 'project-format', 'compatibility', 'analysis', 'editing', 'integration', 'editor', 'signal', 'signal-ui', 'atlas', 'atlas-ui', 'dc', 'dc-ui', 'ac', 'ac-ui', 'competition', 'competition-ui']
 const allowedDependencies = {
   domain: [],
   topology: ['domain'],
@@ -20,7 +20,9 @@ const allowedDependencies = {
   analysis: ['engineering'],
   editing: ['engineering'],
   integration: ['engineering', 'compatibility', 'transforms', 'education', 'topology', 'editing'],
-  editor: ['ac', 'ac-ui', 'dc', 'dc-ui', 'engineering', 'editing', 'project-format', 'integration', 'education', 'visualization'],
+  editor: ['analysis', 'ac', 'ac-ui', 'dc', 'dc-ui', 'engineering', 'editing', 'project-format', 'integration', 'education', 'visualization'],
+  competition: ['engineering', 'analysis', 'project-format', 'atlas', 'ac', 'dc', 'signal'],
+  'competition-ui': ['competition', 'engineering', 'project-format'],
   ac: ['engineering', 'analysis', 'dc'],
   'ac-ui': ['ac', 'engineering', 'analysis'],
   dc: ['engineering', 'analysis'],
@@ -58,7 +60,7 @@ export default defineConfig([
               .flatMap((other) => [`**/${other}`, `**/${other}/**`]),
             message: '此依赖违反模块方向；请通过 domain 类型或在 App 中组合模块。',
           },
-          ...(['components', 'visualization', 'editor', 'signal-ui', 'atlas-ui', 'dc-ui', 'ac-ui'].includes(layer) ? [] : [{
+          ...(['components', 'visualization', 'editor', 'signal-ui', 'atlas-ui', 'dc-ui', 'ac-ui', 'competition-ui'].includes(layer) ? [] : [{
             group: ['react', 'react/*', 'react-dom', 'react-dom/*'],
             message: '计算与教学契约不依赖 React。',
           }]),

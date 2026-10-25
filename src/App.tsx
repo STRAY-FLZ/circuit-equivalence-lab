@@ -12,6 +12,11 @@ import type { CircuitNetwork } from './domain'
 import { SchematicEditor } from './editor'
 import type { SchematicEditorHandle } from './editor'
 import { CircuitAtlas } from './atlas-ui'
+import { CompetitionWorkbench } from './competition-ui/CompetitionWorkbench'
+import type { CompetitionWorkbenchHandle } from './competition-ui/CompetitionWorkbench'
+import type { ToolTransfer } from './competition'
+import type { SignalWorkbenchHandle } from './signal-ui/SignalWorkbench'
+import { DEFAULT_GENERATOR } from './signal'
 import { SignalWorkbench } from './signal-ui'
 import packageText from '../package.json?raw'
 
@@ -29,7 +34,10 @@ function ElementInventory({ network }: { readonly network: CircuitNetwork }) {
 }
 
 export default function App() {
-  const [workspace, setWorkspace] = useState<'v1' | 'editor' | 'signal' | 'atlas'>('v1')
+  const competitionRef = useRef<CompetitionWorkbenchHandle>(null), signalRef = useRef<SignalWorkbenchHandle>(null)
+  const [competitionVisited, setCompetitionVisited] = useState(false), [competitionContext, setCompetitionContext] = useState<{ projectId: string; experimentId: string; title: string } | null>(null)
+  async function transferToCompetition(transfer: ToolTransfer): Promise<boolean> { const accepted = await competitionRef.current?.receive(transfer) ?? false; setWorkspace('competition'); return accepted }
+  const [workspace, setWorkspace] = useState<'v1' | 'editor' | 'signal' | 'atlas' | 'competition'>('v1')
   const editorRef = useRef<SchematicEditorHandle>(null)
   const [atlasVisited, setAtlasVisited] = useState(false)
   const [editorVisited, setEditorVisited] = useState(false)
@@ -95,10 +103,12 @@ export default function App() {
     <a className="skip-link" href="#main-content">跳转到主要内容</a>
     <SiteHeader />
     <main id="main-content" className="shell">
-      <nav className="workspace-tabs" aria-label="实验工作区"><button aria-pressed={workspace === 'v1'} onClick={() => setWorkspace('v1')}>等效变换与课程</button><button aria-pressed={workspace === 'editor'} onClick={() => { setEditorVisited(true); setWorkspace('editor') }}>原理图编辑器</button><button aria-pressed={workspace === 'signal'} onClick={() => { setSignalVisited(true); setWorkspace('signal') }}>信号实验室</button><button aria-pressed={workspace === 'atlas'} onClick={() => { setEditorVisited(true); setAtlasVisited(true); setWorkspace('atlas') }}>典型电路图谱</button></nav>
-      {editorVisited && <div className="workspace-panel" hidden={workspace !== 'editor'}><SchematicEditor ref={editorRef} /></div>}
+      <nav className="workspace-tabs" aria-label="实验工作区"><button aria-pressed={workspace === 'v1'} onClick={() => setWorkspace('v1')}>等效变换与课程</button><button aria-pressed={workspace === 'editor'} onClick={() => { setEditorVisited(true); setWorkspace('editor') }}>原理图编辑器</button><button aria-pressed={workspace === 'signal'} onClick={() => { setSignalVisited(true); setWorkspace('signal') }}>信号实验室</button><button aria-pressed={workspace === 'atlas'} onClick={() => { setEditorVisited(true); setAtlasVisited(true); setWorkspace('atlas') }}>典型电路图谱</button><button aria-pressed={workspace === 'competition'} onClick={() => { setCompetitionVisited(true); setEditorVisited(true); setSignalVisited(true); setWorkspace('competition') }}>电子设计竞赛</button></nav>
+      {competitionContext && ['editor', 'signal'].includes(workspace) && <p className="muted">当前关联目标：{competitionContext.title}。结果需在工具中显式关联后保存到电赛工程。</p>}
+      {competitionVisited && <div className="workspace-panel" hidden={workspace !== 'competition'}><CompetitionWorkbench ref={competitionRef} onContext={setCompetitionContext} onOpenTool={async (document, kind) => { if (kind === 'atlas') { setAtlasVisited(true); setWorkspace('atlas'); return true } const opened = kind === 'signal' ? await signalRef.current!.openDocument(document, { ...DEFAULT_GENERATOR, frequencyHz: 20000, amplitude: .1, sampleRateHz: 256000, count: 4096 }) : editorRef.current!.openDocument(document, kind); if (opened) setWorkspace(kind === 'signal' ? 'signal' : 'editor'); return opened }} /></div>}
+      {editorVisited && <div className="workspace-panel" hidden={workspace !== 'editor'}><SchematicEditor ref={editorRef} onSourceRevision={(id, revision) => competitionRef.current?.sourceChanged(id, revision)} onCapture={competitionContext ? (document, analysis) => transferToCompetition({ kind: 'analysis', document, analysis }) : undefined} onSync={competitionContext ? document => transferToCompetition({ kind: 'snapshot', document }) : undefined} /></div>}
       {atlasVisited && <div className="workspace-panel" hidden={workspace !== 'atlas'}><CircuitAtlas onOpen={(project, mode) => { const opened = editorRef.current?.openTemplate(project, mode) ?? false; if (opened) setWorkspace('editor'); return opened }} /></div>}
-      {signalVisited && <div className="workspace-panel" hidden={workspace !== 'signal'}><SignalWorkbench /></div>}
+      {signalVisited && <div className="workspace-panel" hidden={workspace !== 'signal'}><SignalWorkbench ref={signalRef} onCapture={competitionContext ? (document, datasetId, channelId) => transferToCompetition({ kind: 'signal', document, datasetId, channelId }) : undefined} /></div>}
       <div className="workspace-panel" hidden={workspace !== 'v1'}>
       <section className="intro"><p className="eyebrow">工具 / 电路学习</p><h1>电路等效变换实验室</h1><p>从连接关系出发，选择真实网络，逐步理解一次等效变换。</p></section>
       <div className="lab-grid">

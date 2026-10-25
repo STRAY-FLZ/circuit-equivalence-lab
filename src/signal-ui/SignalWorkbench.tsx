@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useImperativeHandle, useMemo, useState } from 'react'
+import type { Ref } from 'react'
 import { createId, reviseProject } from '../engineering'
 import type { JsonObject, JsonValue } from '../engineering'
 import { createProjectDocument, deserializeProject, serializeProject } from '../project-format'
@@ -24,7 +25,9 @@ function storedFftOptions(doc: ProjectDocumentV1): SpectrumOptions {
   return isJsonObject(value) ? { window: value.window === 'hann' ? 'hann' : 'rectangular', removeMean: value.removeMean === true } : { window: 'rectangular', removeMean: false }
 }
 function isJsonObject(value: JsonValue | undefined): value is JsonObject { return value !== null && typeof value === 'object' && !Array.isArray(value) }
-export function SignalWorkbench() {
+export interface SignalWorkbenchHandle { openDocument: (document: ProjectDocumentV1, preset?: GeneratorOptions) => Promise<boolean> }
+export function SignalWorkbench({ ref, onCapture }: { readonly ref?: Ref<SignalWorkbenchHandle>; readonly onCapture?: ((document: ProjectDocumentV1, datasetId: string, channelId: string) => Promise<boolean>) | undefined }) {
+  const [savedRevision, setSavedRevision] = useState('')
   const [rcOptions, setRcOptions] = useState<RcFilterOptions>({ resistanceOhms: 1000, capacitanceFarads: 1e-6, initialOutput: 0, mode: 'lowpass' })
   const [document, setDocument] = useState<ProjectDocumentV1 | null>(null), [activeId, setActiveId] = useState<string | null>(null), [channelId, setChannelId] = useState<string | null>(null)
   const [generator, setGenerator] = useState<GeneratorOptions>({ ...DEFAULT_GENERATOR }), [fftOptions, setFftOptions] = useState<SpectrumOptions>({ window: 'rectangular', removeMean: false })
@@ -96,17 +99,12 @@ export function SignalWorkbench() {
       const current = document.project.extensions['org.stray.signal']
       const project = reviseProject(document.project, document.project.revision, { extensions: { ...document.project.extensions, 'org.stray.signal': { ...(isJsonObject(current) ? current : {}), activeDatasetId: activeId, channelId: selectedId, fftOptions: { ...(spectrum?.options ?? fftOptions) } } } })
       const next = await createProjectDocument(project, writer, document.inlineAssets), text = await serializeProject(next)
-      download(text, 'signal-project.straylab.json', 'application/json;charset=utf-8'); setDocument(next); announce('完整信号工程已导出，含原始/派生数据、来源、处理设置与校验。')
+      download(text, 'signal-project.straylab.json', 'application/json;charset=utf-8'); setDocument(next); setSavedRevision(next.project.revision); announce('完整信号工程已导出，含原始/派生数据、来源、处理设置与校验。')
     }
     catch (e) { announce(`工程未导出：${messageFor(e)}。没有截断或省略资产。`, true) } finally { setBusy(false) }
   }
-  async function openProject(file: File) {
-    if (busy) return; setBusy(true)
-    try {
-      if (file.size > 32 * 1024 * 1024) throw new Error('工程超过 32 MiB 文件上限；当前数据保持不变。')
-      const result = await deserializeProject(new Uint8Array(await file.arrayBuffer()))
-      if (result.kind !== 'ready') throw new Error(result.kind === 'invalid' ? result.issues.map(i => `${i.path}: ${i.message}`).join('；') : '此工程格式、版本或所需扩展不受支持。')
-      const doc = result.document, options = storedFftOptions(doc), captures = doc.project.measurements.filter(d => d.kind === 'waveform' && d.axis.kind === 'uniform-time' && d.axis.count <= 65536 && d.channels.length <= 4)
+  async function loadDocument(doc: ProjectDocumentV1) {
+    const options = storedFftOptions(doc), captures = doc.project.measurements.filter(d => d.kind === 'waveform' && d.axis.kind === 'uniform-time' && d.axis.count <= 65536 && d.channels.length <= 4)
       const extension = doc.project.extensions['org.stray.signal'], preferred = isJsonObject(extension) ? extension.activeDatasetId : null
       const chosen = captures.find(d => d.id === preferred) ?? captures[0]
       if (chosen) {
@@ -116,12 +114,33 @@ export function SignalWorkbench() {
         setDocument(result.document); setActiveId(chosen.id); setChannelId(channel); setSpectrum(result.spectrum); setFftError(result.error)
       } else { setDocument(doc); setActiveId(null); setChannelId(null); setSpectrum(null); setFftError('') }
       setFftOptions(options); setPendingCsv(null); announce(chosen ? '工程已打开，原始采样、通道身份、来源和处理设置已恢复。' : '工程已打开并完整保留；没有本工作台支持的均匀捕获，可生成或导入新数据。')
+    setSavedRevision(doc.project.revision)
+  }
+  useImperativeHandle(ref, () => ({ async openDocument(doc, preset) {
+    if (busy) return false
+    if (document && document.project.revision !== savedRevision && !window.confirm('信号实验室有未导出的数据，载入电赛工程并替换当前数据？')) return false
+    setBusy(true)
+    try { await loadDocument(doc); if (preset && !doc.project.measurements.some(d => d.kind === 'waveform')) setGenerator(preset); return true }
+    catch (e) { announce(messageFor(e), true); return false } finally { setBusy(false) }
+  } }))
+  async function capture() {
+    if (!document || !activeId || !selectedId || !onCapture || busy) return
+    setBusy(true); try { const ok = await onCapture(document, activeId, selectedId); announce(ok ? '实际采样与测量已关联到电赛实验。' : '关联未完成，当前数据保留，请检查工作台提示。', !ok) } catch (e) { announce(messageFor(e), true) } finally { setBusy(false) }
+  }
+  async function openProject(file: File) {
+    if (busy) return; setBusy(true)
+    try {
+      if (file.size > 32 * 1024 * 1024) throw new Error('工程超过 32 MiB 文件上限；当前数据保持不变。')
+      const result = await deserializeProject(new Uint8Array(await file.arrayBuffer()))
+      if (result.kind !== 'ready') throw new Error(result.kind === 'invalid' ? result.issues.map(i => `${i.path}: ${i.message}`).join('；') : '此工程格式、版本或所需扩展不受支持。')
+      await loadDocument(result.document)
     } catch (e) { announce(`打开失败，当前数据保持不变：${messageFor(e)}`, true) } finally { setBusy(false) }
   }
   const editGenerator = (key: keyof GeneratorOptions, value: number | WaveKind) => setGenerator(o => ({ ...o, [key]: value }))
   return <section className="signal-workbench" aria-label="信号实验室工作区" aria-busy={busy}>
     <header className="signal-heading"><div><p className="eyebrow">工程 / 信号测量</p><h1>信号测量与分析实验室</h1><p>生成或导入采样，观察时域、测量有效值并分析频谱。</p></div><p className="signal-note">合成与导入数据工作台<br />不采集硬件，不从原理图求解波形</p></header>
     <p aria-label="信号处理状态" role={failed ? 'alert' : 'status'} className={`signal-message ${failed ? 'error' : ''}`}>{busy ? '正在处理完整采样与资产，请稍候…' : message}</p>
+    {onCapture && <button disabled={busy || !waveform} onClick={() => void capture()}>关联到电赛实验</button>}
     <section className="signal-section" aria-label="信号发生器"><h2>01 / 信号发生器</h2><form onSubmit={e => { e.preventDefault(); void generate() }}><fieldset disabled={busy}><legend>离散合成参数</legend><div className="signal-form-grid"><label>波形<select aria-label="波形" value={generator.kind} onChange={e => editGenerator('kind', e.target.value as WaveKind)}>{Object.entries(waveNames).map(([key, name]) => <option key={key} value={key}>{name}</option>)}</select></label>
       {([
         ['frequencyHz', '频率 / Hz', 1, generator.kind === 'noise'], ['amplitude', '峰值幅值 / V', 0.1, false], ['offset', '直流偏置 / V', 0.1, false], ['phaseRadians', '初相位 / rad', 0.1, generator.kind === 'noise'], ['sampleRateHz', '采样率 / Hz', 1, false], ['count', '采样点数', 1, false], ['dutyCycle', '占空比（0–1）', 0.01, generator.kind !== 'square' && generator.kind !== 'pulse'], ['seed', '噪声种子（uint32）', 1, generator.kind !== 'noise'],

@@ -3,14 +3,14 @@ import { deriveElectricalNets } from '../engineering'
 import type { EngineeringProject } from '../engineering'
 import { createDcInput, dcEngine } from '../dc'
 import type { DcSolution } from '../dc'
-import type { AnalysisResult } from '../analysis/types'
+import type { AnalysisCapture, AnalysisInput, AnalysisResult } from '../analysis/types'
 import './dc.css'
 
 export interface DcHighlight { readonly revision: string; readonly sheetId: string; readonly anchorIds: readonly string[]; readonly componentId?: string; readonly text: string }
 const number = (n: number): string => Number(n.toPrecision(8)).toString()
-export function DcAnalysisPanel({ project, sheetId, initialReference = '', onHighlight }: { readonly project: EngineeringProject; readonly sheetId: string; readonly initialReference?: string; readonly onHighlight: (value: DcHighlight | null) => void }) {
+export function DcAnalysisPanel({ project, sheetId, initialReference = '', onHighlight, onCapture }: { readonly project: EngineeringProject; readonly sheetId: string; readonly initialReference?: string; readonly onCapture?: ((capture: AnalysisCapture<DcSolution>) => Promise<boolean>) | undefined; readonly onHighlight: (value: DcHighlight | null) => void }) {
   const [reference, setReference] = useState(initialReference), [running, setRunning] = useState(false), [progress, setProgress] = useState(0)
-  const [record, setRecord] = useState<{ result: AnalysisResult<DcSolution>; reference: string } | null>(null)
+  const [record, setRecord] = useState<{ input: AnalysisInput; result: AnalysisResult<DcSolution>; reference: string } | null>(null)
   const [error, setError] = useState('')
   const sheet = project.sheets.find(s => s.id === sheetId)!, topology = deriveElectricalNets(project)
   const nets = topology.nets.filter(n => n.anchorIds.some(id => sheet.anchors.some(a => a.id === id)))
@@ -25,10 +25,11 @@ export function DcAnalysisPanel({ project, sheetId, initialReference = '', onHig
     try {
       const input = await createDcInput(project, sheetId, reference || undefined)
       const result = await dcEngine.run(input, { signal: new AbortController().signal, readAsset: () => Promise.resolve(new Uint8Array()), onProgress: completed => setProgress(completed) })
-      setRecord({ result, reference })
+      setRecord({ input, result, reference })
     } catch (failure) { setError(failure instanceof Error ? failure.message : '分析输入无效。') }
     finally { setRunning(false) }
   }
+  async function captureResult() { if (!record || stale || !solution || !onCapture) return; setRunning(true); try { const ok = await onCapture({ project: record.input.project, configuration: record.input.configuration, result: record.result }); if (!ok) setError('关联未完成，当前结果仍保留，请检查电赛工作台提示。') } catch (e) { setError(e instanceof Error ? e.message : '关联失败。') } finally { setRunning(false) } }
   function exportReport() {
     if (!record || stale || !solution) return
     const url = URL.createObjectURL(new Blob([JSON.stringify(record.result, null, 2)], { type: 'application/json;charset=utf-8' }))
@@ -50,7 +51,7 @@ export function DcAnalysisPanel({ project, sheetId, initialReference = '', onHig
       <details><summary>实际 MNA 方程与矩阵</summary><p>对每个非参考节点列 KCL；电阻使用欧姆定律，电压定义支路增加电流未知量和电压约束。系统 A x = b 同时求解这些未知量。以下是本次实际盖章矩阵，不是示意方程；未另行实现网孔法。</p>
         <ol>{solution.equations.unknowns.map((u, i) => <li key={i}>x[{i}] = {u.name} / {u.unit} = {number(solution.equations.solution[i]!)}</li>)}</ol>
         <div className="dc-scroll" tabIndex={0} role="region" aria-label="MNA 矩阵"><pre>{solution.equations.rows.map((row, i) => `${row.name} [${row.unit}]\n${solution.equations.matrix[i]!.map((a, j) => `${number(a)}*x[${j}]`).join(' + ')} = ${number(solution.equations.rhs[i]!)}\nA[${i}] = [ ${solution.equations.matrix[i]!.map(number).join(', ')} ]; b[${i}] = ${number(solution.equations.rhs[i]!)}\n`).join('\n')}</pre></div><p className="muted">显示取 8 位有效数字；导出报告保留完整数值与稳定对象映射。求解采用行列缩放和完全主元高斯消元。</p></details>
-      <button onClick={exportReport}>导出直流分析报告 JSON</button><button onClick={() => onHighlight(null)}>清除分析高亮</button>
+      {onCapture && <button disabled={running} onClick={() => void captureResult()}>关联到电赛实验</button>}<button onClick={exportReport}>导出直流分析报告 JSON</button><button onClick={() => onHighlight(null)}>清除分析高亮</button>
       <details><summary>本次分析来源</summary><p className="dc-ids">工程 {record!.result.provenance.projectId} · 修订 {record!.result.provenance.inputRevision}<br />引擎 {record!.result.provenance.engine.id} / {record!.result.provenance.engine.version}<br />SHA-256 {record!.result.provenance.inputDigest}</p></details>
     </div>}
     <p className="muted">保存工程会保留电路、参数及控制支路 ID。分析结果属于当前会话；重新打开工程后请重新选择参考并运行，可另行导出分析报告。</p>

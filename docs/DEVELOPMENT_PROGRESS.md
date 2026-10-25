@@ -1,5 +1,43 @@
 # Development Progress
 
+Updated **2026-10-25**. Active authorized module **V2.5.0 — Competition project workspace**.
+**In Progress, E01–E10: 4/10**; only verified deliverables count.
+Baseline local/remote main and published v2.4.0 verified at
+`350a5d0de427d5016456e50a4de8e5ed780f2024`. Clean baseline; branch
+`codex/v2.5-competition-workspace`. Owner authorizes implementation, source/data/
+browser acceptance and production release after acceptance. Stop before V3.
+
+Design: reuse schema-1 EngineeringProject/CompetitionRecord/ExperimentRecord,
+assets and immutable revisions; validated versioned namespaced workspace extension.
+Source verification: primary 2019 national statement collection at Shandong
+Agricultural University cross-checked with Hunan committee index; Guangdong 2026
+G statement downloaded from SCUT regional committee archive and visually read.
+National training homepage returned 502, so primary university/committee sources
+used. No blocker. Checkpoint: 26 focused core/UI tests passed, including actual AC/DC
+and signal transfers, stale edits, official-attribution tampering, metric boundaries,
+units and report/project reimport with unchanged assets. Typecheck passed. Scoped
+lint cleanup is underway. Implementation of tool handoffs and planning/notebook/
+report UI is present; real production-build browser acceptance remains. No remote
+update or release action yet. Do not duplicate implemented work on resume.
+
+| ID | Deliverable | Status |
+| --- | --- | --- |
+| E01 | Project/experiment architecture and validation | Verified |
+| E02 | At least six primary-source verified problems | Verified |
+| E03 | Attributed requirements and engineering metrics | Verified |
+| E04 | Independent project/two partial training workflows | Implementation Complete |
+| E05 | Tasks and traceable design alternatives | Implementation Complete |
+| E06 | Quantitative acceptance and evidence provenance | Verified |
+| E07 | Actual engineering tool/result integration | Implementation Complete |
+| E08 | Notebook, portable project and printable report | Implementation Complete |
+| E09 | Source/data tests and actual browser acceptance | In Progress |
+| E10 | Documentation/version/production release | Planned |
+
+Prior V2.4.0: **Released / 10/10**; canonical Release confirms final identity.
+The dated prior checkpoints below are preserved.
+
+---
+
 Updated **2026-10-23**. Active authorized module **V2.4.0 — AC, filters and frequency response**.
 **Implementation Complete → Verified → Application Released**; dated pre-tag
 checkpoint **9/10**, final F10 identity/handoff in the canonical Release below.

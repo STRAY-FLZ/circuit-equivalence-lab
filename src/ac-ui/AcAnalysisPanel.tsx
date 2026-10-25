@@ -3,7 +3,7 @@ import { deriveElectricalNets } from '../engineering'
 import type { EngineeringProject, JsonObject, ComplexValue } from '../engineering'
 import { acEngine, createAcInput, parseAcSettings } from '../ac'
 import type { AcPhasor, AcResult, AcSettings, SweepOptions } from '../ac'
-import type { AnalysisResult } from '../analysis'
+import type { AnalysisCapture, AnalysisInput, AnalysisResult } from '../analysis'
 import { BodeChart } from './BodeChart'
 import { fmt } from './format'
 import './ac.css'
@@ -16,9 +16,9 @@ function initial(project: EngineeringProject, sheetId: string): { settings: AcSe
   if (stored) { try { return { settings: parseAcSettings(stored as JsonObject), error: '' } } catch (e) { return { settings: { frequencyHz: 100, sources: [] }, error: `已保存交流配置无效：${e instanceof Error ? e.message : '格式错误'}。请重新明确配置。` } } }
   return { settings: { frequencyHz: 100, sources: [] }, error: '' }
 }
-export function AcAnalysisPanel({ project, sheetId, onSave, onHighlight }: { readonly project: EngineeringProject; readonly sheetId: string; readonly onSave: (settings: AcSettings) => void; readonly onHighlight: (value: AcHighlight | null) => void }) {
+export function AcAnalysisPanel({ project, sheetId, onSave, onHighlight, onCapture }: { readonly project: EngineeringProject; readonly sheetId: string; readonly onSave: (settings: AcSettings) => void; readonly onCapture?: ((capture: AnalysisCapture<AcResult>) => Promise<boolean>) | undefined; readonly onHighlight: (value: AcHighlight | null) => void }) {
   const [loaded] = useState(() => initial(project, sheetId)), [settings, setSettings] = useState(loaded.settings), [error, setError] = useState(loaded.error), [running, setRunning] = useState(false), [progress, setProgress] = useState('')
-  const [record, setRecord] = useState<{ result: AnalysisResult<AcResult>; controls: string } | null>(null), abort = useRef<AbortController | null>(null)
+  const [record, setRecord] = useState<{ input: AnalysisInput; result: AnalysisResult<AcResult>; controls: string } | null>(null), abort = useRef<AbortController | null>(null)
   const sheet = project.sheets.find(s => s.id === sheetId)!, topology = deriveElectricalNets(project)
   const nets = topology.nets.filter(n => n.anchorIds.some(id => sheet.anchors.some(a => a.id === id)))
   const sources = sheet.components.filter(c => ['voltage-source', 'current-source'].includes(project.definitions.find(d => d.id === c.definitionId)!.kind))
@@ -34,12 +34,13 @@ export function AcAnalysisPanel({ project, sheetId, onSave, onHighlight }: { rea
   async function run(sweep: boolean) {
     setRunning(true); setError(''); onHighlight(null); const controller = new AbortController(); abort.current = controller
     const single: AcSettings = { frequencyHz: current.frequencyHz, sources: current.sources, ...(current.referenceAnchorId ? { referenceAnchorId: current.referenceAnchorId } : {}) }
-    try { const input = await createAcInput(project, sheetId, sweep ? { ...current, sweep: scan } : single); const result = await acEngine.run(input, { signal: controller.signal, readAsset: () => Promise.resolve(new Uint8Array()), onProgress: (n, total) => setProgress(`${n}/${total ?? '?'}`) }); setRecord({ result, controls }) }
+    try { const input = await createAcInput(project, sheetId, sweep ? { ...current, sweep: scan } : single); const result = await acEngine.run(input, { signal: controller.signal, readAsset: () => Promise.resolve(new Uint8Array()), onProgress: (n, total) => setProgress(`${n}/${total ?? '?'}`) }); setRecord({ input, result, controls }) }
     catch (e) { setError(e instanceof Error ? e.message : '交流分析失败。') }
     finally { setRunning(false); abort.current = null }
   }
   const highlight = (anchorIds: readonly string[], text: string, componentId?: string) => onHighlight({ revision: project.revision, sheetId, anchorIds, text, ...(componentId ? { componentId } : {}) })
   function save() { try { parseAcSettings({ ...current }); onSave(current); setError('') } catch (e) { setError(e instanceof Error ? e.message : '保存失败。') } }
+  async function captureResult() { if (!record || stale || !solution || !onCapture) return; setRunning(true); try { const ok = await onCapture({ project: record.input.project, configuration: record.input.configuration, result: record.result }); if (!ok) setError('关联未完成，当前结果仍保留，请检查电赛工作台提示。') } catch (e) { setError(e instanceof Error ? e.message : '关联失败。') } finally { setRunning(false) } }
   function report() { if (!record || stale || !solution) return; const url = URL.createObjectURL(new Blob([JSON.stringify(record.result, null, 2)], { type: 'application/json;charset=utf-8' })), a = document.createElement('a'); a.href = url; a.download = 'stray-ac-report.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000) }
   return <section className="ac-panel" aria-label="交流分析面板">
     <header><p className="eyebrow">相量 / 频率响应 / 滤波</p><h2>交流分析与滤波</h2><p>理想线性 RLC、独立电压/电流源与四类线性受控源。正弦稳态采用余弦参考：v(t) = √2 |V| cos(2πft + φ)，相量为 RMS，采用 exp(+jωt)。</p></header>
@@ -63,7 +64,7 @@ export function AcAnalysisPanel({ project, sheetId, onSave, onHighlight }: { rea
       <p>S = V conj(I) = P + jQ；正 Q 为感性，负 Q 为容性。复功率不平衡 {complex(solution.checks.powerImbalance)} VA；最大 KCL 残差 {fmt(solution.checks.maxKclAmps)} A；复数归一化残差 {fmt(solution.checks.complexBackwardError)}；缩放主元比 {fmt(solution.checks.scaledPivotRatio)}（非条件数）。</p>
       {result?.sweep && <BodeChart key={record!.result.provenance.inputDigest} sweep={result.sweep} />}
       <details><summary>实际复数 MNA 方程与矩阵</summary><p>Y(ω)V 与理想源约束组成 A(ω)x=b；以下为本次实际复数矩阵。行列缩放、完全主元复数消元，并重算原单位残差。</p><ol>{solution.equations.unknowns.map((u, i) => <li key={i}>x[{i}] = {u.name} / {u.unit} = {complex(solution.equations.solution[i]!)}</li>)}</ol><div className="ac-scroll" tabIndex={0}><pre>{solution.equations.rows.map((r, i) => `${r.name} [${r.unit}]\nA[${i}] = [${solution.equations.matrix[i]!.map(complex).join(', ')}]; b[${i}] = ${complex(solution.equations.rhs[i]!)}\n`).join('\n')}</pre></div></details>
-      <div className="ac-actions"><button onClick={report}>导出交流分析报告 JSON</button><button onClick={() => onHighlight(null)}>清除交流高亮</button></div><details><summary>交流分析来源</summary><p className="ac-provenance">工程 {record!.result.provenance.projectId} · 修订 {record!.result.provenance.inputRevision}<br />{record!.result.provenance.engine.id} / {record!.result.provenance.engine.version}<br />SHA-256 {record!.result.provenance.inputDigest}</p></details>
+      <div className="ac-actions">{onCapture && <button disabled={running} onClick={() => void captureResult()}>关联到电赛实验</button>}<button onClick={report}>导出交流分析报告 JSON</button><button onClick={() => onHighlight(null)}>清除交流高亮</button></div><details><summary>交流分析来源</summary><p className="ac-provenance">工程 {record!.result.provenance.projectId} · 修订 {record!.result.provenance.inputRevision}<br />{record!.result.provenance.engine.id} / {record!.result.provenance.engine.version}<br />SHA-256 {record!.result.provenance.inputDigest}</p></details>
     </div>}
   </section>
 }

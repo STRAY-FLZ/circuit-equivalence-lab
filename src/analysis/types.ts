@@ -48,6 +48,8 @@ export interface AnalysisResult<Output> {
   readonly provenance: ResultProvenance
   readonly outcome: AnalysisOutcome<Output>
 }
+/** Immutable tool-to-workspace handoff; result remains bound to its actual input. */
+export interface AnalysisCapture<Output> { readonly project: EngineeringProject; readonly configuration: AnalysisConfiguration; readonly result: AnalysisResult<Output> }
 export interface AnalysisEngine<Output> {
   readonly descriptor: EngineDescriptor
   inspect(input: AnalysisInput): CapabilityReport
