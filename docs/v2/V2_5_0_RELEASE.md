@@ -3,7 +3,7 @@
 Authorized 2026-10-25: implement, source/numerical/data/browser verify and publish
 V2.5.0, stop before V3. Branch `codex/v2.5-competition-workspace`; verified clean
 baseline main/v2.4.0 `350a5d0de427d5016456e50a4de8e5ed780f2024`.
-Core checkpoint `41a5526`. **Implementation Complete → Verified; not yet Released**.
+Core checkpoint `41a5526`. **Implementation Complete → Verified → Application Released**.
 
 **E01–E09 Verified / 9-of-10**, E10 publication in progress at this checkpoint.
 Six verified problems: national 2019 A/C/D/E/F and regional Guangdong 2026 G.
@@ -12,8 +12,8 @@ See [source register](COMPETITION_SOURCES.md) and
 
 Final local standards passed: typecheck, lint, **647 tests / 40 files**, build.
 Current assets `index-Dtjdmh6Q.js` / `index-BvQK5Hgb.css`. No new dependency. After the standard run, the asynchronous handoff update guard
-passed four focused UI cases, scoped lint, typecheck and build; production CI will
-repeat all standard checks before release.
+passed four focused UI cases, scoped lint, typecheck and build; production CI
+then repeated all standard checks successfully.
 Known informational build notices: existing classic theme initializer is preserved;
 bundle is about 557 kB minified/179 kB gzip and triggers Vite's 500 kB advisory.
 No unsupported performance or physical-device certification is claimed.
@@ -43,8 +43,28 @@ Replays/validators are committed in `tests/browser/competition-workspace.js`,
 Generated synthetic data/screenshots and original PDFs/archive remain ignored;
 no original full statement is copied into the repository. Scope stops at V2.5.0.
 
-Pending: authorized production integration/push, Actions/Pages monitoring,
-actual public replay/download validation, final records/tag/Release/handoff.
+## Public acceptance and final identity
+
+Verified **2026-10-25**: production candidate
+**`a9bc62a905ff855631a1b7d00ef28753e1f0ac9c`**, [workflow 40177292317](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40177292317)
+succeeded, including typecheck/lint/647 tests/build and Pages deployment. Public
+entry loaded version 2.5.0 with the JS/CSS identities above. The full real Chrome
+replay passed the same nine journeys, including original source navigation,
+training alternatives, actual tools, native downloads and preserved earlier features.
+Zero app console or resource errors; desktop/mobile light/dark screenshots inspected.
+
+`node tests/browser/verify-competition-downloads.mjs competition-live` passed
+against the six actual public downloads: two independent projects, exact JSON/HTML
+round trips, 402 analytic AC checks, three waveform datasets, original CSV/sample
+retention, exact RC recurrence, distinct provenance and manual unit conversion.
+No hardware result or complete official contest rubric is claimed.
+
+This is a dated **pre-tag 9/10** record. This documentation commit is deployed
+and checked with `tests/browser/competition-external-import.js` before tagging.
+The [canonical V2.5.0 Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.5.0)
+records the exact final production SHA, final workflow, targeted live outcome,
+`v2.5.0` tag and **E01–E10 Released / 10-of-10** handoff. No V3 implementation.
+Public entry: https://stray-flz.github.io/circuit-equivalence-lab/.
 
 ## History-preserving rollback
 

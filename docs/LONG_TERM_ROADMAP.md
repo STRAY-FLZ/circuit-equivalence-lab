@@ -21,7 +21,7 @@ complete intended feature scope; it does not authorize implementation or release
   and DEVELOPMENT_PROGRESS.md for later internal design completion or implementation.
 - The priorities and future version labels are planning targets, not release
   tags or promises of dates. Historical V1 package was `0.1.0`; current public
-  release is V2.4.0 (AC/filter public workflow verified). Owner approved Atlas on 2026-10-22 and shifted
+  release is V2.5.0 (competition public workflow/data verified; final tag/identity in Release). Owner approved Atlas on 2026-10-22 and shifted
   DC/filters/competition to V2.3/2.4/2.5. V3–V6 unchanged. See the actual
   [version checklist](VERSION_CHECKLIST.md); the unchecked original scope below
   is a planning inventory, not a current completion tracker.
@@ -309,11 +309,11 @@ V2.4.0 application is publicly released and verified: independent complex MNA, e
 actual voltage-ratio sweeps/Bode, five editable filter/resonance experiments and
 sampled RC ZOH processing. Acceptance/release status is maintained in
 [V2.4 evidence](v2/V2_4_0_RELEASE.md). Arbitrary transient/nonlinear simulation
-remains outside this scope; V2.5 has not started.
+remains outside this scope; V2.5 status follows below.
 
 ### V2.5 — Competition Project Workspace
 
-V2.5.0 implementation is verified: six original-source historical entries,
+V2.5.0 application is publicly verified: six original-source historical entries,
 attributed requirements, plans, real engineering evidence, metric comparisons,
 notebooks and portable reports. See [actual acceptance/release state](v2/V2_5_0_RELEASE.md).
 This is partial training, not autonomous contest completion, official grading,

@@ -1,8 +1,12 @@
 # Production deployment
 
-Current application release: **V2.4.0**, publicly verified 2026-10-23.
-See [AC/filter evidence and rollback](v2/V2_4_0_RELEASE.md) and the
-[canonical final identity](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.4.0).
+Current application release: **V2.5.0**, publicly verified 2026-10-25.
+Candidate `a9bc62a905ff855631a1b7d00ef28753e1f0ac9c` / workflow `40177292317`
+passed all standard checks, deployment and full public training/download acceptance.
+See [competition evidence and rollback](v2/V2_5_0_RELEASE.md) and the
+[canonical final identity/tag/10-of-10 handoff](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.5.0)
+following this documentation deployment and targeted live confirmation.
+Previous V2.4 evidence remains in its [dated record](v2/V2_4_0_RELEASE.md).
 V2.3 DC evidence remains in its [dated record](v2/V2_3_0_RELEASE.md).
 Previous V2.2.0 was verified 2026-10-22. See the
 [dated Atlas evidence and range rollback](v2/V2_2_0_RELEASE.md),

@@ -834,3 +834,16 @@ handoffs, external-editor fingerprint reconciliation and portable report round t
 See [implementation](v2/COMPETITION_WORKSPACE_IMPLEMENTATION.md),
 [source register](v2/COMPETITION_SOURCES.md), [release status/rollback](v2/V2_5_0_RELEASE.md).
 No prior numerical rewrite, new dependency or unrelated next phase.
+
+## 2026-10-25 — V2.5 public acceptance and finalization
+
+Candidate `a9bc62a905ff855631a1b7d00ef28753e1f0ac9c` / workflow `40177292317`
+succeeded with all standard checks and Pages deployment. Actual public 2.5.0
+loaded `index-Dtjdmh6Q.js` / `index-BvQK5Hgb.css`. Nine real Chrome journeys
+and six native downloads passed, including 402 analytic AC checks, exact project/
+report round trips, raw CSV/samples, RC recurrence and evidence provenance; zero
+app console/resource errors. Screenshots inspected at 1440/390 in both themes.
+Dated pre-tag checkpoint: E01–E09 Verified, 9/10. Final documentation deployment
+and targeted external-editor/report check precede tag/Release. Exact final identity
+and Released E01–E10 10/10 handoff are recorded in the canonical Release linked
+from [release evidence](v2/V2_5_0_RELEASE.md). Stop before V3; no blocker.

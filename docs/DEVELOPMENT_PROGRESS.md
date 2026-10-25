@@ -1,7 +1,9 @@
 # Development Progress
 
 Updated **2026-10-25**. Active authorized module **V2.5.0 — Competition project workspace**.
-**Verified E01–E09; release In Progress, E01–E10: 9/10**; only verified deliverables count.
+**Implementation Complete → Verified → Application Released**. Dated pre-tag
+checkpoint **E01–E09 Verified, 9/10**; final E10 identity and **Released 10/10**
+are recorded in the [canonical V2.5.0 Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.5.0) after this documentation deployment and targeted live confirmation.
 Baseline local/remote main and published v2.4.0 verified at
 `350a5d0de427d5016456e50a4de8e5ed780f2024`. Clean baseline; branch
 `codex/v2.5-competition-workspace`. Owner authorizes implementation, source/data/
@@ -28,8 +30,17 @@ Independent download checks: two project IDs, byte-identical JSON/report round t
 CSV/float64 retention, exact RC recurrence and 11mV/0.01V comparison. Screenshots
 inspected. Package/writer 2.5.0 candidate, schema1; no dependency or V1/DC/AC algorithm
 changes. Candidate assets `index-Dtjdmh6Q.js` / `index-BvQK5Hgb.css`.
-Next: authorized integration/push/Pages, full public acceptance, final records/tag.
-No remote update yet at this checkpoint. No blocker. Stop before V3.
+Public acceptance **2026-10-25**: candidate main
+`a9bc62a905ff855631a1b7d00ef28753e1f0ac9c`, [workflow 40177292317](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40177292317)
+completed build/deploy successfully, including all standard checks. Actual public
+root loaded 2.5.0 and the candidate assets above. Full public Chrome replay passed
+all nine grouped journeys with zero app console/resource errors. Public native
+downloads independently passed all numerical, provenance and byte-integrity checks
+listed above. Desktop/mobile light/dark screenshots inspected.
+Next: deploy this documentation, targeted public external-editor/report confirmation,
+then tag/Release on the verified final commit. This is a dated pre-tag checkpoint;
+canonical Release records the exact final SHA/workflow and E10 completion. No blocker.
+Stop before V3; later work requires separate authorization.
 
 
 | ID | Deliverable | Status |
