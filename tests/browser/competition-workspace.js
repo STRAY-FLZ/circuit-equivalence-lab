@@ -1,0 +1,70 @@
+// Existing offline Playwright CLI; actual built preview or public entry, with native files.
+async page => {
+  const root = page.url(), prefix = new URL(root).hostname === '127.0.0.1' ? 'competition-local' : 'competition-live';
+  const assert = (ok, message) => { if (!ok) throw new Error(message); }, errors = [], failed = [], journeys = [], downloads = [], dialogs = [];
+  let dismissNext = false;
+  const onError = e => errors.push(e.message), onConsole = m => { if (m.type() === 'error') errors.push(m.text()); }, onResponse = r => { if (r.status() >= 400 && r.url().startsWith(new URL(root).origin)) failed.push({ url: r.url(), status: r.status() }); }, onDialog = async d => { dialogs.push({ message: d.message(), action: dismissNext ? 'dismiss' : 'accept' }); if (dismissNext) { dismissNext = false; await d.dismiss(); } else await d.accept(); };
+  page.on('pageerror', onError); page.on('console', onConsole); page.on('response', onResponse); page.on('dialog', onDialog); page.setDefaultTimeout(15000);
+  const button = name => page.getByRole('button', { name, exact: true }), label = name => page.getByLabel(name, { exact: true }), status = label('电赛工作台状态');
+  const save = async (action, name) => { const pending = page.waitForEvent('download'); await button(action).click(); const path = `output/playwright/${prefix}-${name}`; await (await pending).saveAs(path); downloads.push(path); return path; };
+  const wait = text => status.filter({ hasText: text }).waitFor();
+  const fill = async (name, value) => label(name).fill(String(value));
+  const create = async id => { await button('赛题库').click(); await fill('搜索历史赛题', id === 'guangdong-2026-g' ? '广东' : '简易电路'); await page.locator(`[data-problem-id="${id}"]`).click(); await button('创建独立训练工程').click(); await wait('已创建独立训练工程'); };
+  const runAc = async () => { await button('运行频率扫描').click(); await label('交流分析状态').filter({ hasText: '分析完成' }).waitFor(); };
+  const attach = async () => { await button('关联到电赛实验').click(); await wait('实际结果与原始数据已关联'); };
+  const attempt = async name => { await fill('尝试名称', name); await button('记录本次尝试').click(); await wait('本次尝试已记录'); };
+  const plan = async (name, params) => { await button('任务与方案').click(); await fill('方案名称', name); await fill('技术方法与假设', '理想线性RC子训练；不模拟原题晶体管放大器'); await fill('参数选择', params); await fill('预期优点', '参数明确、便于核对参考公式'); await fill('预期缺点', '不包含真实器件寄生与非线性'); await fill('风险', '软件结果不等于硬件达标'); await fill('选择依据', '用实际频扫比较目标，保持来源可追溯'); await fill('设计修订说明', '浏览器验收的合成训练方案记录'); await button('保存方案记录').click(); await wait('记录已更新'); };
+  try {
+    await page.goto(root); await page.evaluate(() => { globalThis.__competitionVerification = { status: 'running' }; }); await page.setViewportSize({ width: 1440, height: 1100 });
+    assert((await label('应用版本').innerText()).includes('v2.5.0'), 'actual target version');
+    const resources = await page.evaluate(() => [...globalThis.document.querySelectorAll('script[src],link[rel="stylesheet"]')].map(e => e.getAttribute('src') || e.getAttribute('href')));
+    for (const resource of resources) assert(resource.startsWith('/circuit-equivalence-lab/') && (await page.request.get(new URL(resource, root).href)).status() === 200, `preserved resource ${resource}`);
+    await button('电子设计竞赛').click(); await fill('搜索历史赛题', '广东'); await page.locator('[data-problem-id="guangdong-2026-g"]').click();
+    const detail = label('赛题详情'), source = await detail.getByRole('link', { name: '打开原始赛题文件' }).getAttribute('href'); assert(source.includes('scut.edu.cn') && source.endsWith('.rar'), 'original regional archive'); assert((await detail.innerText()).includes('未单列组别'), 'no invented division');
+    const popupPending = page.waitForEvent('popup'); await detail.getByRole('link', { name: '查看官方/高校发布页' }).click(); const official = await popupPending; await official.waitForLoadState('domcontentloaded'); assert((await official.locator('body').innerText()).includes('2026全国大学生电子设计竞赛赛题发布'), 'actual regional publication'); await official.close();
+    await label('搜索历史赛题').focus(); await page.keyboard.press('Tab'); assert(await label('赛事范围').evaluate(e => e === globalThis.document.activeElement), 'keyboard access to index filters');
+    journeys.push('regional G original archive/publication opened, source year/division/conditions and keyboard search verified');
+    await create('nuedc-2019-d'); assert((await label('工程需求表').innerText()).includes('派生工程解释/计算'), 'distinct attributed requirements');
+    await plan('RC方案A', 'R=1000 ohm, C=1e-6 F'); await label('阅读原题与范围限制').check(); await wait('记录已更新');
+    await button('实验与测量').click(); await fill('参数设置', 'R=1kΩ，C=1µF；软件训练，不是原题完整电路'); await fill('观察与限制', '等待实际频扫后比较；不预填硬件结果'); await button('保存实验笔记').click(); await wait('记录已更新');
+    await button('打开交流频率响应训练').click(); await label('交流分析面板').waitFor(); await runAc(); await attach();
+    assert((await label('实际观测值').locator('option:checked').innerText()).includes('159.'), 'real solver estimated cutoff'); await attempt('方案A AC'); assert((await label('指标比较表').innerText()).includes('训练比较通过'), 'initial actual cutoff passes');
+    await page.getByLabel('打开电赛工程或报告', { exact: true }).setInputFiles('output/playwright/competition-invalid-source.json'); await status.filter({ hasText: '官方需求被改写' }).waitFor(); assert((await label('指标比较表').innerText()).includes('方案A AC'), 'invalid import preserves existing project');
+    await button('赛题库').click(); dismissNext = true; await button('创建独立训练工程').click(); await button('我的项目').click(); assert((await label('工程需求表').innerText()).includes('理想RC参考截止频率'), 'dismissed replacement retains project');
+    journeys.push('independent national training project, attributed requirements, saved task/plan/notebook, real AC capture, pass and rejected tampered/replacement preservation');
+    await button('原理图编辑器').click(); await button('R1 元件').click(); await fill('电阻值', 2000); await button('应用属性').click(); await button('电子设计竞赛').click(); await button('指标验收').click(); assert((await label('指标比较表').innerText()).includes('无法判定'), 'changed engineering revision makes linked evidence stale');
+    await button('原理图编辑器').click(); await runAc(); await attach(); await attempt('方案B AC'); assert((await label('指标比较表').innerText()).includes('训练比较未通过'), 'changed cutoff fails retained design target'); assert((await label('指标比较表').innerText()).includes('79.'), 'actual changed cutoff');
+    await plan('RC方案B', 'R=2000 ohm, C=1e-6 F；保留原截止目标以观察偏离');
+    await button('实验与测量').click(); await fill('实验结论', '实际计算：R加倍使截止频率减半；仅支持当前理想线性子训练。'); await fill('复盘', '旧证据属于历史修订，不能当作当前方案验证。'); await fill('下一步', '另建目标或调整元件，再用真实采样检查。'); await button('保存实验笔记').click(); await wait('记录已更新');
+    const acProject = await save('导出电赛工程', 'ac-project.straylab.json'), acReport = await save('导出可打印报告', 'ac-report.html');
+    await label('打开电赛工程或报告').setInputFiles(acReport); await wait('电赛工程已打开'); await button('指标验收').click(); assert(await label('指标比较表').getByRole('row').count() === 3, 'portable report restores two actual attempts'); await save('导出电赛工程', 'ac-reopened.straylab.json');
+    journeys.push('resistor edit/stale/rerun, second design result, traceable alternatives and review, native JSON/HTML exports and report reimport');
+    for (const width of [1440, 390]) for (const theme of ['light', 'dark']) {
+      await page.setViewportSize({ width, height: width === 390 ? 844 : 1100 }); const toggle = page.getByRole('switch', { name: '夜间模式' }); if (await toggle.getAttribute('aria-checked') !== String(theme === 'dark')) await toggle.click();
+      await label('指标比较表').scrollIntoViewIfNeeded(); assert(await page.evaluate(() => globalThis.document.documentElement.scrollWidth <= globalThis.innerWidth + 1), 'no workspace page overflow');
+      if (width === 390) { await label('指标比较表').focus(); await page.keyboard.press('ArrowRight'); await page.waitForFunction(() => globalThis.document.querySelector('[aria-label=指标比较表]').scrollLeft > 0); assert(await label('指标比较表').evaluate(e => e.scrollLeft) > 0, 'keyboard table horizontal scroll'); }
+      await page.getByLabel('电子设计竞赛工作区').screenshot({ path: `output/playwright/${prefix}-${width}-${theme}.png` }); journeys.push(`${width}px ${theme} actual metrics/source layout and keyboard table access`);
+    }
+    await page.setViewportSize({ width: 1440, height: 1100 });
+    await create('guangdong-2026-g'); await button('开始训练实验').click(); await button('打开信号测量训练').click(); assert(await label('频率 / Hz').inputValue() === '20000', 'explicit training generator preset'); await button('生成并分析').click(); await label('信号处理状态').filter({ hasText: '合成采样已生成' }).waitFor();
+    assert((await page.getByTestId('measurement-totalRms').innerText()).includes('0.07071068 V'), 'actual deterministic RMS'); await attach(); await attempt('合成正弦采样'); assert((await label('指标比较表').innerText()).includes('软件合成'), 'simulation provenance');
+    await button('信号实验室').click(); await label('选择 CSV 文件').setInputFiles('output/playwright/competition-synthetic.csv'); await label('单位 input_mV').selectOption('mV'); await button('确认列与单位并导入').click(); await label('信号处理状态').filter({ hasText: 'CSV 已导入' }).waitFor(); await attach(); await attempt('合成验收CSV输入'); assert((await label('指标比较表').innerText()).includes('仪器获取方式未经本应用核实'), 'import is not certified hardware');
+    await button('信号实验室').click(); await button('运行采样 RC 滤波').click(); await label('信号处理状态').filter({ hasText: 'RC 采样滤波完成' }).waitFor(); assert(await page.getByTestId('waveform-path').count() === 2, 'preserved input and actual derived output'); await attach();
+    await page.getByText('添加自定目标或派生解释', { exact: true }).click(); await fill('目标名称', '20kHz RC低通输出RMS'); await fill('目标测试条件', '验收合成输入20kHz/100mV峰值，fs256kHz，RC=1kΩ/1µF'); await fill('目标评价方法', '完整派生输出的采样总RMS'); await label('验收规则').selectOption('maximum'); await fill('限值', .01); await button('添加训练指标').click(); await wait('自定或派生目标已添加');
+    await label('验收指标').selectOption({ label: '20kHz RC低通输出RMS / V' }); await attempt('实际RC滤波输出'); assert((await label('指标比较表').innerText()).includes('训练比较通过'), 'derived filtering criterion');
+    await page.getByText('录入用户报告值', { exact: true }).click(); await fill('报告记录名称', '手动软件验收用例（非硬件）'); await fill('用户报告值', 11); await label('报告值单位').selectOption('mV'); await fill('报告测试条件', '用于验证单位换算的人工录入测试，不是官方实测'); await fill('报告获取方法', '用户报告，未连接硬件'); await button('保存用户报告证据').click(); await wait('用户报告值已保存'); await attempt('手动填报换算对比'); assert((await label('指标比较表').innerText()).includes('训练比较未通过'), '11mV exceeds 0.01V limit'); assert((await label('指标比较表').innerText()).includes('用户手动填报'), 'manual provenance fixed');
+    const signalProject = await save('导出电赛工程', 'signal-project.straylab.json'), signalReport = await save('导出可打印报告', 'signal-report.html');
+    await label('打开电赛工程或报告').setInputFiles(signalProject); await wait('电赛工程已打开'); await button('指标验收').click(); assert(await label('指标比较表').getByRole('row').count() === 5, 'all signal evidence attempts restored'); await save('导出电赛工程', 'signal-reopened.straylab.json');
+    journeys.push('actual generation/FFT/RMS, explicit mV CSV conversion, imported provenance, sampled RC/raw retention, custom metric, manual-unit comparison, native project/report reopen');
+    const reportPage = await page.context().newPage(); await reportPage.goto(`file:///D:/D-codex/circuit-equivalence-lab/${signalReport}`); assert((await reportPage.locator('body').innerText()).includes('不等于官方评分'), 'report attribution boundary'); assert(await reportPage.locator('svg path').count() > 0, 'report actual plots'); assert((await reportPage.locator('body').innerText()).includes('手动软件验收用例'), 'report real user records'); await reportPage.screenshot({ path: `output/playwright/${prefix}-report.png`, fullPage: false }); await reportPage.close();
+    await button('典型电路图谱').click(); assert(await page.getByRole('heading', { name: '典型电路图谱', exact: true }).isVisible(), 'Atlas retained');
+    await button('原理图编辑器').click(); await button('直流分析').click(); await label('直流参考节点').selectOption({ label: (await label('直流参考节点').locator('option').allTextContents()).find(t => t.includes('COM')) }); await button('运行直流分析').click(); await page.getByRole('alert').filter({ hasText: 'DC_MODEL_UNSUPPORTED' }).waitFor(); assert((await label('交流分析状态').innerText()).includes('分析完成'), 'AC remains available; DC model boundary retained');
+    await button('典型电路图谱').click(); await page.getByRole('searchbox',{name:'搜索电路图谱'}).fill('电压源与电阻负载'); await page.locator('[data-template-id=voltage-load]').click(); await button('使用直流分析').click(); await button('运行直流分析').click(); await label('直流分析状态').filter({hasText:'分析完成'}).waitFor(); assert((await label('支路结果表').innerText()).includes('0.005'),'actual existing DC 5mA');
+    await button('等效变换与课程').click(); await page.getByRole('button', { name: /串联化简 R1/ }).click(); await button('预览等效变换').click(); await button('开始分步学习').click(); assert(await page.getByRole('region', { name: '分步学习' }).isVisible(), 'V1 lesson retained'); await button('下一步').click(); assert(await page.locator('math').count() > 0, 'MathML retained'); assert(await page.getByRole('link', { name: '返回首页', exact: true }).getAttribute('href') === 'https://stray-flz.github.io/stray-articles/', 'home navigation');
+    journeys.push('portable printable report actual plots/text, Atlas/DC boundary/AC, V1 lesson/MathML/home preserved');
+    assert(!errors.length && !failed.length, JSON.stringify({ errors, failed }));
+    const result = { status: 'passed', root, resources, browser: await page.evaluate(() => globalThis.navigator.userAgent), journeys, downloads, dialogs, errors, failed, acProject, signalProject };
+    await page.evaluate(result => { globalThis.__competitionVerification = result; }, result); return result;
+  } catch (error) { await page.evaluate(result => { globalThis.__competitionVerification = result; }, { status: 'failed', message: String(error), journeys, downloads, errors, failed }); throw error; }
+  finally { page.off('pageerror', onError); page.off('console', onConsole); page.off('response', onResponse); page.off('dialog', onDialog); }
+}

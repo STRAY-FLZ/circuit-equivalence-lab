@@ -7,7 +7,7 @@ import App from '../App'
 import { createCompetitionProject, readWorkspace } from '../competition'
 import { serializeProject } from '../project-format'
 import type { ProjectDocumentV1 } from '../project-format'
-const button = (name: string) => screen.getByRole('button', { name, exact: true })
+const button = (name: string) => screen.getByRole('button', { name })
 beforeEach(() => { vi.spyOn(window, 'confirm').mockReturnValue(true); Object.defineProperty(window, 'matchMedia', { configurable: true, value: vi.fn().mockReturnValue({ matches: false }) }); window.localStorage.clear() })
 afterEach(() => vi.restoreAllMocks())
 async function create() { fireEvent.click(button('创建独立训练工程')); await waitFor(() => expect(screen.getByLabelText('电赛工作台状态')).toHaveTextContent('已创建独立训练工程')) }
@@ -46,11 +46,13 @@ describe('competition user workflow and existing tool boundary', () => {
     render(<CompetitionWorkbench ref={ref} onOpenTool={onOpenTool} onContext={() => {}} />)
     const text = await serializeProject(source), file = new File([text], 'training.json', { type: 'application/json' }); Object.defineProperty(file, 'text', { value: () => Promise.resolve(text) })
     fireEvent.change(screen.getByLabelText('打开电赛工程或报告'), { target: { files: [file] } }); await waitFor(() => expect(screen.getByLabelText('电赛工作台状态')).toHaveTextContent('电赛工程已打开'))
+    fireEvent.click(button('实验与测量')); expect(screen.getByLabelText('当前电赛实验')).toHaveDisplayValue('RC频率响应子训练')
     fireEvent.click(button('任务与方案')); fireEvent.change(screen.getByLabelText('方案名称'), { target: { value: '方案A' } }); fireEvent.change(screen.getByLabelText('技术方法与假设'), { target: { value: '理想RC' } }); fireEvent.change(screen.getByLabelText('选择依据'), { target: { value: '先验证线性参考' } }); fireEvent.click(button('保存方案记录')); await waitFor(() => expect(screen.getByText('方案A')).toBeInTheDocument())
     fireEvent.click(button('实验与测量')); fireEvent.change(screen.getByLabelText('实验结论'), { target: { value: '等待真实测量后补充' } }); fireEvent.click(button('保存实验笔记')); await waitFor(() => expect(screen.getByLabelText('电赛工作台状态')).toHaveTextContent('记录已更新'))
     fireEvent.click(button('打开交流频率响应训练')); await waitFor(() => expect(onOpenTool).toHaveBeenCalled())
     const handed = onOpenTool.mock.calls[0]![0] as ProjectDocumentV1; expect(readWorkspace(handed.project).alternatives[0]!.title).toBe('方案A'); expect(readWorkspace(handed.project).notebooks.some(n => n.conclusion === '等待真实测量后补充')).toBe(true)
     const bad = new File(['{}'], 'bad.json'); Object.defineProperty(bad, 'text', { value: () => Promise.resolve('{}') }); fireEvent.change(screen.getByLabelText('打开电赛工程或报告'), { target: { files: [bad] } }); await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('当前工程保留'))
-    act(() => { ref.current!.sourceChanged(source.project.id, crypto.randomUUID()) })
+    await act(async () => { const receiving = ref.current!.receive({ kind: 'snapshot', document: handed }); ref.current!.sourceChanged(source.project.id, crypto.randomUUID()); await receiving })
+    expect(screen.getByText(/编辑器存在待回传修订/)).toBeInTheDocument()
   })
 })

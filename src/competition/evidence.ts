@@ -5,7 +5,7 @@ import type { ProjectDocumentV1 } from '../project-format'
 import { analysisDigest } from '../analysis/snapshot'
 import { loadWaveform, measurementsFor } from '../signal'
 import { compareMetric } from './metrics'
-import { editWorkspace, now, workspaceExtension } from './project'
+import { circuitDigest, editWorkspace, now, workspaceExtension } from './project'
 import { demand, readWorkspace, sameJson } from './validation'
 import { WORKSPACE_EXTENSION } from './types'
 import type { Datum, Evidence, ToolTransfer, WorkspaceState } from './types'
@@ -72,7 +72,7 @@ export async function receiveToolTransfer(document: ProjectDocumentV1, experimen
     if (transfer.kind === 'analysis') results = [...results, { id: resultId, analysisId, engine: transfer.analysis.result.provenance.engine, inputRevision: p.revision, inputDigest, outcome: 'success', artifactAssetIds: [artifact.entry.id] }]
     evidence = { id: createId(), experimentId, title, origin, acquisition, method, conditions: transfer.kind === 'analysis' ? JSON.stringify(transfer.analysis.configuration.options) : `数据集 ${datasetIds[0]}，通道 ${transfer.channelId}；采样与原始来源见记录`, recordedAtUtc: now(), basisRevision: p.revision, sourceProjectId: p.id, sourceRevision: p.revision, inputDigest, analysisId, resultId, datasetIds, artifactAssetIds: [artifact.entry.id], data }
   }
-  const nextState: WorkspaceState = { ...state, engineeringRevision: p.revision, sourceRevisions: [...state.sourceRevisions.filter(r => r.projectId !== p.id), { projectId: p.id, revision: p.revision }], evidence: evidence ? [...state.evidence, evidence] : state.evidence }
+  const nextState: WorkspaceState = { ...state, circuitDigest: await circuitDigest(p), engineeringRevision: p.revision, sourceRevisions: [...state.sourceRevisions.filter(r => r.projectId !== p.id), { projectId: p.id, revision: p.revision }], evidence: evidence ? [...state.evidence, evidence] : state.evidence }
   const project = reviseProject(document.project, document.project.revision, { definitions: p.definitions, symbols: p.symbols, sheets: p.sheets, analyses, results, measurements: union(document.project.measurements, p.measurements), assets, experiments: document.project.experiments.map(e => e.id === experimentId && evidence ? { ...e, analysisIds: [...new Set([...e.analysisIds, ...(evidence.analysisId ? [evidence.analysisId] : [])])], datasetIds: [...new Set([...e.datasetIds, ...evidence.datasetIds])] } : e), extensions: { ...document.project.extensions, ...p.extensions, [WORKSPACE_EXTENSION]: workspaceExtension(nextState) } })
   readWorkspace(project); return createProjectDocument(project, document.writer, inlineAssets)
 }

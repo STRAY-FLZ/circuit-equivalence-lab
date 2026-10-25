@@ -50,7 +50,7 @@ export interface Evidence {
 export interface Attempt { readonly id: string; readonly metricId: string; readonly evidenceId: string; readonly datumKey: string; readonly label: string; readonly recordedAtUtc: string }
 export interface WorkspaceState {
   readonly version: 1; readonly catalogVersion: 1; readonly problemId: string; readonly competitionId: string
-  readonly engineeringRevision: string; readonly requirements: readonly Requirement[]; readonly tasks: readonly Task[]
+  readonly engineeringRevision: string; readonly circuitDigest: string; readonly requirements: readonly Requirement[]; readonly tasks: readonly Task[]
   readonly sourceRevisions: readonly { readonly projectId: string; readonly revision: string }[]
   readonly alternatives: readonly Alternative[]; readonly notebooks: readonly Notebook[]; readonly metrics: readonly Metric[]
   readonly evidence: readonly Evidence[]; readonly attempts: readonly Attempt[]

@@ -1,5 +1,13 @@
 # Architecture
 
+## V2.5 competition/evidence extension
+
+`src/competition` owns a validated versioned namespace inside schema-1 projects,
+source-backed requirements, metric comparison, immutable evidence and HTML reports.
+`src/competition-ui` presents one local active project with portable files. App
+composes actual editor/analysis/signal handoffs; raw data and original numerical
+engines stay independent. See [methods and identity/freshness boundaries](v2/COMPETITION_WORKSPACE_IMPLEMENTATION.md).
+
 ## V2.4 AC/filter extension
 
 Independent complex MNA in `src/ac` consumes engineering/analysis contracts and

@@ -2,6 +2,14 @@
 
 STRAY Electronics Lab / 电路实验室 is an interactive circuit learning and engineering tool. V2.0.0 adds engineering projects, an editable SVG schematic, explicit wiring, undo/redo, portable JSON files, and verified resistor-network transformations with five-stage lessons based on the current circuit.
 
+V2.5.0 adds a source-backed competition training workspace: six individually
+verified historical problems, attributed requirements, design alternatives, real
+DC/AC/signal evidence, quantitative metric comparisons, notebooks and portable
+printable reports. Existing tools share schema-1 projects and preserve raw data.
+See [sources](docs/v2/COMPETITION_SOURCES.md),
+[methods and limits](docs/v2/COMPETITION_WORKSPACE_IMPLEMENTATION.md) and
+[actual release state](docs/v2/V2_5_0_RELEASE.md).
+
 V2.4.0 adds independent complex AC MNA, explicit RMS excitations, phasor/power
 results, real frequency sweeps and interactive Bode plots, five editable Atlas
 filter/resonance experiments and sampled RC ZOH processing with preserved source
@@ -34,7 +42,7 @@ See [patch verification and release status](docs/v2/V2_0_1_WIRE_INTERACTION.md).
 V2.0.2 makes each palette activation place one component; holding and dragging
 an existing component moves its original instance. See [movement patch evidence](docs/v2/V2_0_2_COMPONENT_MOVEMENT.md).
 
-The completed V1 M0–M8 foundation remains available at [Circuit Equivalence Lab](https://stray-flz.github.io/circuit-equivalence-lab/), linked from the [Stray tools page](https://stray-flz.github.io/stray-articles/tools/). See the [changelog](CHANGELOG.md), [V2.0.0 release record](docs/v2/V2_0_0_RELEASE.md), and [deployment and maintenance](docs/DEPLOYMENT.md). Transformations support eligible resistor-only sheets; DC supports the documented linear source models; AC supports the documented ideal linear RLC/source models; arbitrary transient and nonlinear simulation remain unsupported. Application version 2.4.0 and project-file schema version 1 are independent.
+The completed V1 M0–M8 foundation remains available at [Circuit Equivalence Lab](https://stray-flz.github.io/circuit-equivalence-lab/), linked from the [Stray tools page](https://stray-flz.github.io/stray-articles/tools/). See the [changelog](CHANGELOG.md), [V2.0.0 release record](docs/v2/V2_0_0_RELEASE.md), and [deployment and maintenance](docs/DEPLOYMENT.md). Transformations support eligible resistor-only sheets; DC supports the documented linear source models; AC supports the documented ideal linear RLC/source models; arbitrary transient and nonlinear simulation remain unsupported. Application version 2.5.0 and project-file schema version 1 are independent.
 
 ## 本地运行
 
@@ -141,4 +149,4 @@ if (result.kind === 'finite') {
 
 结果区分 `finite`、`short-circuit`（明确为 0Ω）、`open-circuit` 和带错误代码的 `error`。有限结果含所选分量的节点电压、各电阻支路的电流/压降及残差诊断；以第二端子为参考，在第一端子注入 1 A。极端尺度、病态矩阵或结果溢出会返回数值失败，不会伪装为物理开路。稠密求解限制为最多 512 个未知节点。
 
-The V2.4.0 regression suite contains 621 tests in 38 files, including the accepted 579-test V2.3.0 baseline. The original 315-test V1 baseline remains preserved. See [architecture](docs/ARCHITECTURE.md), [development log](docs/DEV_LOG.md), and [M0–M8 roadmap](docs/ROADMAP.md). Tool configuration follows the official [Vite](https://vite.dev/guide/), [Vitest](https://vitest.dev/guide/), and [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files) documentation.
+The V2.5.0 regression suite contains 647 tests in 40 files, including the accepted 621-test V2.4.0 baseline. The original 315-test V1 baseline remains preserved. See [architecture](docs/ARCHITECTURE.md), [development log](docs/DEV_LOG.md), and [M0–M8 roadmap](docs/ROADMAP.md). Tool configuration follows the official [Vite](https://vite.dev/guide/), [Vitest](https://vitest.dev/guide/), and [ESLint](https://eslint.org/docs/latest/use/configure/configuration-files) documentation.

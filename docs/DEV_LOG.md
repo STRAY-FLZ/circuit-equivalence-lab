@@ -821,3 +821,16 @@ passed build/deploy. Real public Chrome replay 13 journeys and download validato
 for actual artifacts, sample integrity, limits and rollback. This documentation
 checkpoint precedes the final tag; the canonical Release records final 10/10,
 exact SHA and workflow following its deployment/targeted live confirmation.
+
+
+## 2026-10-25 — V2.5 competition workspace verified candidate
+
+Owner authorized implementation/release through E01–E10, stop before V3. Source
+register has five national originals and one Guangdong regional original; not
+secondary archive authenticity. Core checkpoint `41a5526`. 647 tests/40 files,
+final lint/typecheck/build, built Chrome full training and native-download checks
+passed. Added explicit source identity/units/attribution, actual engine/dataset
+handoffs, external-editor fingerprint reconciliation and portable report round trips.
+See [implementation](v2/COMPETITION_WORKSPACE_IMPLEMENTATION.md),
+[source register](v2/COMPETITION_SOURCES.md), [release status/rollback](v2/V2_5_0_RELEASE.md).
+No prior numerical rewrite, new dependency or unrelated next phase.

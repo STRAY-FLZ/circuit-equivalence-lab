@@ -12,6 +12,8 @@ import { readWorkspace } from './validation'
 import { exportCompetitionReport, extractProjectText } from './report'
 import type { Criterion } from './types'
 import type { JsonObject } from '../engineering'
+import { applyEdit } from '../editing'
+import { reconcileCompetitionDocument } from './project'
 const writer = { name: 'competition acceptance', version: '2.5.0' }, host = () => ({ signal: new AbortController().signal, readAsset: () => Promise.resolve(new Uint8Array()), onProgress: () => {} })
 
 describe('verified problem index and attribution', () => {
@@ -61,7 +63,13 @@ describe('competition project, actual engine evidence and portable reports', () 
     const metric = state.metrics[1]!, evidence = state.evidence[0]!, id = createId()
     doc = await editWorkspace(doc, s => ({ ...s, attempts: [...s.attempts, { id, metricId: metric.id, evidenceId: evidence.id, datumKey: 'sweep:crossing:0', label: '真实RC计算', recordedAtUtc: now() }] }))
     state = readWorkspace(doc.project); expect(evaluateAttempt(state, id).kind).toBe('pass'); expect(evaluateAttempt(state, id, { [doc.project.id]: createId() }).kind).toBe('indeterminate')
-    const reopened = await deserializeProject(await serializeProject(doc)); expect(reopened.kind).toBe('ready'); if (reopened.kind === 'ready') expect(readWorkspace(reopened.document.project)).toEqual(state)
+    const pendingReport = await deserializeProject(extractProjectText(await exportCompetitionReport(doc, { [doc.project.id]: createId() })))
+    if (pendingReport.kind !== 'ready') throw new Error('pending report')
+    expect(pendingReport.document.project.revision).not.toBe(doc.project.revision); expect(evaluateAttempt(readWorkspace(pendingReport.document.project), id).kind).toBe('indeterminate')
+    const reopened = await deserializeProject(await serializeProject(doc)); expect(reopened.kind).toBe('ready'); if (reopened.kind === 'ready') { expect(readWorkspace(reopened.document.project)).toEqual(state); expect((await reconcileCompetitionDocument(reopened.document)).project.revision).toBe(doc.project.revision) }
+    const resistor = doc.project.sheets[0]!.components.find(c => c.reference === 'R1')!, external = applyEdit(doc.project, sheet.id, { type: 'properties', id: resistor.id, reference: 'R1', parameters: { resistance: { kind: 'quantity', quantity: { value: 2000, unit: 'ohm' } } } })
+    const reconciled = await reconcileCompetitionDocument(await createProjectDocument(external, writer, doc.inlineAssets))
+    expect(evaluateAttempt(readWorkspace(reconciled.project), id).kind).toBe('indeterminate'); expect(reconciled.project.revision).not.toBe(external.revision)
     const invalid = { ...result, provenance: { ...result.provenance, inputDigest: '0'.repeat(64) } }
     await expect(receiveToolTransfer(doc, experimentId, { kind: 'analysis', document: await createProjectDocument(input.project, writer), analysis: { project: input.project, configuration: input.configuration, result: invalid } })).rejects.toThrow('摘要')
   })

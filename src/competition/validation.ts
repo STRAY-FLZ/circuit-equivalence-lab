@@ -24,6 +24,7 @@ export function readWorkspace(project: EngineeringProject): WorkspaceState {
   const problem = problemById(s.problemId), competition = project.competitions.find(c => c.id === s.competitionId)
   demand(competition && competition.sourceUrls.includes(problem.sourceUrl) && competition.sourceUrls.includes(problem.publicationUrl), '赛题身份或原始出处不匹配。')
   demand(uuid.test(s.engineeringRevision), '工程依据修订无效。')
+  demand(/^[0-9a-f]{64}$/.test(s.circuitDigest), '电路与交流配置摘要缺失或无效。')
   for (const list of [s.requirements, s.tasks, s.alternatives, s.notebooks, s.metrics, s.evidence, s.attempts, s.sourceRevisions]) demand(Array.isArray(list) && list.length <= 256, '工作台记录缺失或超过每类256条的当前上限。')
   const seen = new Set<string>(), id = (value: string) => { demand(uuid.test(value) && !seen.has(value), '工作台对象ID无效或重复。'); seen.add(value) }
   const experiment = (value: string) => demand(competition.experimentIds.includes(value) && project.experiments.some(e => e.id === value), '实验引用失效。')
@@ -36,10 +37,12 @@ export function readWorkspace(project: EngineeringProject): WorkspaceState {
     if (r.origin !== 'published') demand(r.classification === 'unspecified', '自定训练或派生解释不能标为官方基本/发挥要求。')
   }
   const requirementIds = new Set(s.requirements.map(r => r.id))
+  demand(s.requirements.filter(r => r.origin === 'published').length === 1 && s.requirements.some(r => r.origin === 'derived') && s.requirements.some(r => r.origin === 'training') && s.metrics.length > 0, '工程缺少原题、派生解释或训练指标记录。')
   for (const t of s.tasks) { id(t.id); demand(nonempty(t.title) && typeof t.done === 'boolean', '任务记录无效。') }
   for (const a of s.alternatives) { id(a.id); demand([a.title, a.approach, a.parameters, a.advantages, a.disadvantages, a.risks, a.rationale, a.references, a.revisionNote].every(text) && nonempty(a.title) && uuid.test(a.basedOnRevision) && stamp(a.recordedAtUtc), '方案或修订来源无效。') }
   const notebooks = new Set<string>()
-  for (const n of s.notebooks) { experiment(n.experimentId); demand(!notebooks.has(n.experimentId), '实验笔记重复。'); notebooks.add(n.experimentId); demand([n.objective, n.setup, n.parameters, n.observations, n.problems, n.adjustments, n.conclusion, n.review, n.nextSteps].every(text) && strings(n.requirementIds) && n.requirementIds.every(id => requirementIds.has(id)), '实验笔记或需求引用无效。') }
+  for (const n of s.notebooks) { experiment(n.experimentId); demand(!notebooks.has(n.experimentId), '实验笔记重复。'); notebooks.add(n.experimentId); demand([n.objective, n.setup, n.parameters, n.observations, n.problems, n.adjustments, n.conclusion, n.review, n.nextSteps].every(text) && strings(n.requirementIds) && n.requirementIds.length > 0 && n.requirementIds.every(id => requirementIds.has(id)), '实验笔记或需求引用无效。') }
+  demand(competition.experimentIds.every(id => notebooks.has(id)) && s.requirements.filter(r => r.origin === 'derived' || r.origin === 'training').every(r => s.notebooks.some(n => n.requirementIds.includes(r.id)) || s.metrics.some(m => m.requirementId === r.id)), '工程实验或目标关联缺失。')
   for (const m of s.metrics) { id(m.id); demand(requirementIds.has(m.requirementId) && [m.title, m.conditions, m.method].every(nonempty) && !!units[m.unit], '指标需有需求、单位、测试条件和方法。'); validateCriterion(m.criterion); const r = s.requirements.find(r => r.id === m.requirementId)!; demand(r.unit === m.unit && sameJson(r.criterion, m.criterion), '指标与需求规则不符；请先建立新的训练目标。') }
   const sourceIds = new Set<string>()
   for (const r of s.sourceRevisions) { demand(uuid.test(r.projectId) && uuid.test(r.revision) && !sourceIds.has(r.projectId), '来源工程修订无效或重复。'); sourceIds.add(r.projectId) }

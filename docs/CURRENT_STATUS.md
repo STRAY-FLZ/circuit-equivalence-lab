@@ -1,7 +1,7 @@
 # Current Development Status
 
 Updated **2026-10-25**. Active authorized module **V2.5.0 — Competition project workspace**.
-**In Progress, E01–E10: 4/10**; only verified deliverables count.
+**Verified E01–E09; release In Progress, E01–E10: 9/10**; only verified deliverables count.
 Baseline local/remote main and published v2.4.0 verified at
 `350a5d0de427d5016456e50a4de8e5ed780f2024`. Clean baseline; branch
 `codex/v2.5-competition-workspace`. Owner authorizes implementation, source/data/
@@ -13,25 +13,37 @@ Source verification: primary 2019 national statement collection at Shandong
 Agricultural University cross-checked with Hunan committee index; Guangdong 2026
 G statement downloaded from SCUT regional committee archive and visually read.
 National training homepage returned 502, so primary university/committee sources
-used. No blocker. Checkpoint: 26 focused core/UI tests passed, including actual AC/DC
-and signal transfers, stale edits, official-attribution tampering, metric boundaries,
-units and report/project reimport with unchanged assets. Typecheck passed. Scoped
-lint cleanup is underway. Implementation of tool handoffs and planning/notebook/
-report UI is present; real production-build browser acceptance remains. No remote
-update or release action yet. Do not duplicate implemented work on resume.
+used. Checkpoint **2026-10-25**: E01–E09 Verified, **9/10**; E10 release In Progress.
+Core commit `41a5526`. Final typecheck/lint/test/build passed: **647 tests / 40 files**.
+Built Chrome 155 passed 9 grouped full workflows: source publication, national
+project/attribution, plans/notebook, actual AC capture and two designs, stale/rerun,
+invalid-source/replacement protection, JSON/HTML native save/reopen, regional
+signal generation/FFT/RMS/CSV/filter/manual-unit comparison, 1440/390 light/dark,
+keyboard tables, printable report and existing Atlas/DC/AC/V1/MathML/home.
+Zero app console/resource errors. Supplemental latest-build actual external-editor
+R=3000 export/reimport correctly invalidated both old AC attempts; stable experiment
+restoration and readable report min/max-envelope axes at 390px passed.
+Independent download checks: two project IDs, byte-identical JSON/report round trips,
+402 actual AC frequency points vs analytic formula, 3 waveform datasets, original
+CSV/float64 retention, exact RC recurrence and 11mV/0.01V comparison. Screenshots
+inspected. Package/writer 2.5.0 candidate, schema1; no dependency or V1/DC/AC algorithm
+changes. Candidate assets `index-Dtjdmh6Q.js` / `index-BvQK5Hgb.css`.
+Next: authorized integration/push/Pages, full public acceptance, final records/tag.
+No remote update yet at this checkpoint. No blocker. Stop before V3.
+
 
 | ID | Deliverable | Status |
 | --- | --- | --- |
 | E01 | Project/experiment architecture and validation | Verified |
 | E02 | At least six primary-source verified problems | Verified |
 | E03 | Attributed requirements and engineering metrics | Verified |
-| E04 | Independent project/two partial training workflows | Implementation Complete |
-| E05 | Tasks and traceable design alternatives | Implementation Complete |
+| E04 | Independent project/two partial training workflows | Verified |
+| E05 | Tasks and traceable design alternatives | Verified |
 | E06 | Quantitative acceptance and evidence provenance | Verified |
-| E07 | Actual engineering tool/result integration | Implementation Complete |
-| E08 | Notebook, portable project and printable report | Implementation Complete |
-| E09 | Source/data tests and actual browser acceptance | In Progress |
-| E10 | Documentation/version/production release | Planned |
+| E07 | Actual engineering tool/result integration | Verified |
+| E08 | Notebook, portable project and printable report | Verified |
+| E09 | Source/data tests and actual browser acceptance | Verified |
+| E10 | Documentation/version/production release | In Progress |
 
 Prior V2.4.0: **Released / 10/10**; canonical Release confirms final identity.
 The dated prior checkpoints below are preserved.

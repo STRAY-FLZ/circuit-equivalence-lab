@@ -313,9 +313,11 @@ remains outside this scope; V2.5 has not started.
 
 ### V2.5 — Competition Project Workspace
 
-Introduce real past-problem indexing, measurable requirements, test records, and reports.
-
-Release once usable.
+V2.5.0 implementation is verified: six original-source historical entries,
+attributed requirements, plans, real engineering evidence, metric comparisons,
+notebooks and portable reports. See [actual acceptance/release state](v2/V2_5_0_RELEASE.md).
+This is partial training, not autonomous contest completion, official grading,
+hardware acquisition or full nonlinear/MCU/RF simulation. Stop before V3.
 
 ### V3.x — Advanced Circuits and Analog Electronics
 

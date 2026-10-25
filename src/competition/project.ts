@@ -1,5 +1,6 @@
 import { createEngineeringProject, createId, reviseProject } from '../engineering'
-import type { JsonObject } from '../engineering'
+import type { EngineeringProject, JsonObject } from '../engineering'
+import { analysisDigest } from '../analysis/snapshot'
 import { createProjectDocument } from '../project-format'
 import type { ProjectDocumentV1 } from '../project-format'
 import { instantiateTemplate } from '../atlas'
@@ -9,11 +10,22 @@ import { WORKSPACE_EXTENSION } from './types'
 import type { Notebook, Requirement, WorkspaceState } from './types'
 
 export const now = () => new Date().toISOString()
+export function circuitDigest(project: EngineeringProject): Promise<string> {
+  // Match schema-1's unordered entity collections; pin/drawing order stays meaningful.
+  const byId = <T extends { readonly id: string }>(values: readonly T[]): T[] => [...values].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+  return analysisDigest({ definitions: byId(project.definitions), symbols: byId(project.symbols), sheets: byId(project.sheets).map(s => ({ ...s, components: byId(s.components), anchors: byId(s.anchors), connections: byId(s.connections), labels: byId(s.labels), references: byId(s.references), ports: byId(s.ports) })), acSettings: project.extensions['org.stray.ac'] ?? null })
+}
 export function workspaceExtension(state: WorkspaceState): JsonObject { return JSON.parse(JSON.stringify(state)) as JsonObject }
 export async function editWorkspace(document: ProjectDocumentV1, change: (state: WorkspaceState) => WorkspaceState): Promise<ProjectDocumentV1> {
   const state = change(readWorkspace(document.project))
   const project = reviseProject(document.project, document.project.revision, { extensions: { ...document.project.extensions, [WORKSPACE_EXTENSION]: workspaceExtension(state) }, experiments: document.project.experiments.map(e => { const notebook = state.notebooks.find(n => n.experimentId === e.id); return notebook ? { ...e, notes: notebook.conclusion || notebook.objective } : e }) })
   readWorkspace(project); return createProjectDocument(project, document.writer, document.inlineAssets)
+}
+/** Reconcile external editor changes while keeping notebook-only revisions separate. */
+export async function reconcileCompetitionDocument(document: ProjectDocumentV1): Promise<ProjectDocumentV1> {
+  const state = readWorkspace(document.project), digest = await circuitDigest(document.project)
+  if (digest === state.circuitDigest) return document
+  return editWorkspace(document, s => ({ ...s, circuitDigest: digest, engineeringRevision: document.project.revision, sourceRevisions: [...s.sourceRevisions.filter(r => r.projectId !== document.project.id), { projectId: document.project.id, revision: document.project.revision }] }))
 }
 export async function createCompetitionProject(problemId: string, writer: ProjectDocumentV1['writer']): Promise<ProjectDocumentV1> {
   const problem = problemById(problemId), base = instantiateTemplate(problemId === 'nuedc-2019-a' ? 'voltage-load' : 'rc-lowpass')
@@ -23,7 +35,7 @@ export async function createCompetitionProject(problemId: string, writer: Projec
   const requirements = [published, derived, training], experiments = ['周期信号测量子训练', 'RC频率响应子训练', '电气性能与自定义实验'].map(title => ({ id: createId(), title, analysisIds: [], datasetIds: [], notes: '独立训练子集，不代表整题实现或官方测试。' }))
   const competition = { id: createId(), title: `${problem.year} ${problem.letter} · ${problem.title}`, sourceUrls: [problem.sourceUrl, problem.publicationUrl], experimentIds: experiments.map(e => e.id) }
   const notebooks: Notebook[] = experiments.map((e, i) => ({ experimentId: e.id, objective: e.title, setup: '按训练说明配置软件或导入数据，记录真实条件。', parameters: '', observations: '', problems: '', adjustments: '', conclusion: '', review: '', nextSteps: '', requirementIds: [requirements[i === 0 ? 2 : i === 1 ? 1 : 0]!.id] }))
-  const state: WorkspaceState = { version: 1, catalogVersion: 1, problemId, competitionId: competition.id, engineeringRevision: base.revision, sourceRevisions: [{ projectId: base.id, revision: base.revision }], requirements, notebooks, tasks: ['阅读原题与范围限制', '比较方案并明确假设', '运行实验并关联实际证据', '核对指标与导出报告'].map(title => ({ id: createId(), title, done: false })), alternatives: [], evidence: [], attempts: [], metrics: requirements.map(r => ({ id: createId(), requirementId: r.id, title: r.title, unit: r.unit, criterion: r.criterion, conditions: r.conditions, method: r.method })) }
+  const state: WorkspaceState = { version: 1, catalogVersion: 1, problemId, competitionId: competition.id, engineeringRevision: base.revision, circuitDigest: await circuitDigest(base), sourceRevisions: [{ projectId: base.id, revision: base.revision }], requirements, notebooks, tasks: ['阅读原题与范围限制', '比较方案并明确假设', '运行实验并关联实际证据', '核对指标与导出报告'].map(title => ({ id: createId(), title, done: false })), alternatives: [], evidence: [], attempts: [], metrics: requirements.map(r => ({ id: createId(), requirementId: r.id, title: r.title, unit: r.unit, criterion: r.criterion, conditions: r.conditions, method: r.method })) }
   const project = createEngineeringProject({ ...base, title: `${competition.title} · 训练工程`, experiments, competitions: [competition], extensions: { ...base.extensions, [WORKSPACE_EXTENSION]: workspaceExtension(state) } })
   readWorkspace(project); return createProjectDocument(project, writer)
 }
@@ -31,6 +43,7 @@ export async function replaceTrainingCircuit(document: ProjectDocumentV1, templa
   const usedSheets = document.project.analyses.some(a => a.scope.kind === 'circuit')
   if (usedSheets) throw new Error('已有分析引用当前图纸。请新建独立训练工程比较另一电路，或继续编辑现有元件。')
   const template = instantiateTemplate(templateId), state = readWorkspace(document.project)
-  const project = reviseProject(document.project, document.project.revision, { definitions: template.definitions, symbols: template.symbols, sheets: template.sheets, extensions: { ...document.project.extensions, 'org.stray.ac': template.extensions['org.stray.ac'] ?? {}, [WORKSPACE_EXTENSION]: workspaceExtension({ ...state, engineeringRevision: template.revision, sourceRevisions: state.sourceRevisions.map(r => r.projectId === document.project.id ? { ...r, revision: template.revision } : r) }) } })
+  const digest = await circuitDigest({ ...document.project, definitions: template.definitions, symbols: template.symbols, sheets: template.sheets, extensions: { ...document.project.extensions, 'org.stray.ac': template.extensions['org.stray.ac'] ?? {} } })
+  const project = reviseProject(document.project, document.project.revision, { definitions: template.definitions, symbols: template.symbols, sheets: template.sheets, extensions: { ...document.project.extensions, 'org.stray.ac': template.extensions['org.stray.ac'] ?? {}, [WORKSPACE_EXTENSION]: workspaceExtension({ ...state, circuitDigest: digest, engineeringRevision: template.revision, sourceRevisions: state.sourceRevisions.map(r => r.projectId === document.project.id ? { ...r, revision: template.revision } : r) }) } })
   return createProjectDocument(project, document.writer, document.inlineAssets)
 }
