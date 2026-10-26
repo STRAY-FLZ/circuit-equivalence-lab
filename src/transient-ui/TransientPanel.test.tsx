@@ -8,6 +8,7 @@ import { SignalWorkbench } from '../signal-ui'
 import type { SignalWorkbenchHandle } from '../signal-ui/SignalWorkbench'
 import { configureTransientExperiment, readTransientRecord } from '../transient'
 import type { ProjectDocumentV1 } from '../project-format'
+import { deserializeProject, serializeProject } from '../project-format'
 
 const button = (name: string) => screen.getByRole('button', { name })
 beforeEach(() => { vi.spyOn(window, 'confirm').mockReturnValue(true) })
@@ -23,6 +24,12 @@ describe('actual transient editor integration', () => {
     expect(screen.getByLabelText('暂态精确样本读数')).toHaveTextContent('t=0.001 s')
     expect(screen.getByLabelText('暂态精确样本读数')).toHaveTextContent('解析参考 6.32120559 V')
     expect(screen.getByLabelText('U(C1) 光标读数')).toHaveTextContent('样本 100')
+    fireEvent.change(screen.getByLabelText('时间缩放'), { target: { value: '4' } })
+    fireEvent.change(screen.getByLabelText('水平位置'), { target: { value: '200' } })
+    expect(screen.getByLabelText('精确样本索引')).toHaveValue(200)
+    expect(screen.getByLabelText('U(C1) 光标读数')).toHaveTextContent('样本 200')
+    fireEvent.change(screen.getByLabelText('精确样本索引'), { target: { value: '100' } })
+    expect(screen.getByLabelText('U(C1) 光标读数')).toHaveTextContent('样本 100')
     fireEvent.click(button('保存本次模拟到工程'))
     await waitFor(() => expect(screen.getByLabelText('暂态分析状态')).toHaveTextContent('完整保存到工程'), { timeout: 10000 })
     fireEvent.click(button('R1 元件')); fireEvent.change(screen.getByLabelText('电阻值'), { target: { value: '2000' } }); fireEvent.click(button('应用属性'))
@@ -34,6 +41,11 @@ describe('actual transient editor integration', () => {
     await waitFor(() => expect(opened).toHaveBeenCalledTimes(1), { timeout: 10000 })
     const saved = opened.mock.calls[0]![0], record = readTransientRecord(saved, project.sheets[0]!.id)!
     expect(record.axis.count).toBe(501); expect(saved.project.measurements.some(d => d.metadata.simulated === true)).toBe(true)
+    const reopened = await deserializeProject(await serializeProject(saved)); if (reopened.kind !== 'ready') throw Error('bad file')
+    act(() => { expect(ref.current!.openDocument(reopened.document, 'transient')).toBe(true) })
+    await waitFor(() => expect(screen.getByLabelText('暂态模拟结果')).toBeInTheDocument())
+    expect(screen.getByLabelText('暂态分析状态')).not.toHaveTextContent('过期')
+    expect(screen.getByLabelText('模拟时长 / s')).toHaveValue(.005)
   }, 30000)
   it('protects unsaved transient configuration and rejects invalid numerical inputs', async () => {
     const ref = createRef<SchematicEditorHandle>(); render(<SchematicEditor ref={ref} />)

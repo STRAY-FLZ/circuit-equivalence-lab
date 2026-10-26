@@ -153,3 +153,12 @@ change the nine `numerical`/`experiment` flags for the V1 resistor path.
 Ten storage-element templates still explicitly reject DC calculation. The
 protected editor handoff can open DC mode with a visible COM/B reference;
 analysis waits for explicit run. [DC methods and coverage](DC_ANALYSIS_IMPLEMENTATION.md).
+
+## V3.0 transient entry points — 2026-10-26
+
+The dated V2.2 scope above is preserved. Ten existing RC/RL/RLC/filter templates
+now provide a distinct transient teaching action, retaining the 12-category/89-family
+hierarchy and 27 current recipes. No recipe is duplicated to change analysis mode.
+Editing, DC, AC, transient and resistor guided lessons remain distinct actions.
+Actual transient applicability/initial constraints are checked by its own provider.
+See [models, experiments and acceptance](../v3/TRANSIENT_IMPLEMENTATION.md).

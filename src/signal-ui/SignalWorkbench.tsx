@@ -138,7 +138,7 @@ export function SignalWorkbench({ ref, onCapture }: { readonly ref?: Ref<SignalW
   }
   const editGenerator = (key: keyof GeneratorOptions, value: number | WaveKind) => setGenerator(o => ({ ...o, [key]: value }))
   return <section className="signal-workbench" aria-label="信号实验室工作区" aria-busy={busy}>
-    <header className="signal-heading"><div><p className="eyebrow">工程 / 信号测量</p><h1>信号测量与分析实验室</h1><p>生成或导入采样，观察时域、测量有效值并分析频谱。</p></div><p className="signal-note">合成与导入数据工作台<br />不采集硬件，不从原理图求解波形</p></header>
+    <header className="signal-heading"><div><p className="eyebrow">工程 / 信号测量</p><h1>信号测量与分析实验室</h1><p>生成或导入采样，观察时域、测量有效值并分析频谱。</p></div><p className="signal-note">合成与导入数据工作台<br />不采集硬件；可检查独立暂态引擎的模拟波形</p></header>
     <p aria-label="信号处理状态" role={failed ? 'alert' : 'status'} className={`signal-message ${failed ? 'error' : ''}`}>{busy ? '正在处理完整采样与资产，请稍候…' : message}</p>
     {onCapture && <button disabled={busy || !waveform} onClick={() => void capture()}>关联到电赛实验</button>}
     <section className="signal-section" aria-label="信号发生器"><h2>01 / 信号发生器</h2><form onSubmit={e => { e.preventDefault(); void generate() }}><fieldset disabled={busy}><legend>离散合成参数</legend><div className="signal-form-grid"><label>波形<select aria-label="波形" value={generator.kind} onChange={e => editGenerator('kind', e.target.value as WaveKind)}>{Object.entries(waveNames).map(([key, name]) => <option key={key} value={key}>{name}</option>)}</select></label>

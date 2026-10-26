@@ -25,6 +25,11 @@ export function parseTransientSettings(value: unknown): TransientSettings {
   return value as unknown as TransientSettings
 }
 export function settingsJson(settings: TransientSettings): JsonObject { return JSON.parse(JSON.stringify(settings)) as JsonObject }
+/** Configuration equality follows stable component IDs, independent of file key/entity ordering. */
+export function transientSettingsKey(s: TransientSettings): string {
+  const sorted = <T extends { readonly componentId: string }>(values: readonly T[]) => [...values].sort((a, b) => a.componentId < b.componentId ? -1 : a.componentId > b.componentId ? 1 : 0)
+  return JSON.stringify({ version: s.version, method: s.method, durationSeconds: s.durationSeconds, intervalSeconds: s.intervalSeconds, relativeTolerance: s.relativeTolerance, ...(s.referenceAnchorId !== undefined ? { referenceAnchorId: s.referenceAnchorId } : {}), sources: sorted(s.sources).map(v => ({ componentId: v.componentId, unit: v.unit, mode: v.mode, ...(v.mode === 'constant' ? { value: v.value } : v.mode === 'step' ? { initial: v.initial, final: v.final, atSeconds: v.atSeconds } : { initial: v.initial, final: v.final, startSeconds: v.startSeconds, endSeconds: v.endSeconds }) })), initialConditions: sorted(s.initialConditions).map(v => ({ componentId: v.componentId, value: v.value, unit: v.unit })) })
+}
 export function storedTransientSettings(project: EngineeringProject, sheetId: string): TransientSettings | null {
   const container = project.extensions[TRANSIENT_EXTENSION]
   if (!object(container) || container[sheetId] === undefined) return null

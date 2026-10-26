@@ -116,7 +116,7 @@ export async function solveTransient(c: TransientCircuit, settings: TransientSet
   const energyBalanceErrorJ = sample.energyJ - initialEnergyJ + resistorDissipationJ - sourceDeliveredJ + numericalDissipationJ
   const energyScale = initialEnergyJ + sample.energyJ + resistorDissipationJ + Math.abs(sourceDeliveredJ) + numericalDissipationJ
   if (![energyBalanceErrorJ, energyScale].every(Number.isFinite) || Math.abs(energyBalanceErrorJ) > 1e-12 + 1e-7 * energyScale) throw new TransientError('TRAN_ENERGY', '含源供能、阻性耗散与后向欧拉数值耗散的能量核对未通过。', [], 'numerical')
-  return { referenceAnchorId: c.referenceAnchorId, settings, axis: { kind: 'uniform-time', startSeconds: 0, intervalSeconds: settings.intervalSeconds, count: intervals + 1 }, series,
+  return { circuit: c, referenceAnchorId: c.referenceAnchorId, settings, axis: { kind: 'uniform-time', startSeconds: 0, intervalSeconds: settings.intervalSeconds, count: intervals + 1 }, series,
     checks: { linearSolves, acceptedSteps, rejectedSteps, minimumStepSeconds, maximumStepSeconds, maxLocalErrorRatio, maxKclAmps, maxBackwardError, eventTimes: events, initialEnergyJ, finalEnergyJ: sample.energyJ, resistorDissipationJ, sourceDeliveredJ, numericalDissipationJ, energyBalanceErrorJ },
     diagnostics: [{ code: 'TRAN_APPROXIMATION', severity: 'info', message: '后向欧拉一阶近似；步长倍分控制局部储能状态误差，不保证全局精确值。事件前积分、事件后代数重求解；均匀输出可能无法显示两个采样点之间的窄脉冲。数值耗散与物理电阻耗散分列。', entityIds: [] }],
   }

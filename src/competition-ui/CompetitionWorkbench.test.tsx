@@ -54,5 +54,7 @@ describe('competition user workflow and existing tool boundary', () => {
     const bad = new File(['{}'], 'bad.json'); Object.defineProperty(bad, 'text', { value: () => Promise.resolve('{}') }); fireEvent.change(screen.getByLabelText('打开电赛工程或报告'), { target: { files: [bad] } }); await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('当前工程保留'))
     await act(async () => { const receiving = ref.current!.receive({ kind: 'snapshot', document: handed }); ref.current!.sourceChanged(source.project.id, crypto.randomUUID()); await receiving })
     expect(screen.getByText(/编辑器存在待回传修订/)).toBeInTheDocument()
+    await act(async () => { ref.current!.sourceChanged(source.project.id, handed.project.revision); await ref.current!.receive({ kind: 'snapshot', document: handed }) })
+    expect(screen.queryByText(/编辑器存在待回传修订/)).not.toBeInTheDocument()
   })
 })

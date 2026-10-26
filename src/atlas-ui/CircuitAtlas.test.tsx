@@ -37,7 +37,8 @@ describe('atlas navigation and existing workspaces', () => {
     const capability = within(screen.getByRole('region', { name: '模板能力' }))
     expect(capability.getAllByText('暂未提供')).toHaveLength(2)
     expect(capability.getByText('可编辑 · 可导出重开')).toBeInTheDocument()
-    expect(screen.getByText(/直流与任意暂态模型尚不支持/)).toBeInTheDocument()
+    expect(screen.getByText(/直流模型不支持储能元件/)).toBeInTheDocument()
+    expect(capability.getByText(/线性暂态与交流需各自明确/)).toBeInTheDocument()
   })
   it('searches secondary metadata while retaining selection and previous expansion when cleared', () => {
     render(<CircuitAtlas onOpen={() => true} />)

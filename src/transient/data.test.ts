@@ -39,6 +39,7 @@ describe('portable transient data and independent references', () => {
     expect(await transientBasis(imported.document.project)).toBe(f.record.basisDigest)
     const c = imported.document.project.sheets[0]!.components.find(c => c.reference === 'R1')!, next = applyEdit(imported.document.project, f.sheetId, { type: 'properties', id: c.id, reference: c.reference, parameters: { resistance: { kind: 'quantity', quantity: { value: 2000, unit: 'ohm' } } } })
     expect(await transientBasis(next)).not.toBe(f.record.basisDigest)
+    expect(restored.circuit.elements.find(e => e.reference === 'R1')!.value).toBe(1000)
   })
   it('two saved simulations restore the explicit latest result ID independently of UUID array order', async () => {
     const input = await createTransientInput(f.document.project, f.sheetId, { ...f.record.settings, durationSeconds: .00002 }), result = await transientEngine.run(input, { signal: new AbortController().signal, readAsset: () => Promise.reject(Error('none')), onProgress: () => {} })

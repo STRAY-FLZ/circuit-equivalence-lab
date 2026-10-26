@@ -317,11 +317,15 @@ V2.5.0 application is publicly verified: six original-source historical entries,
 attributed requirements, plans, real engineering evidence, metric comparisons,
 notebooks and portable reports. See [actual acceptance/release state](v2/V2_5_0_RELEASE.md).
 This is partial training, not autonomous contest completion, official grading,
-hardware acquisition or full nonlinear/MCU/RF simulation. Stop before V3.
+hardware acquisition or full nonlinear/MCU/RF simulation. V2.5 is complete; V3.0 authorization/status follows below.
 
 ### V3.x — Advanced Circuits and Analog Electronics
 
-Expand dynamic circuits, nonlinear devices, amplification, power supplies, and advanced circuit theory.
+V3.0.0 linear transient laboratory is implemented and locally verified; production
+acceptance is in progress. See [actual release state](v3/V3_0_0_RELEASE.md). It covers
+explicit RLC/independent-source dynamics, initial/event conditions, first/second-order
+teaching and portable simulated data. Later analog/nonlinear/amplification/power
+modules remain planned. Stop before V3.1; no automatic next phase.
 
 ### V4.x — Digital Electronics, Embedded Systems and Control
 

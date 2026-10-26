@@ -219,3 +219,11 @@ results and original-unit residual/KCL/power evidence. Session-only UI results
 require exact revision/reference; project schema stays 1. See
 [actual APIs and numerical contract](DC_ANALYSIS_IMPLEMENTATION.md), including
 reference precedence, legacy source adaptation, limits and diagnostic semantics.
+
+## Implemented V3.0 transient provider — 2026-10-26
+
+The earlier proposed DTO remains historical design. The independent typed
+`org.stray.engine.transient-mna/1` now owns `transient.linear`, actual dynamic MNA,
+explicit source/IC/event options and immutable numerical/provenance outputs.
+See [implemented equations, limits and waveform commits](../v3/TRANSIENT_IMPLEMENTATION.md).
+No D05 policy or DC/AC/V1 interpretation changes.

@@ -1,6 +1,6 @@
 # Linear transient laboratory — V3.0.0
 
-Status 2026-10-26: implementation and scoped acceptance in progress, not Released.
+Status 2026-10-26: T01–T09 locally Verified, release In Progress, not Released.
 Baseline V2.5.0 `99e2ba7512341af3ffe0ba4697a4bdcd3a670cca`. No V3.1/V4 work.
 
 ## Provider and supported models
@@ -121,7 +121,9 @@ explicit latest-result UUID (array ordering after file canonicalization is not t
 ordering). Immutable result manifests reference full float64-le waveform datasets
 in four-channel groups, preserving every output series and raw prior datasets.
 Each group carries simulated engine/revision/digest/configuration and uniform axis;
-manifest records actual method, event and numerical/energy diagnostics.
+manifest records actual method, event and numerical/energy diagnostics, plus the
+resolved original R/C/L values, node/branch/pin orientations and reference snapshot.
+Later circuit edits cannot silently change those recorded simulation parameters.
 
 Selected scope views reuse original assets with fresh derived-channel identities
 and full ancestry. Signal Lab opens those waveforms for inspection without automatic
@@ -149,5 +151,9 @@ Scoped numerical/data tests cover analytical RC/RL, all RLC damping cases, initi
 continuity, off-grid/aligned pulses, polarity, current-source RC, time refinement,
 small/large time constants, KCL/energy, bad input/constraints, cancellation/work caps,
 source/asset identity, exact export/reopen, latest-result order and competition links.
-Real built/public browser acceptance and final standard checks are still pending.
+Final standard checks passed: 685 tests/43 files, typecheck/lint/build. Built Chrome
+11 grouped journeys and a targeted final report handoff passed; 15 native projects/
+9615 samples independently matched analytical fixtures, with KCL/energy/asset/CSV/
+report checks. Actual public acceptance/tag/Release remain pending; see
+[release evidence](V3_0_0_RELEASE.md).
 No universal symbolic, nonlinear, switch, coupled-inductor, SPICE, hardware or PCB claim.

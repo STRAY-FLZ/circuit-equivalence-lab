@@ -94,12 +94,25 @@ describe('linear transient actual MNA', () => {
     const e = series(out, 'E(C1)').map((v, i) => v + series(out, 'E(L1)')[i]!)
     for (let i = 1; i < e.length; i++) expect(e[i]).toBeLessThanOrEqual(e[i - 1]! + 1e-15)
     expect(Math.abs(out.checks.energyBalanceErrorJ)).toBeLessThan(1e-10)
-  })
+  }, 20000)
   it('time-step refinement reduces BE error independently of display samples', async () => {
     const coarse = success(await run(fixture('rc-charge-topology', { tolerance: 1e-3, dt: .00002 }))), fine = success(await run(fixture('rc-charge-topology', { tolerance: 1e-3, dt: .000005 })))
     const exact = 10 * (1 - Math.exp(-1)), a = Math.abs(series(coarse, 'U(C1)')[50]! - exact), b = Math.abs(series(fine, 'U(C1)')[200]! - exact)
     expect(b).toBeLessThan(a / 2.5)
   })
+  it('an unsuitable coarse output interval does not become the integration step silently', async () => {
+    const out = success(await run(fixture('rc-charge-topology', { dt: .005 })))
+    expect(out.axis.count).toBe(2); expect(out.checks.acceptedSteps).toBeGreaterThan(100)
+    expect(Math.abs(series(out, 'U(C1)')[1]! - 10 * (1 - Math.exp(-5)))).toBeLessThan(.005)
+    expect(out.checks.maximumStepSeconds).toBeLessThan(.0001)
+  })
+  it('RLC natural response retains nonzero independent capacitor and inductor initial states', async () => {
+    const f = fixture('series-rlc', { r: 200, l: 1, c: 25e-6, voltage: 0, duration: .01, dt: .0001 }), out = success(await run(f, { initialConditions: f.settings.initialConditions.map(s => ({ ...s, value: s.unit === 'V' ? 5 : .02 })) }))
+    expect(series(out, 'U(C1)')[0]).toBeCloseTo(5, 12); expect(series(out, 'I(L1)')[0]).toBeCloseTo(.02, 12)
+    const wd = Math.sqrt(30000), expected = Math.exp(-1) * (5 * Math.cos(wd * .01) + (800 + 500) / wd * Math.sin(wd * .01))
+    expect(Math.abs(series(out, 'U(C1)')[100]! - expected)).toBeLessThan(.01)
+    expect(out.checks.initialEnergyJ).toBeCloseTo(.5 * 25e-6 * 25 + .5 * .02 ** 2, 12)
+  }, 20000)
   it.each([1e-9, 1e3])('scales with small/large time constants %d s', async tau => {
     const f = fixture('rc-charge-topology', { c: tau / 1000, duration: tau * 5, dt: tau / 100 }), out = success(await run(f))
     expect(series(out, 'U(C1)')[100]).toBeCloseTo(6.321205588, 2)

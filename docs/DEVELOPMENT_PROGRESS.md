@@ -1,7 +1,7 @@
 # Development Progress
 
 Updated **2026-10-26**. Active authorized module **V3.0.0 — Linear circuit transient and dynamic response**.
-**In Progress / T01–T10: 4/10**. Owner authorizes implementation and release after
+**In Progress / T01–T10: 9/10**. Owner authorizes implementation and release after
 mathematical/data/built/public acceptance; stop before V3.1/V4.
 
 Verified baseline local/origin/main/tag v2.5.0 and latest Release:
@@ -14,7 +14,7 @@ piecewise-constant independent sources, adaptive backward-Euler step doubling,
 event alignment and uniform output samples. Strict initial/event constraint
 checks; no leakage/auto-ground or invented impulse solution. Reuse validated
 linear algebra, connectivity, chart/file infrastructure; do not rewrite DC/AC/V1.
-T01–T04 Verified. Scoped numerical/data/actual React integration acceptance: **36 new tests passed**
+T01–T04 Verified. Scoped numerical/data/actual React integration acceptance: **38 new tests passed**
 (across valid focused runs; historical suites not repeated). Includes RC/RL values,
 three series/parallel damping classes, convergence, source events/current excitation,
 energy/KCL, cancellation/work caps, byte/UUID round trips, explicit latest-result ID,
@@ -22,8 +22,23 @@ raw data preservation and competition ancestry. Real editor UI accepted RC/RL sa
 inspection, save, stale/undo, draft guard and Signal inspection without automatic FFT.
 Typecheck and changed-source lint passed at numerical checkpoint; new UI tests also pass.
 See [methods and limits](v3/TRANSIENT_IMPLEMENTATION.md).
-Next: actual built Chrome full workflow, layouts and integration, then final
-standard checks/version/docs and authorized production delivery.
+Built Chrome 155 completed 11 grouped workflows on candidate 3.0.0, including all
+RC/RL responses, pulse, series/parallel RLC damping, four V/A/J traces, keyboard
+zoom/pan, 1440/390 light/dark, native files, Signal/competition and real DC/AC/V1.
+No app console/resource errors; screenshots inspected. Numerical/data validator
+accepted analytic waveforms, KCL/energy and raw assets, then identified a same-turn
+source-revision notification race causing a redundant report export revision.
+Corrected synchronous pending tracking; preserved the existing newer-edit guard
+and passed its expanded UI regression. Targeted final-build report/asset replay passed: same-turn notification consumed,
+newer concurrent edits still protected, HTML import restored actual 1ms samples.
+Independent 15-project/9615-sample validator passed, with 29646 KCL/34452 scalar
+checks; exact JSON/CSV/report round trips and independent raw bytes preserved.
+Final typecheck/lint/build and full **685 tests / 43 files** passed. Updated the old
+Atlas capability-copy assertion for the new supported transient boundary; no
+application changes after the accepted final build. Assets `index-J1OsolEm.js\` / \`index-CjMhsG_I.css\`.
+T01–T09 Verified, 9/10; T10 release In Progress.
+Next: authorized candidate integration/push, Actions/Pages and full public workflow,
+then final evidence/tag/Release/handoff. Application/writer candidate 3.0.0, schema1; core checkpoint 58e96d7.
 No dependency changes, no blocker, no remote V3 update.
 
 | ID | Deliverable | Status |
@@ -32,12 +47,12 @@ No dependency changes, no blocker, no remote V3 update.
 | T02 | Dynamic MNA, adaptive backward Euler and diagnostics | Verified |
 | T03 | Storage initial conditions, continuity and energy | Verified |
 | T04 | Explicit DC, step and bounded pulse events | Verified |
-| T05 | RC/RL first-order experiments and references | In Progress |
-| T06 | Series/parallel RLC and damping references | In Progress |
-| T07 | Waveform workbench and teaching | In Progress |
-| T08 | Atlas, Signal, competition and portable persistence | In Progress |
-| T09 | Numerical, integration and real browser acceptance | In Progress |
-| T10 | Documentation, version and verified production release | Planned |
+| T05 | RC/RL first-order experiments and references | Verified |
+| T06 | Series/parallel RLC and damping references | Verified |
+| T07 | Waveform workbench and teaching | Verified |
+| T08 | Atlas, Signal, competition and portable persistence | Verified |
+| T09 | Numerical, integration and real browser acceptance | Verified |
+| T10 | Documentation, version and verified production release | In Progress |
 
 Prior V2.5.0 **Released / E01–E10 10/10**, canonical Release confirms exact final
 identity. Dated historical checkpoints below are preserved.

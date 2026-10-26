@@ -34,6 +34,7 @@ export interface TransientSample {
   readonly maxKclAmps: number; readonly backwardError: number
 }
 export interface TransientResult {
+  readonly circuit: TransientCircuit
   readonly axis: { readonly kind: 'uniform-time'; readonly startSeconds: 0; readonly intervalSeconds: number; readonly count: number }
   readonly referenceAnchorId: string; readonly series: readonly TransientSeries[]
   readonly settings: TransientSettings

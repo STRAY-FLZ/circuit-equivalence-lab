@@ -7,11 +7,12 @@ import type { ProjectDocumentV1 } from '../project-format'
 import { float64Bytes, readSeries } from '../signal'
 import { parseTransientSettings, settingsJson } from './configuration'
 import { TRANSIENT_ENGINE, TRANSIENT_EXTENSION, TransientError } from './types'
-import type { TransientResult, TransientSeries, TransientSettings } from './types'
+import type { TransientCircuit, TransientResult, TransientSeries, TransientSettings } from './types'
 
 export interface StoredTransient {
   readonly kind: 'org.stray.transient.record'; readonly version: 1; readonly resultId: string; readonly sheetId: string
   readonly provenance: ResultProvenance; readonly basisDigest: string; readonly createdAtUtc: string
+  readonly circuit: TransientCircuit
   readonly settings: TransientSettings; readonly axis: TransientResult['axis']; readonly checks: TransientResult['checks']; readonly diagnostics: TransientResult['diagnostics']
   readonly datasetIds: readonly string[]
   readonly series: readonly (Omit<TransientSeries, 'values'> & { readonly datasetId: string; readonly channelId: string })[]
@@ -35,9 +36,9 @@ export async function appendTransient(document: ProjectDocumentV1, capture: Anal
       channels.push({ id: channelId, name: series.name, samples: { assetId: asset.entry.id, encoding: 'float64-le', count: value.axis.count, unit: series.unit }, ...(series.quantity === 'node-voltage' ? { probeAnchorId: series.entityId } : {}) })
       mapped.push({ entityId: series.entityId, name: series.name, quantity: series.quantity, unit: series.unit, datasetId, channelId })
     }
-    datasets.push({ id: datasetId, title: `暂态模拟 · ${start / 4 + 1}`, kind: 'waveform', axis: value.axis, channels, source: { kind: 'simulated', engine: TRANSIENT_ENGINE, projectRevision: result.provenance.inputRevision, analysisId: configuration.id, inputDigest: result.provenance.inputDigest }, metadata: { version: 1, sourceProjectId: project.id, sheetId, basisDigest, method: settings.method, relativeTolerance: settings.relativeTolerance, absoluteVoltageTolerance: 1e-8, absoluteCurrentTolerance: 1e-10, initialConvention: 'specified state at 0-; finite consistent algebraic solve at 0+', eventConvention: 'integrate left forcing to event, preserve states, solve right algebraic values', settings: settingsJson(settings), numerical: JSON.parse(JSON.stringify(value.checks)) as JsonObject } })
+    datasets.push({ id: datasetId, title: `暂态模拟 · ${start / 4 + 1}`, kind: 'waveform', axis: value.axis, channels, source: { kind: 'simulated', engine: TRANSIENT_ENGINE, projectRevision: result.provenance.inputRevision, analysisId: configuration.id, inputDigest: result.provenance.inputDigest }, metadata: { version: 1, sourceProjectId: project.id, sheetId, basisDigest, circuit: JSON.parse(JSON.stringify(value.circuit)) as JsonObject, method: settings.method, relativeTolerance: settings.relativeTolerance, absoluteVoltageTolerance: 1e-8, absoluteCurrentTolerance: 1e-10, initialConvention: 'specified state at 0-; finite consistent algebraic solve at 0+', eventConvention: 'integrate left forcing to event, preserve states, solve right algebraic values', settings: settingsJson(settings), numerical: JSON.parse(JSON.stringify(value.checks)) as JsonObject } })
   }
-  const record: StoredTransient = { kind: 'org.stray.transient.record', version: 1, resultId, sheetId, provenance: result.provenance, basisDigest, createdAtUtc: new Date().toISOString(), settings, axis: value.axis, checks: value.checks, diagnostics: value.diagnostics, datasetIds: datasets.map(d => d.id), series: mapped }
+  const record: StoredTransient = { kind: 'org.stray.transient.record', version: 1, resultId, sheetId, provenance: result.provenance, basisDigest, createdAtUtc: new Date().toISOString(), circuit: value.circuit, settings, axis: value.axis, checks: value.checks, diagnostics: value.diagnostics, datasetIds: datasets.map(d => d.id), series: mapped }
   const artifact = await createInlineAsset(new TextEncoder().encode(JSON.stringify(record)), 'application/json'); staged.push(artifact)
   const old = project.extensions[TRANSIENT_EXTENSION], container = isObject(old) ? old : {}
   const previousLast = container.lastResultIds, lastResultIds = isObject(previousLast) ? previousLast : {}
@@ -56,6 +57,7 @@ export function readTransientRecord(document: ProjectDocumentV1, sheetId: string
     const r = JSON.parse(new TextDecoder().decode(decodeInlineAsset(asset))) as StoredTransient
     if (r.kind !== 'org.stray.transient.record' || r.version !== 1 || r.resultId !== result.id || r.sheetId !== sheetId) continue
     parseTransientSettings(r.settings)
+    if (r.provenance.projectId !== document.project.id || !/^[a-f0-9]{64}$/.test(r.basisDigest) || !r.circuit || !isArray(r.circuit.elements) || !isArray(r.circuit.nodes) || !r.circuit.elements.every(e => Number.isFinite(e.value) && ['resistor', 'capacitor', 'inductor', 'voltage-source', 'current-source'].includes(e.kind)) || r.axis.startSeconds !== 0) throw new TransientError('TRAN_RECORD', '原始暂态电路参数/来源快照缺失。')
     if (r.provenance.inputDigest !== result.inputDigest || r.provenance.inputRevision !== result.inputRevision || r.provenance.analysisId !== result.analysisId || !isArray(r.series) || r.series.length === 0 || r.axis.kind !== 'uniform-time' || r.axis.count !== Math.round(r.settings.durationSeconds / r.settings.intervalSeconds) + 1 || r.axis.intervalSeconds !== r.settings.intervalSeconds) throw new TransientError('TRAN_RECORD', '暂态记录身份/时间轴不完整。')
     for (const s of r.series) { const d = document.project.measurements.find(d => d.id === s.datasetId), ch = d?.channels.find(c => c.id === s.channelId); if (!d || !ch || d.source.kind !== 'simulated' || d.source.inputDigest !== result.inputDigest || ch.samples.count !== r.axis.count || ch.samples.unit !== s.unit) throw new TransientError('TRAN_RECORD', '暂态记录引用的模拟数据/单位缺失。') }
     return r

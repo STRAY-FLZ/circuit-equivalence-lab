@@ -2,6 +2,14 @@
 
 STRAY Electronics Lab / 电路实验室 is an interactive circuit learning and engineering tool. V2.0.0 adds engineering projects, an editable SVG schematic, explicit wiring, undo/redo, portable JSON files, and verified resistor-network transformations with five-stage lessons based on the current circuit.
 
+V3.0.0 adds a linear transient laboratory: real adaptive backward-Euler RLC MNA,
+explicit initial storage and DC/step/pulse sources, RC/RL and series/parallel RLC
+experiments, synchronized time-domain/energy plots and independent references.
+Ten existing Atlas entries open transient teaching; complete simulated datasets
+share the Signal/competition/file workflow. No hardware or general SPICE claim.
+See [equations, accuracy and limits](docs/v3/TRANSIENT_IMPLEMENTATION.md) and
+[actual verification/release state](docs/v3/V3_0_0_RELEASE.md).
+
 V2.5.0 adds a source-backed competition training workspace: six individually
 verified historical problems, attributed requirements, design alternatives, real
 DC/AC/signal evidence, quantitative metric comparisons, notebooks and portable
@@ -42,7 +50,7 @@ See [patch verification and release status](docs/v2/V2_0_1_WIRE_INTERACTION.md).
 V2.0.2 makes each palette activation place one component; holding and dragging
 an existing component moves its original instance. See [movement patch evidence](docs/v2/V2_0_2_COMPONENT_MOVEMENT.md).
 
-The completed V1 M0–M8 foundation remains available at [Circuit Equivalence Lab](https://stray-flz.github.io/circuit-equivalence-lab/), linked from the [Stray tools page](https://stray-flz.github.io/stray-articles/tools/). See the [changelog](CHANGELOG.md), [V2.0.0 release record](docs/v2/V2_0_0_RELEASE.md), and [deployment and maintenance](docs/DEPLOYMENT.md). Transformations support eligible resistor-only sheets; DC supports the documented linear source models; AC supports the documented ideal linear RLC/source models; arbitrary transient and nonlinear simulation remain unsupported. Application version 2.5.0 and project-file schema version 1 are independent.
+The completed V1 M0–M8 foundation remains available at [Circuit Equivalence Lab](https://stray-flz.github.io/circuit-equivalence-lab/), linked from the [Stray tools page](https://stray-flz.github.io/stray-articles/tools/). See the [changelog](CHANGELOG.md), [V2.0.0 release record](docs/v2/V2_0_0_RELEASE.md), and [deployment and maintenance](docs/DEPLOYMENT.md). Transformations support eligible resistor-only sheets; DC supports the documented linear source models; AC supports the documented ideal linear RLC/source models; the transient provider supports the documented finite linear RLC/independent-source scope; nonlinear and arbitrary-switching simulation remain unsupported. Application version 3.0.0 and project-file schema version 1 are independent.
 
 ## 本地运行
 
@@ -81,6 +89,8 @@ src/
   editor/         Editable SVG view and project persistence controls
   integration/    Verified transformations and transactional writeback
   analysis/       Typed asynchronous analysis provider contracts
+  transient/      Dynamic MNA, adaptive BE, references and portable simulation data
+  transient-ui/   Initial/excitation controls and actual synchronized time-domain plots
   signal/         Sample generation, statistics, FFT, CSV and verified data assets
   signal-ui/      Responsive oscilloscope and integrated signal workbench
   atlas/          Typed circuit taxonomy, immutable recipes and project instances

@@ -170,3 +170,12 @@ units, hash, source kind, RMS definition, and preservation of raw data. Reject
 timestamp reversal, mismatched channel lengths, nonfinite values, wrong byte count,
 and unspecified units. Check irregular-time FFT rejection, synthetic/imported/live
 source labels, derived-source cycles, and stale simulation/probe references.
+
+## V3.0 simulated transient data — 2026-10-26
+
+Uniform output uses full float64-le assets and stable dataset/channel IDs, in
+Signal-compatible four-channel groups. The record retains the original resolved
+circuit/parameters/pin directions, IC/source settings, revision/digest and actual
+BE step/error/energy metadata. Selection preserves original assets through an
+explicit derived lineage; Signal inspection does not silently run an unsuitable
+FFT. Schema1 and file budgets remain. See [V3.0 implementation](../v3/TRANSIENT_IMPLEMENTATION.md).

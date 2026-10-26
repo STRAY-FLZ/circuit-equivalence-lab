@@ -847,3 +847,23 @@ Dated pre-tag checkpoint: E01–E09 Verified, 9/10. Final documentation deployme
 and targeted external-editor/report check precede tag/Release. Exact final identity
 and Released E01–E10 10/10 handoff are recorded in the canonical Release linked
 from [release evidence](v2/V2_5_0_RELEASE.md). Stop before V3; no blocker.
+
+## 2026-10-26 — V3.0 transient verified candidate
+
+Owner authorized linear RLC transient development and production release, stop
+before V3.1/V4. Baseline 99e2ba7/v2.5.0; branch codex/v3.0-transient-lab, core
+checkpoint 58e96d7. Independent adaptive BE/MNA, exact storage/event constraints,
+actual KCL/energy/dissipation and typed provenance; existing numerical engines
+unchanged. Ten Atlas actions reuse existing recipes; scope/Signal/competition
+share real full samples and original parameters/pin directions.
+
+Final 685 tests/43 files, typecheck/lint/build passed. Built Chrome 11 grouped
+journeys plus final handoff accepted; independently checked 15 actual native
+projects/9615 sample instants, 29646 KCL/34452 scalar checks, exact portable JSON/
+CSV/report and independent raw-byte preservation. Resolved canonical settings
+equality/latest-result identity, synchronized cursor/pan, editor history asset
+filtering and a same-turn source notification race; preserved the newer-edit guard.
+No app console/resource errors; screenshots inspected at1440/390 in both themes.
+T01–T09 Verified 9/10. No remote V3 update at this checkpoint; production acceptance
+and T10 final identity remain. See [methods](v3/TRANSIENT_IMPLEMENTATION.md) and
+[release/rollback](v3/V3_0_0_RELEASE.md).

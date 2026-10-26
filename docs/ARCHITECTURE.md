@@ -1,5 +1,16 @@
 # Architecture
 
+## V3.0 linear transient extension
+
+`src/transient` owns the independent provider, true dynamic MNA, step-doubling BE,
+initial/event consistency, energy accounting and immutable waveform manifests.
+Only the unchanged DC linear algebra is reused, not DC/AC component interpretation.
+`src/transient-ui` composes this inside the editor with existing scope charts.
+Portable assets, original model/parameter/direction snapshots and stable record IDs
+share schema1. App explicitly hands selected simulated data to Signal/competition;
+no automatic FFT or cross-engine source reinterpretation. See
+[mathematics, layers, limits and compatibility](v3/TRANSIENT_IMPLEMENTATION.md).
+
 ## V2.5 competition/evidence extension
 
 `src/competition` owns a validated versioned namespace inside schema-1 projects,
