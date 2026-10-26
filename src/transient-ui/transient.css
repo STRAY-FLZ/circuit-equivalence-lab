@@ -1,0 +1,19 @@
+.transient-panel { border-top: 1px solid var(--line); padding-block: var(--space-6); min-width: 0; }
+.transient-panel header { max-width: 75ch; }
+.transient-panel h2 { font-size: 1.8rem; }
+.transient-panel p, .transient-panel output { line-height: 1.8; overflow-wrap: anywhere; }
+.transient-panel fieldset, .transient-teaching, .transient-results { border: 0; border-top: 1px solid var(--line); margin-block: var(--space-5); padding: var(--space-4) 0; min-width: 0; }
+.transient-panel legend { padding-right: var(--space-3); font-weight: 650; }
+.transient-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: var(--space-4); }
+.transient-panel label { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+.transient-panel input:not([type=checkbox]):not([type=range]), .transient-panel select { width: 100%; min-width: 0; min-height: 44px; background: var(--paper); color: var(--ink); border: 1px solid var(--line); padding: .55rem; border-radius: 3px; }
+.transient-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-block: var(--space-4); }
+.transient-actions button { min-height: 44px; }
+.transient-selections { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: var(--space-3); padding-block: var(--space-4); }
+.transient-selections label { flex-direction: row; align-items: center; }
+.transient-panel summary { cursor: pointer; padding-block: .6rem; }
+.transient-panel output { display: block; padding-block: var(--space-4); }
+.transient-provenance { overflow-wrap: anywhere; color: var(--muted); }
+.transient-panel [role=alert] { color: var(--danger); }
+.transient-panel .signal-channel-controls label { flex-direction: row; }
+@media (max-width: 700px) { .transient-actions button { flex: 1 1 150px; } }

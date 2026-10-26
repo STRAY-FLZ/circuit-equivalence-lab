@@ -13,7 +13,7 @@ export const now = () => new Date().toISOString()
 export function circuitDigest(project: EngineeringProject): Promise<string> {
   // Match schema-1's unordered entity collections; pin/drawing order stays meaningful.
   const byId = <T extends { readonly id: string }>(values: readonly T[]): T[] => [...values].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
-  return analysisDigest({ definitions: byId(project.definitions), symbols: byId(project.symbols), sheets: byId(project.sheets).map(s => ({ ...s, components: byId(s.components), anchors: byId(s.anchors), connections: byId(s.connections), labels: byId(s.labels), references: byId(s.references), ports: byId(s.ports) })), acSettings: project.extensions['org.stray.ac'] ?? null })
+  return analysisDigest({ definitions: byId(project.definitions), symbols: byId(project.symbols), sheets: byId(project.sheets).map(s => ({ ...s, components: byId(s.components), anchors: byId(s.anchors), connections: byId(s.connections), labels: byId(s.labels), references: byId(s.references), ports: byId(s.ports) })), acSettings: project.extensions['org.stray.ac'] ?? null, ...(project.extensions['org.stray.transient'] !== undefined ? { transientSettings: project.extensions['org.stray.transient'] } : {}) })
 }
 export function workspaceExtension(state: WorkspaceState): JsonObject { return JSON.parse(JSON.stringify(state)) as JsonObject }
 export async function editWorkspace(document: ProjectDocumentV1, change: (state: WorkspaceState) => WorkspaceState): Promise<ProjectDocumentV1> {

@@ -2,6 +2,7 @@ import { useId, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { EngineeringProject } from '../engineering'
 import { circuitCategories, circuitTemplates, instantiateTemplate, matchesTemplate, textbookReference } from '../atlas'
+import { configureTransientExperiment, transientTemplateIds } from '../transient'
 import { SchematicPreview } from '../editor'
 import './atlas.css'
 
@@ -13,7 +14,7 @@ function Disclosure({ title, open, onToggle, children, marker, className = '' }:
   </div>
 }
 
-export function CircuitAtlas({ onOpen }: { readonly onOpen: (project: EngineeringProject, mode?: 'dc' | 'ac') => boolean }) {
+export function CircuitAtlas({ onOpen }: { readonly onOpen: (project: EngineeringProject, mode?: 'dc' | 'ac' | 'transient') => boolean }) {
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set(['resistive', 'resistive.series-parallel']))
   const [selectedId, setSelectedId] = useState('resistor-series'), [query, setQuery] = useState(''), [libraryOpen, setLibraryOpen] = useState(false), [message, setMessage] = useState('')
   const detailHeading = useRef<HTMLHeadingElement>(null)
@@ -41,12 +42,12 @@ export function CircuitAtlas({ onOpen }: { readonly onOpen: (project: Engineerin
         </div>
       </aside>
       <article className="atlas-detail" aria-label="所选电路详情">
-        <div className="atlas-detail-heading"><div><p className="eyebrow">{circuitCategories.find(c => c.id === selected.categoryId)!.name} / {selected.difficulty}</p><h2 ref={detailHeading} tabIndex={-1}>{selected.name}</h2></div><button className="primary-button" onClick={() => { const opened = onOpen(instantiateTemplate(selected.id)); setMessage(opened ? '已在编辑器中打开独立工程。' : '已保留原工程；可先返回编辑器导出，再打开模板。') }}>在编辑器中打开</button>{selected.capabilities.dc && <button onClick={() => { const opened = onOpen(instantiateTemplate(selected.id), 'dc'); setMessage(opened ? '已打开直流分析，请确认参考节点并运行。' : '已保留原工程。') }}>使用直流分析</button>}{selected.capabilities.ac && <button onClick={() => { const opened = onOpen(instantiateTemplate(selected.id), 'ac'); setMessage(opened ? '已打开交流实验，激励与输入输出端口已明确，可运行并修改参数。' : '已保留原工程。') }}>交流分析与滤波</button>}</div>
+        <div className="atlas-detail-heading"><div><p className="eyebrow">{circuitCategories.find(c => c.id === selected.categoryId)!.name} / {selected.difficulty}</p><h2 ref={detailHeading} tabIndex={-1}>{selected.name}</h2></div><button className="primary-button" onClick={() => { const opened = onOpen(instantiateTemplate(selected.id)); setMessage(opened ? '已在编辑器中打开独立工程。' : '已保留原工程；可先返回编辑器导出，再打开模板。') }}>在编辑器中打开</button>{selected.capabilities.dc && <button onClick={() => { const opened = onOpen(instantiateTemplate(selected.id), 'dc'); setMessage(opened ? '已打开直流分析，请确认参考节点并运行。' : '已保留原工程。') }}>使用直流分析</button>}{selected.capabilities.ac && <button onClick={() => { const opened = onOpen(instantiateTemplate(selected.id), 'ac'); setMessage(opened ? '已打开交流实验，激励与输入输出端口已明确，可运行并修改参数。' : '已保留原工程。') }}>交流分析与滤波</button>}{transientTemplateIds.some(id => id === selected.id) && <button onClick={() => { const base = instantiateTemplate(selected.id), source = base.sheets[0]!.components.some(c => base.definitions.find(d => d.id === c.definitionId)!.kind === 'voltage-source'); const next = configureTransientExperiment(base, base.sheets[0]!.id, source ? 'zero-state' : 'zero-input'); const opened = onOpen(next, 'transient'); setMessage(opened ? '已打开暂态教学实验；明确配置激励、初值并运行真实积分。' : '已保留原工程。') }}>暂态教学实验</button>}</div>
         <p>{selected.description}</p><p className="atlas-note">预览不会替换当前工程。打开时会创建独立副本；已有未导出的修改会先询问。</p>
         <div className="atlas-preview-scroll" tabIndex={0} role="region" aria-label="原理图预览滚动区"><SchematicPreview project={preview} /></div>
         <p className="atlas-note">窄屏可横向滚动查看完整标注；修改元件请在编辑器中打开。</p>
         <div className="atlas-metadata">
-          <section aria-label="模板能力"><h3>当前可用能力</h3><dl className="atlas-capabilities"><div><dt>原理图</dt><dd>可查看</dd></div><div><dt>工程模板</dt><dd>可编辑 · 可导出重开</dd></div><div><dt>数值分析</dt><dd>{selected.capabilities.numerical ? '电阻等效变换与端口数值核对（依候选条件）' : '暂未提供'}</dd></div><div><dt>直流分析</dt><dd>{selected.capabilities.dc ? 'MNA 工作点（请明确参考节点）' : '当前器件模型不支持'}</dd></div><div><dt>交流分析</dt><dd>{selected.capabilities.ac ? 'RMS 相量 · 实际 Bode · 可编辑实验' : '需在编辑器中配置并检查模型'}</dd></div><div><dt>教学实验</dt><dd>{selected.capabilities.experiment ? '已有电阻变换五阶段课程（依候选条件）' : '暂未提供'}</dd></div></dl><p className="atlas-note">{selected.note}</p></section>
+          <section aria-label="模板能力"><h3>当前可用能力</h3><dl className="atlas-capabilities"><div><dt>原理图</dt><dd>可查看</dd></div><div><dt>工程模板</dt><dd>可编辑 · 可导出重开</dd></div><div><dt>数值分析</dt><dd>{selected.capabilities.numerical ? '电阻等效变换与端口数值核对（依候选条件）' : '暂未提供'}</dd></div><div><dt>直流分析</dt><dd>{selected.capabilities.dc ? 'MNA 工作点（请明确参考节点）' : '当前器件模型不支持'}</dd></div><div><dt>交流分析</dt><dd>{selected.capabilities.ac ? 'RMS 相量 · 实际 Bode · 可编辑实验' : '需在编辑器中配置并检查模型'}</dd></div><div><dt>暂态分析</dt><dd>{transientTemplateIds.some(id => id === selected.id) ? '实际线性 RLC 积分 · 初值/阶跃/脉冲' : '可在编辑器中配置并检查支持范围'}</dd></div><div><dt>教学实验</dt><dd>{selected.capabilities.experiment ? '已有电阻变换五阶段课程（依候选条件）' : '暂未提供'}</dd></div></dl><p className="atlas-note">{selected.note}</p></section>
           <section aria-label="电路学习主题"><h3>结构与学习主题</h3><p>元件：{selected.components.join('、')}</p><div className="atlas-tags">{selected.methods.map(method => <span key={method}>{method}</span>)}</div><p className="atlas-note">方法标签只作学习索引，不是计算按钮。</p><p>教材关联：{selected.chapters.map(n => `第${n}章`).join('、')}</p><a href={textbookReference.url} target="_blank" rel="noreferrer">{textbookReference.title} · 出版社目录</a><p className="atlas-note">原创示例拓扑，按目录主题关联；未复制教材习题或宣称全书实验覆盖。</p></section>
         </div><p role="status" aria-label="图谱操作状态">{message}</p>
       </article>

@@ -1,5 +1,49 @@
 # Current Development Status
 
+Updated **2026-10-26**. Active authorized module **V3.0.0 — Linear circuit transient and dynamic response**.
+**In Progress / T01–T10: 4/10**. Owner authorizes implementation and release after
+mathematical/data/built/public acceptance; stop before V3.1/V4.
+
+Verified baseline local/origin/main/tag v2.5.0 and latest Release:
+`99e2ba7512341af3ffe0ba4697a4bdcd3a670cca`; workflow `40177702787` success,
+clean working tree. Branch `codex/v3.0-transient-lab`; no pre-existing V3 changes.
+No baseline historical suite rerun.
+
+Implement an independent provider: actual linear RLC MNA, explicit ICs and
+piecewise-constant independent sources, adaptive backward-Euler step doubling,
+event alignment and uniform output samples. Strict initial/event constraint
+checks; no leakage/auto-ground or invented impulse solution. Reuse validated
+linear algebra, connectivity, chart/file infrastructure; do not rewrite DC/AC/V1.
+T01–T04 Verified. Scoped numerical/data/actual React integration acceptance: **36 new tests passed**
+(across valid focused runs; historical suites not repeated). Includes RC/RL values,
+three series/parallel damping classes, convergence, source events/current excitation,
+energy/KCL, cancellation/work caps, byte/UUID round trips, explicit latest-result ID,
+raw data preservation and competition ancestry. Real editor UI accepted RC/RL sample
+inspection, save, stale/undo, draft guard and Signal inspection without automatic FFT.
+Typecheck and changed-source lint passed at numerical checkpoint; new UI tests also pass.
+See [methods and limits](v3/TRANSIENT_IMPLEMENTATION.md).
+Next: actual built Chrome full workflow, layouts and integration, then final
+standard checks/version/docs and authorized production delivery.
+No dependency changes, no blocker, no remote V3 update.
+
+| ID | Deliverable | Status |
+| --- | --- | --- |
+| T01 | Transient provider and immutable contracts | Verified |
+| T02 | Dynamic MNA, adaptive backward Euler and diagnostics | Verified |
+| T03 | Storage initial conditions, continuity and energy | Verified |
+| T04 | Explicit DC, step and bounded pulse events | Verified |
+| T05 | RC/RL first-order experiments and references | In Progress |
+| T06 | Series/parallel RLC and damping references | In Progress |
+| T07 | Waveform workbench and teaching | In Progress |
+| T08 | Atlas, Signal, competition and portable persistence | In Progress |
+| T09 | Numerical, integration and real browser acceptance | In Progress |
+| T10 | Documentation, version and verified production release | Planned |
+
+Prior V2.5.0 **Released / E01–E10 10/10**, canonical Release confirms exact final
+identity. Dated historical checkpoints below are preserved.
+
+---
+
 Updated **2026-10-25**. Active authorized module **V2.5.0 — Competition project workspace**.
 **Implementation Complete → Verified → Application Released**. Dated pre-tag
 checkpoint **E01–E09 Verified, 9/10**; final E10 identity and **Released 10/10**

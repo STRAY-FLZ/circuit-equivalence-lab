@@ -56,7 +56,7 @@ export interface WorkspaceState {
   readonly evidence: readonly Evidence[]; readonly attempts: readonly Attempt[]
 }
 export type Judgment = { readonly kind: 'pass' | 'fail'; readonly actual: number; readonly absoluteError: number | null; readonly relativeError: number | null; readonly detail: string } | { readonly kind: 'indeterminate'; readonly detail: string }
-export type ToolKind = 'signal' | 'dc' | 'ac' | 'atlas'
+export type ToolKind = 'signal' | 'dc' | 'ac' | 'transient' | 'atlas'
 export interface AnalysisTransfer { readonly project: EngineeringProject; readonly configuration: AnalysisConfiguration; readonly result: AnalysisResult<DcSolution> | AnalysisResult<AcResult> }
 export type ToolTransfer = { readonly kind: 'analysis'; readonly document: ProjectDocumentV1; readonly analysis: AnalysisTransfer } | { readonly kind: 'signal'; readonly document: ProjectDocumentV1; readonly datasetId: string; readonly channelId: string } | { readonly kind: 'snapshot'; readonly document: ProjectDocumentV1 }
 export const WORKSPACE_EXTENSION = 'org.stray.competition.workspace'

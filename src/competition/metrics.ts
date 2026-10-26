@@ -4,7 +4,7 @@ export const units: Readonly<Record<string, readonly [string, number]>> = {
   V: ['voltage', 1], mV: ['voltage', .001], uV: ['voltage', 1e-6], A: ['current', 1], mA: ['current', .001], uA: ['current', 1e-6],
   Hz: ['frequency', 1], kHz: ['frequency', 1000], MHz: ['frequency', 1e6], s: ['time', 1], ms: ['time', .001], us: ['time', 1e-6],
   ohm: ['resistance', 1], kohm: ['resistance', 1000], F: ['capacitance', 1], uF: ['capacitance', 1e-6], nF: ['capacitance', 1e-9],
-  H: ['inductance', 1], mH: ['inductance', .001], W: ['power', 1], mW: ['power', .001], var: ['reactive-power', 1], VA: ['apparent-power', 1], '1': ['ratio', 1], '%': ['ratio', .01], dB: ['gain-log', 1], deg: ['angle', 1],
+  H: ['inductance', 1], mH: ['inductance', .001], J: ['energy', 1], mJ: ['energy', .001], uJ: ['energy', 1e-6], W: ['power', 1], mW: ['power', .001], var: ['reactive-power', 1], VA: ['apparent-power', 1], '1': ['ratio', 1], '%': ['ratio', .01], dB: ['gain-log', 1], deg: ['angle', 1],
 }
 export function convertQuantity(value: Quantity, unit: string): number {
   const from = units[value.unit], to = units[unit]
