@@ -35,11 +35,21 @@ Independent 15-project/9615-sample validator passed, with 29646 KCL/34452 scalar
 checks; exact JSON/CSV/report round trips and independent raw bytes preserved.
 Final typecheck/lint/build and full **685 tests / 43 files** passed. Updated the old
 Atlas capability-copy assertion for the new supported transient boundary; no
-application changes after the accepted final build. Assets `index-J1OsolEm.js\` / \`index-CjMhsG_I.css\`.
+application changes after the accepted final build. Assets `index-J1OsolEm.js` / `index-CjMhsG_I.css`.
 T01–T09 Verified, 9/10; T10 release In Progress.
 Next: authorized candidate integration/push, Actions/Pages and full public workflow,
 then final evidence/tag/Release/handoff. Application/writer candidate 3.0.0, schema1; core checkpoint 58e96d7.
-No dependency changes, no blocker, no remote V3 update.
+Public candidate 501f3e1cd686928c6a2d2e4fdd4fddcc5d8bf441 / workflow
+40329459842 completed build/deploy with all 685 tests. Actual public 3.0.0
+passed all 11 journeys and the native validator (15 projects/9615 samples, exact
+JSON/CSV/HTML/raw checks), with zero app errors. Screenshots inspected.
+Final screenshot review found narrow-axis clipping of tiny current labels; compact
+scientific ticks now pass actual bounds checks on all four V/A/J traces at390px.
+Nine scoped scope/Signal integration tests, scoped lint, typecheck/build passed;
+numerical samples are unchanged. Final JS index-COa4Wnpk.js, CSS index-CjMhsG_I.css.
+Next: publish this accepted presentation correction/evidence, verify public current
+assets/workflows, then final dated pre-tag record/tag/Release. No blocker.
+No personal-website or later-module work.
 
 | ID | Deliverable | Status |
 | --- | --- | --- |

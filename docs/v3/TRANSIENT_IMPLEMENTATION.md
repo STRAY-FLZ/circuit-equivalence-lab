@@ -154,6 +154,9 @@ source/asset identity, exact export/reopen, latest-result order and competition 
 Final standard checks passed: 685 tests/43 files, typecheck/lint/build. Built Chrome
 11 grouped journeys and a targeted final report handoff passed; 15 native projects/
 9615 samples independently matched analytical fixtures, with KCL/energy/asset/CSV/
-report checks. Actual public acceptance/tag/Release remain pending; see
+report checks. Public candidate 501f3e1 / workflow40329459842 passed all 11 workflows and the same
+actual-download checks. Final axis-label correction passed four narrow SVG text
+bounds and nine scoped UI tests; corrected public assets/tag/Release are being
+confirmed. See
 [release evidence](V3_0_0_RELEASE.md).
 No universal symbolic, nonlinear, switch, coupled-inductor, SPICE, hardware or PCB claim.

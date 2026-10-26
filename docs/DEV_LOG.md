@@ -867,3 +867,14 @@ No app console/resource errors; screenshots inspected at1440/390 in both themes.
 T01–T09 Verified 9/10. No remote V3 update at this checkpoint; production acceptance
 and T10 final identity remain. See [methods](v3/TRANSIENT_IMPLEMENTATION.md) and
 [release/rollback](v3/V3_0_0_RELEASE.md).
+
+## 2026-10-26 — V3.0 first public acceptance and final axis correction
+
+Main candidate 501f3e1cd686928c6a2d2e4fdd4fddcc5d8bf441 / workflow40329459842
+succeeded with 685 tests and deployment. Public11-journey replay and native15-project/
+9615-sample validator passed, exact JSON/CSV/report/raw preservation, no app errors.
+Image inspection found clipped tiny-current y ticks on narrow displays; compact
+scientific axis strings preserve signs without changing samples/cursors/statistics.
+Actual four V/A/J SVG bounds at390px, nine scope/Signal UI cases, scoped lint and
+typecheck/build passed. Final presentation correction will be published/rechecked
+before tagging; no numerical-engine change. See the dated V3 release record.

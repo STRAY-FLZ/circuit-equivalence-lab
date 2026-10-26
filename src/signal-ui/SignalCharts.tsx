@@ -14,7 +14,7 @@ function useChartWidth() {
   }, [])
   return { ref, width }
 }
-function axisNumber(value: number): string { return Number.isFinite(value) ? Number(value.toPrecision(4)).toString() : '不可用' }
+function axisNumber(value: number): string { if (!Number.isFinite(value)) return '不可用'; const text = Number(value.toPrecision(4)).toString(); return text.length > 8 ? value.toExponential(2) : text }
 function pointerFraction(event: PointerEvent<SVGSVGElement>): number {
   const svg = event.currentTarget, matrix = svg.getScreenCTM()
   if (!matrix) return 0

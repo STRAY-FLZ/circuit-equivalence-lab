@@ -56,6 +56,22 @@ Scripts: `tests/browser/transient-workspace.js`, `transient-handoff.js`,
 screenshots and temporary local reports remain ignored. No new dependencies;
 unchanged V1/D05/DC/AC numerical source paths verified against baseline.
 
+## Public candidate acceptance — 2026-10-26
+
+Candidate **501f3e1cd686928c6a2d2e4fdd4fddcc5d8bf441**,
+[workflow 40329459842](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40329459842),
+passed build/deploy including 685 tests. Public Chrome loaded 3.0.0 and completed
+all 11 real workflows with zero app console/resource errors; the actual public
+download validator passed the same 15 projects/9615 samples, KCL/energy, original
+raw assets, exact project/CSV/report checks. Screenshots inspected in both themes.
+
+Final image inspection identified narrow tick-label clipping for tiny currents.
+The one-line shared chart formatter now uses compact scientific notation when
+needed; exact sample data/statistics remain unchanged. Four actual V/A/J SVG
+text bounds pass at390px. Nine focused scope/Signal UI cases, scoped lint and
+typecheck/build passed. Corrected resources: `index-COa4Wnpk.js` / `index-CjMhsG_I.css`.
+The corrected presentation candidate will be deployed and verified before tagging.
+
 ## Release sequence and final identity
 
 Pending: safe main integration/push, Actions/Pages monitoring, full actual public replay
