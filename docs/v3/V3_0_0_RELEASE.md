@@ -5,8 +5,11 @@ production acceptance; stop before V3.1/V4. Baseline local/origin/main/v2.5.0:
 `99e2ba7512341af3ffe0ba4697a4bdcd3a670cca`, workflow `40177702787` success.
 Branch `codex/v3.0-transient-lab`, core checkpoint `58e96d7`.
 
-**Implementation Complete → local verification; not yet Released.**
-T01–T09 **Verified / 9-of-10**; only T10 publication remains in progress.
+**Implementation Complete → Verified → Released / T01–T10: 10/10.**
+Official application/tag **`a77a22112c9c2de6beeba5bf51ec7b9f1df3c624`**,
+[workflow40331268904](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40331268904) success;
+[published v3.0.0 Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.0.0) verified2026-10-26.
+This post-release documentation handoff preserves that immutable application tag.
 Final local typecheck/lint/full **685 tests / 43 files**/build passed.
 One old Atlas assertion was updated to the new supported transient text, with
 its scoped five cases and the final complete suite passing. No dependency change.
@@ -42,7 +45,7 @@ are fixture results, not a promise for every supported parameter set.
 Representative t=1ms RC: numerical **6.31782904V**, independent **6.321205588V**;
 RL: numerical **0.0631782904A**, independent **0.06321205588A**. Both use explicit
 0→10V, zero initial storage and τ=1ms. R doubling gives τ=2ms and actual RC
-**3.9330266V** at 1ms. Series underdamped peak sample at18.1ms: **11.6229436V**,
+**3.9330266V** at 1ms. Series underdamped overshoot sample at18.1ms: **11.6229436V**,
 independent **11.6302882V**. Numerical/analytic values and their errors are separate.
 
 Native downloads also passed byte-identical editor JSON reopen, selected CSV
@@ -70,20 +73,24 @@ The one-line shared chart formatter now uses compact scientific notation when
 needed; exact sample data/statistics remain unchanged. Four actual V/A/J SVG
 text bounds pass at390px. Nine focused scope/Signal UI cases, scoped lint and
 typecheck/build passed. Corrected resources: `index-COa4Wnpk.js` / `index-CjMhsG_I.css`.
-The corrected presentation candidate will be deployed and verified before tagging.
+Corrected production **`a77a22112c9c2de6beeba5bf51ec7b9f1df3c624`** / workflow40331268904
+passed all standard checks and actual public11-journey replay including all four
+SVG text bounds. The15-file/9615-sample native validator passed again. After tagging,
+actual public report reimport, current RC sample recovery and four narrow signed
+V/A/J axes passed; zero errors. Final application assets are those corrected names.
+The earlier J1OsolEm resource identity above is the dated first-build checkpoint.
 
-## Release sequence and final identity
+## Final identity and documentation handoff
 
-Pending: safe main integration/push, Actions/Pages monitoring, full actual public replay
-and native-download validator, final evidence deployment/targeted live confirmation,
-then immutable `v3.0.0` tag and GitHub Release on the verified production commit.
-Do not mark Released from a build/push alone. Exact final identity/workflow and
-T01–T10 **Released 10/10** will be recorded in the
-[canonical V3.0.0 Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.0.0)
-after those checks. Preserve this dated pre-tag checkpoint without a self-referential SHA.
+The application `v3.0.0` tag and published Release point to the verified production
+commit above; tag creation was followed by fresh public report/axis confirmation.
+All T01–T10 are complete. Later main documentation-only handoff preserves application
+resources and the immutable tag. Its exact commit/workflow and final deployment
+confirmation are added to the canonical Release after deployment, avoiding a
+self-referential SHA in this document.
 
 Public entry remains https://stray-flz.github.io/circuit-equivalence-lab/.
-No personal-website changes and no V3.1/V4 work.
+No personal-website changes, no V3.1/V4 work, no blocker.
 
 ## Compatibility and limits
 

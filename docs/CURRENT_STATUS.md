@@ -1,71 +1,52 @@
 # Current Development Status
 
-Updated **2026-10-26**. Active authorized module **V3.0.0 — Linear circuit transient and dynamic response**.
-**In Progress / T01–T10: 9/10**. Owner authorizes implementation and release after
-mathematical/data/built/public acceptance; stop before V3.1/V4.
+Updated **2026-10-26**. **V3.0.0 — Linear circuit transient and dynamic response**.
+**Implementation Complete → Verified → Released / T01–T10: 10/10**.
 
-Verified baseline local/origin/main/tag v2.5.0 and latest Release:
-`99e2ba7512341af3ffe0ba4697a4bdcd3a670cca`; workflow `40177702787` success,
-clean working tree. Branch `codex/v3.0-transient-lab`; no pre-existing V3 changes.
-No baseline historical suite rerun.
+Official application/tag `v3.0.0`: **`a77a22112c9c2de6beeba5bf51ec7b9f1df3c624`**;
+[build/deploy 40331268904](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40331268904) succeeded. The annotated tag and [published Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.0.0)
+were verified against that production commit. Subsequent documentation-only main
+handoff does not change the tagged application; its exact SHA/workflow are recorded
+in the canonical Release. Baseline v2.5.0/main99e2ba7; branch `codex/v3.0-transient-lab`,
+core checkpoint58e96d7. Stop before V3.1/V4; no blocker.
 
-Implement an independent provider: actual linear RLC MNA, explicit ICs and
-piecewise-constant independent sources, adaptive backward-Euler step doubling,
-event alignment and uniform output samples. Strict initial/event constraint
-checks; no leakage/auto-ground or invented impulse solution. Reuse validated
-linear algebra, connectivity, chart/file infrastructure; do not rewrite DC/AC/V1.
-T01–T04 Verified. Scoped numerical/data/actual React integration acceptance: **38 new tests passed**
-(across valid focused runs; historical suites not repeated). Includes RC/RL values,
-three series/parallel damping classes, convergence, source events/current excitation,
-energy/KCL, cancellation/work caps, byte/UUID round trips, explicit latest-result ID,
-raw data preservation and competition ancestry. Real editor UI accepted RC/RL sample
-inspection, save, stale/undo, draft guard and Signal inspection without automatic FFT.
-Typecheck and changed-source lint passed at numerical checkpoint; new UI tests also pass.
-See [methods and limits](v3/TRANSIENT_IMPLEMENTATION.md).
-Built Chrome 155 completed 11 grouped workflows on candidate 3.0.0, including all
-RC/RL responses, pulse, series/parallel RLC damping, four V/A/J traces, keyboard
-zoom/pan, 1440/390 light/dark, native files, Signal/competition and real DC/AC/V1.
-No app console/resource errors; screenshots inspected. Numerical/data validator
-accepted analytic waveforms, KCL/energy and raw assets, then identified a same-turn
-source-revision notification race causing a redundant report export revision.
-Corrected synchronous pending tracking; preserved the existing newer-edit guard
-and passed its expanded UI regression. Targeted final-build report/asset replay passed: same-turn notification consumed,
-newer concurrent edits still protected, HTML import restored actual 1ms samples.
-Independent 15-project/9615-sample validator passed, with 29646 KCL/34452 scalar
-checks; exact JSON/CSV/report round trips and independent raw bytes preserved.
-Final typecheck/lint/build and full **685 tests / 43 files** passed. Updated the old
-Atlas capability-copy assertion for the new supported transient boundary; no
-application changes after the accepted final build. Assets `index-J1OsolEm.js` / `index-CjMhsG_I.css`.
-T01–T09 Verified, 9/10; T10 release In Progress.
-Next: authorized candidate integration/push, Actions/Pages and full public workflow,
-then final evidence/tag/Release/handoff. Application/writer candidate 3.0.0, schema1; core checkpoint 58e96d7.
-Public candidate 501f3e1cd686928c6a2d2e4fdd4fddcc5d8bf441 / workflow
-40329459842 completed build/deploy with all 685 tests. Actual public 3.0.0
-passed all 11 journeys and the native validator (15 projects/9615 samples, exact
-JSON/CSV/HTML/raw checks), with zero app errors. Screenshots inspected.
-Final screenshot review found narrow-axis clipping of tiny current labels; compact
-scientific ticks now pass actual bounds checks on all four V/A/J traces at390px.
-Nine scoped scope/Signal integration tests, scoped lint, typecheck/build passed;
-numerical samples are unchanged. Final JS index-COa4Wnpk.js, CSS index-CjMhsG_I.css.
-Next: publish this accepted presentation correction/evidence, verify public current
-assets/workflows, then final dated pre-tag record/tag/Release. No blocker.
-No personal-website or later-module work.
+Independent actual RLC MNA with explicit V/I DC/step/pulse, storage initial states,
+adaptive backward Euler, event alignment, KCL/energy and bounded cancellation.
+Real RC/RL/series-parallel RLC teaching, ten existing Atlas entries, synchronized
+V/A/J scope, Signal/competition handoffs and complete portable schema1 data.
+Original parameters/pin directions/revisions/digests/raw assets persist; new runs
+receive new IDs. No new dependency or V1/D05/DC/AC numerical rewrite.
+
+Final **685 tests /43 files**, typecheck/lint/build and production CI passed.
+Actual built/public Chrome155 accepted11 grouped workflows, 1440/390 light/dark,
+keyboard/zoom/cursors, report/native reopen and existing DC/AC/V1/MathML/home.
+Four narrow V/A/J SVG text bounds passed after compact signed-axis correction;
+nine scoped scope/Signal cases passed. Zero app console/resource errors.
+15 actual downloaded project files/9615 sample instants independently matched
+analytical fixtures;29646 KCL/34452 scalar checks, exact JSON/CSV/HTML/raw bytes.
+Post-tag actual report import restored RC6.31782904V at1ms, distinct from analytic
+6.321205588V. Public assets `index-COa4Wnpk.js` / `index-CjMhsG_I.css` verified.
+
+Methods/limits: [transient implementation](v3/TRANSIENT_IMPLEMENTATION.md).
+Exact release, acceptance and history-preserving rollback: [release record](v3/V3_0_0_RELEASE.md).
+Only scoped finite linear models; no nonlinear/controlled-source transient,
+arbitrary switching/impulses/SPICE/hardware/PCB. Local error is not global exactness.
+Next recommended module: separately scoped V3.1; **not started**.
 
 | ID | Deliverable | Status |
 | --- | --- | --- |
-| T01 | Transient provider and immutable contracts | Verified |
-| T02 | Dynamic MNA, adaptive backward Euler and diagnostics | Verified |
-| T03 | Storage initial conditions, continuity and energy | Verified |
-| T04 | Explicit DC, step and bounded pulse events | Verified |
-| T05 | RC/RL first-order experiments and references | Verified |
-| T06 | Series/parallel RLC and damping references | Verified |
-| T07 | Waveform workbench and teaching | Verified |
-| T08 | Atlas, Signal, competition and portable persistence | Verified |
-| T09 | Numerical, integration and real browser acceptance | Verified |
-| T10 | Documentation, version and verified production release | In Progress |
+| T01 | Independent immutable transient provider | Verified |
+| T02 | Dynamic MNA, adaptive BE and diagnostics | Verified |
+| T03 | Explicit C/L states, continuity and energy | Verified |
+| T04 | Constant/step/pulse sources and event rules | Verified |
+| T05 | RC/RL zero-input/zero-state/complete responses | Verified |
+| T06 | Series/parallel RLC damping and energy exchange | Verified |
+| T07 | Actual waveform/cursor/teaching workbench | Verified |
+| T08 | Atlas/Signal/competition and portable data | Verified |
+| T09 | Numerical, integrity and built/public acceptance | Verified |
+| T10 | Documentation/version/tag/production release | Released |
 
-Prior V2.5.0 **Released / E01–E10 10/10**, canonical Release confirms exact final
-identity. Dated historical checkpoints below are preserved.
+Previous dated V2 checkpoints below remain historical evidence.
 
 ---
 

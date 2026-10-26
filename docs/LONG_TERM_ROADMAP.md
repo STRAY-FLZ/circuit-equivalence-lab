@@ -21,7 +21,7 @@ complete intended feature scope; it does not authorize implementation or release
   and DEVELOPMENT_PROGRESS.md for later internal design completion or implementation.
 - The priorities and future version labels are planning targets, not release
   tags or promises of dates. Historical V1 package was `0.1.0`; current public
-  release is V2.5.0 (competition public workflow/data verified; final tag/identity in Release). Owner approved Atlas on 2026-10-22 and shifted
+  release is V3.0.0 (linear transient public workflow/data/tag verified; final identity in Release). Owner approved Atlas on 2026-10-22 and shifted
   DC/filters/competition to V2.3/2.4/2.5. V3–V6 unchanged. See the actual
   [version checklist](VERSION_CHECKLIST.md); the unchecked original scope below
   is a planning inventory, not a current completion tracker.
@@ -321,8 +321,8 @@ hardware acquisition or full nonlinear/MCU/RF simulation. V2.5 is complete; V3.0
 
 ### V3.x — Advanced Circuits and Analog Electronics
 
-V3.0.0 linear transient laboratory is implemented and locally verified; production
-acceptance is in progress. See [actual release state](v3/V3_0_0_RELEASE.md). It covers
+V3.0.0 linear transient laboratory is Released10/10, with numerical/data/public
+acceptance and immutable application tag verified. See [actual release state](v3/V3_0_0_RELEASE.md). It covers
 explicit RLC/independent-source dynamics, initial/event conditions, first/second-order
 teaching and portable simulated data. Later analog/nonlinear/amplification/power
 modules remain planned. Stop before V3.1; no automatic next phase.

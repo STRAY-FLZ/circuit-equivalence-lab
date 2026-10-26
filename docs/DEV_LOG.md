@@ -878,3 +878,15 @@ scientific axis strings preserve signs without changing samples/cursors/statisti
 Actual four V/A/J SVG bounds at390px, nine scope/Signal UI cases, scoped lint and
 typecheck/build passed. Final presentation correction will be published/rechecked
 before tagging; no numerical-engine change. See the dated V3 release record.
+
+## 2026-10-26 — V3.0.0 Released10/10 and final handoff
+
+Official application/tag v3.0.0 = a77a22112c9c2de6beeba5bf51ec7b9f1df3c624; workflow40331268904
+success with685 tests/43 files, lint/typecheck/build/deploy. Full corrected public
+Chrome11-journey replay and15-file/9615-sample independent validator passed.
+Post-tag report import/RC1ms recovery and four V/A/J signed-axis bounds passed.
+Published Release id424303524 confirms exact application identity; no force push
+or tag move, no personal-website edit or V3.1/V4 work. This subsequent main commit
+updates only final documentation/status to Released10/10 and preserves app assets
+index-COa4Wnpk.js / index-CjMhsG_I.css. Its deployment outcome is appended to the
+canonical Release after monitoring and live confirmation. No blocker.

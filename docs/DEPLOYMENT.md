@@ -1,11 +1,15 @@
 # Production deployment
 
-Current application release: **V2.5.0**, publicly verified 2026-10-25.
-Candidate `a9bc62a905ff855631a1b7d00ef28753e1f0ac9c` / workflow `40177292317`
-passed all standard checks, deployment and full public training/download acceptance.
-See [competition evidence and rollback](v2/V2_5_0_RELEASE.md) and the
-[canonical final identity/tag/10-of-10 handoff](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v2.5.0)
-following this documentation deployment and targeted live confirmation.
+Current application release: **V3.0.0**, publicly verified2026-10-26.
+Official application/tag `v3.0.0`: `a77a22112c9c2de6beeba5bf51ec7b9f1df3c624`,
+[build/deploy40331268904](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40331268904) success,
+685 tests and actual public workflows/downloads verified. Tag/Release readback and
+post-tag report/sample/signed-axis confirmations passed.
+See [mathematics/data/acceptance/rollback](v3/V3_0_0_RELEASE.md) and
+[canonical exact identity](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.0.0).
+A subsequent documentation-only main handoff preserves the application resource
+identities and immutable tag; its deployment SHA/workflow is recorded in Release.
+Prior V2.5 evidence remains [here](v2/V2_5_0_RELEASE.md).
 Previous V2.4 evidence remains in its [dated record](v2/V2_4_0_RELEASE.md).
 V2.3 DC evidence remains in its [dated record](v2/V2_3_0_RELEASE.md).
 Previous V2.2.0 was verified 2026-10-22. See the
