@@ -1,5 +1,17 @@
 # Architecture
 
+## V3.2 amplifier frequency extension
+
+`src/amplifier` is a distinct typed provider: it resolves the authoritative
+graph, projects explicit capacitors open for current nonlinear DC bias, derives
+hybrid-π or nMOS conductances from that exact point, then builds an incremental
+R/C/controlled-source network solved by unchanged complex MNA utilities.
+Original DC/AC providers retain their capabilities and numerical behavior.
+Explicit source/port settings, stable identities, revision/digest and bounded
+frequency records are portable schema1 data. `src/amplifier-ui` composes this in
+the editor and reuses the accessible Bode chart; eight Atlas recipes open the
+same project model. See [methods and limitations](v3/AMPLIFIER_FREQUENCY_IMPLEMENTATION.md).
+
 ## V3.1 introductory analog extension
 
 Pinned engineering device definitions and terminal maps feed independent

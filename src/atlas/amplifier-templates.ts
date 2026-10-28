@@ -26,7 +26,7 @@ function design(family: 'npn' | 'nmos', coupled: boolean, degeneration: boolean,
   return parts
 }
 function template(id: string, family: 'npn' | 'nmos', name: string, description: string, parts: readonly TemplatePart[]): CircuitTemplate {
-  return { id: `amplifier-${id}`, amplifier: true, analog: family, categoryId: 'analog', familyId: `analog.${family}`, name, description, recipe: recipe(parts), difficulty: '进阶', components: [...new Set(parts.map(p => p.kind))], topics: [name, '放大器频率响应'], methods: ['真实直流偏置', '增量复数 MNA', '频率扫描'], chapters: [], status: 'implemented', capabilities: { schematic: true, editable: true, numerical: false, dc: false, ac: false, experiment: false }, actions: ['view', 'edit', 'export'], note: '先求当前直流工作点、检查区域，再用同模型导数构造小信号频率网络。图中电容为显式教学假设；不代表实测器件参数或非线性暂态。' }
+  return { id: `amplifier-${id}`, amplifier: true, categoryId: 'analog', familyId: `analog.${family}`, name, description, recipe: recipe(parts), difficulty: '进阶', components: [...new Set(parts.map(p => p.kind))], topics: [name, '放大器频率响应'], methods: ['真实直流偏置', '增量复数 MNA', '频率扫描'], chapters: [], status: 'implemented', capabilities: { schematic: true, editable: true, numerical: false, dc: false, ac: false, experiment: false }, actions: ['view', 'edit', 'export'], note: '先求当前直流工作点、检查区域，再用同模型导数构造小信号频率网络。图中电容为显式教学假设；不代表实测器件参数或非线性暂态。' }
 }
 export const amplifierTemplates: readonly CircuitTemplate[] = [
   template('ce-basic', 'npn', '共射放大器 · 直接偏置', '电压偏置经输入电阻驱动基极，实际集电极负载决定中频增益。', design('npn', false, false, false, false)),

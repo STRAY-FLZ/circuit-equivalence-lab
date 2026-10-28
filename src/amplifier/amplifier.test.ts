@@ -110,6 +110,17 @@ describe('actual DC-biased amplifier provider', () => {
     const a = sample(first, 1000), b = sample(second, 1000); if (a.kind !== 'available' || b.kind !== 'available') throw Error('missing')
     expect(a.transfer.real).toBeCloseTo(-b.transfer.real, 9); expect(a.maxKclAmps).toBeLessThan(1e-10)
     const currentSum = a.terminalAmps!.reduce(add, c()); expect(currentSum.real).toBeCloseTo(0, 13); expect(currentSum.imaginary).toBeCloseTo(0, 13)
+    const reversedInput = await success(p, { ...s, input: [s.input[1], s.input[0]] }), reversed = sample(reversedInput, 1000); if (reversed.kind !== 'available') throw Error('missing')
+    expect(a.transfer.real).toBeCloseTo(-reversed.transfer.real, 9)
+    const shifted = await success(p, { ...s, phaseDegrees: 90 }), source = shifted.single.branches.find(b => b.id === s.excitationSourceId)!
+    expect(source.voltage.value.real).toBeCloseTo(0, 12); expect(source.voltage.value.imaginary).toBeCloseTo(s.magnitudeRms, 12)
+    expect(magnitude(sample(shifted, 1000))).toBeCloseTo(a.magnitude, 9); expect(shifted.bias.device.terminalAmps).toEqual(first.bias.device.terminalAmps)
+  })
+  it('uses actual source resistance and output loading, with a fresh bias', async () => {
+    const p = instantiateTemplate('amplifier-ce-basic'), first = await success(p), higherSource = await success(edit(p, 'RS', 'resistance', 20000)), heavierLoad = await success(edit(p, 'RL', 'resistance', 1000))
+    expect(magnitude(sample(higherSource, 1000))).toBeLessThan(magnitude(sample(first, 1000)))
+    expect(higherSource.bias.device.terminalAmps[1]).toBeLessThan(first.bias.device.terminalAmps[1]!)
+    expect(magnitude(sample(heavierLoad, 1000))).toBeCloseTo(magnitude(sample(first, 1000)) * 2 / 3, 7)
   })
   it('rejects stale digests, invalid frequencies, bias regions, models, and cancellation', async () => {
     const p = instantiateTemplate('amplifier-ce-basic'), s = getSettings(p), input = await createAmplifierInput(p, p.sheets[0]!.id, s)
@@ -123,6 +134,8 @@ describe('actual DC-biased amplifier provider', () => {
     expect(() => applyEdit(coupled, sheet.id, { type: 'properties', id: capacitor.id, reference: capacitor.reference, parameters: { capacitance: { kind: 'quantity', quantity: { value: 1, unit: 'V' } } } })).toThrow()
     expect(() => applyEdit(coupled, sheet.id, { type: 'properties', id: capacitor.id, reference: capacitor.reference, parameters: { capacitance: { kind: 'quantity', quantity: { value: NaN, unit: 'F' } } } })).toThrow()
     expect((await amplifierEngine.run(input, { ...host(), signal: AbortSignal.abort() })).outcome.kind).toBe('cancelled')
+    const abort = new AbortController(), cancelled = await amplifierEngine.run(input, { ...host(), signal: abort.signal, onProgress: count => { if (count >= 8) abort.abort() } })
+    expect(cancelled.outcome.kind).toBe('cancelled')
   })
   it('preserves genuine failed-frequency gaps rather than fabricating gain or cutoffs', async () => {
     const p = instantiateTemplate('amplifier-cs-coupled'), s = getSettings(p), value = await success(p, { ...s, startHz: 1e-310, endHz: 1, points: 9 })
