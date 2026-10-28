@@ -328,7 +328,7 @@ teaching and portable simulated data. V3.1 introductory analog implementation is
 Released10/10 with actual public acceptance: Shockley/NPN/nMOS operating regions,
 same-model local gains, ideal negative-feedback op-amps and12 editable templates.
 See [actual V3.1 release state](v3/V3_1_0_RELEASE.md). V3.2 practical
-single-stage amplifier frequency response is implemented and under acceptance;
+single-stage amplifier frequency response is Released10/10 with verified public acceptance;
 [V3.2 actual release state](v3/V3_2_0_RELEASE.md). Higher-fidelity/dynamic
 analog, power and later modules remain planned. Stop before V3.3/V4;
 no automatic next phase.

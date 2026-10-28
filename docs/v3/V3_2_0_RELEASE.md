@@ -1,7 +1,7 @@
 # V3.2.0 — Amplifier frequency response release record
 
-2026-10-28. Local candidate **Verified9/10**, not yet published. B01–B09 Verified;
-B10 production release in progress. Baseline
+Published **2026-10-29 (Asia/Shanghai)**. **Implementation Complete → Verified → Released10/10**. B01–B09 Verified;
+B10 Released. Baseline
 main e29fa051784851a2be5e897d445ea82538eb0e36 and public v3.1.0 application
 0bd1b11ccba8a52c54727c2e49433d6d31577027 confirmed. Feature branch
 `codex/v3.2-amplifier-frequency`, core checkpoint cfbcfdf.
@@ -17,7 +17,7 @@ main e29fa051784851a2be5e897d445ea82538eb0e36 and public v3.1.0 application
 | B07 | Justified sampled plateau, crossings and bandwidth | Verified |
 | B08 | Editable Atlas/editor experiments and portable records | Verified |
 | B09 | Full numerical, compatibility and built Chrome acceptance | Verified |
-| B10 | Version/docs, public acceptance, verified tag and Release | In Progress |
+| B10 | Version/docs, public acceptance, verified tag and Release | Released |
 
 ## Local implementation evidence
 
@@ -73,9 +73,27 @@ Full details and provenance: [implementation](AMPLIFIER_FREQUENCY_IMPLEMENTATION
 
 ## Production and rollback
 
-Pending final candidate, successful deployment, actual public interaction,
-v3.2.0 annotated tag and published Release. Do not call this Released from a
-local build or successful push. For an authorized rollback, revert the full
+Official application/tag **v3.2.0** at
+**b2a851f7f623761e32e27cb82559bfd58e6a19c6**;
+[build and deployment40687925759](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40687925759)
+succeeded for that SHA. [GitHub Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.2.0)
+id426942854 was published 2026-10-28T16:53:53Z (October29 China time);
+the annotated tag and Release target were read back and verified.
+
+Public Chrome on October28 saved four actual engineering files and desktop/narrow
+light/dark screenshots before the session was interrupted. On October29 those
+files passed804-point/4131-check independent verification. A fresh canonical
+public Chrome session independently confirmed CE and CS bias/Bode, numeric
+cutoffs, actual keyboard cursor, narrow layout, matching built JS/CSS resources,
+and no app console/resource errors. Separate public Chrome runs confirmed actual
+DC, AC/Bode, transient, Signal/FFT, V1/MathML, analog and competition evidence.
+The public session's final marker from October28 was lost; this evidence is
+reported as downloaded-data recovery plus fresh targeted verification.
+
+Public resources: index-1FkAOr_N.js and index-CUYa2Us9.css, matching the
+verified local candidate. This documentation-only handoff does not change the
+application or immutable tag; its exact SHA and successful workflow are recorded
+in the canonical Release to avoid a self-referential commit hash. For an authorized rollback, revert the full
 V3.2 change range on a new branch, run checks and redeploy without force or
 moving immutable tags. Keep exported V3.2 project originals; old applications
 do not gain the V3.2 provider. Do not reset history or touch the personal site.

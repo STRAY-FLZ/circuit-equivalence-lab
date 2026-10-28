@@ -1,22 +1,52 @@
 # Current Development Status
 
-Updated **2026-10-28**. Active module **V3.2.0 — Amplifier frequency response**.
-**Implementation Complete → Verified / B01–B10: 9/10**. Baseline local/remote main e29fa05,
-released v3.1.0 application/tag0bd1b11 confirmed. Branch
-`codex/v3.2-amplifier-frequency`. Owner authorizes implementation and production
-release only after full numerical, compatibility, browser and live acceptance.
+Updated **2026-10-29**. **V3.2.0 — Amplifier frequency response**.
+**Implementation Complete → Verified → Released / B01–B10: 10/10**.
 
-B01 architecture, B02 DC-to-Jacobian, B03 hybrid-π, B04 nMOS, B05 capacitor
-network, B06 complex MNA/sweep, B07 conservative bandwidth and B08 editor/Atlas:
-Verified. B09 final local checks Verified; B10 production release In Progress. Twenty-one focused numerical
-fixtures pass, including eight real recipes, separate V/A residual checks,
-independent scalar DC bias, fixed-gm and isolated RC references. Original nonlinear
-solver remains unchanged; the new provider independently verifies correction
-after a strict normalized-residual rejection. [Working contract](v3/AMPLIFIER_FREQUENCY_IMPLEMENTATION.md).
-Built Chrome passed four analog journeys, prior-integration boundaries and four
-actual downloads/804 points/4131 independent checks. Final typecheck/lint/762 tests/47 files/build passed. Next: production release
-and public Chrome acceptance. No blocker. Not published.
-Stop before V3.3/V4; do not change the personal website.
+Official application/tag `v3.2.0`: **`b2a851f7f623761e32e27cb82559bfd58e6a19c6`**;
+[build/deploy40687925759](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40687925759)
+succeeded. [Published Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.2.0)
+id426942854 and annotated tag were verified against that application commit.
+This subsequent documentation-only main handoff does not alter the tagged app;
+its exact SHA and workflow are recorded in the canonical Release. Baseline V3.1.0
+app0bd1b11 / main e29fa05; development branch `codex/v3.2-amplifier-frequency`,
+core checkpoint cfbcfdf. Stop before V3.3/V4; no blocker.
+
+Eight editable CE/CS experiments solve actual current DC bias and derive hybrid-π
+or nMOS gm/rπ/gds at that point. Independent complex MNA, explicit R/C and source/
+load networks, single RMS excitation, real Bode samples and conservative plateau/
+cutoff/bandwidth estimates. Explicit parasitic capacitances are teaching values.
+The original V1/D05/DC/AC/transient/analog algorithms are unchanged; a specialized
+correction fallback checks the same DC equations in original units.
+
+Typecheck/lint/build and **762 tests / 47 files** passed locally and production CI.
+Real built/public Chrome155 confirmed CE/CS operating regions, frequency response,
+changes, stale state, file reopens, desktop/narrow themes and keyboard; existing
+DC/AC/transient/Signal/V1/analog/competition flows passed. The prior public browser
+session was interrupted after saving four project files and four screenshots;
+804 actual points /4131 independent checks passed on those files on October29,
+and a fresh public session reconfirmed both transistor families and the keyboard.
+No app console/resource errors in the fresh acceptance. Schema1 / writer3.2.0;
+saved settings/provenance persist but reopening requires explicit recomputation.
+
+[Methods, assumptions and compatibility](v3/AMPLIFIER_FREQUENCY_IMPLEMENTATION.md);
+[release, evidence and rollback](v3/V3_2_0_RELEASE.md). Limits: a single introductory
+NPN or nMOS stage, no industrial SPICE, nonlinear transient, thermal/noise, full
+parasitic device physics or real op-amp dynamics. No new dependency or personal
+website change. Next recommendation: separately define V3.3 scope; **not started**.
+
+| ID | Deliverable | Status |
+| --- | --- | --- |
+| B01 | Typed provider and pinned graph | Verified |
+| B02 | Verified current bias and exact linearization | Verified |
+| B03 | BJT hybrid-π exact derivatives | Verified |
+| B04 | nMOS incremental model and valid regions | Verified |
+| B05 | Coupling, bypass and explicit capacitance networks | Verified |
+| B06 | Complex MNA, phasors and actual sweep gaps | Verified |
+| B07 | Sampled plateau, cutoff and bandwidth estimates | Verified |
+| B08 | Eight editor/Atlas experiments and portable records | Verified |
+| B09 | Numerical, compatibility and real browser acceptance | Verified |
+| B10 | Documentation, production, tag and Release | Released |
 
 ---
 

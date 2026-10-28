@@ -1,6 +1,6 @@
 # V3.2 amplifier frequency response — working contract
 
-Started 2026-10-28. B01–B10 In Progress/Planned; no public V3.2 release yet.
+Released 2026-10-29 (Asia/Shanghai); B01–B10:10/10.
 Baseline: clean local/remote main e29fa051784851a2be5e897d445ea82538eb0e36,
 V3.1.0 application/tag 0bd1b11ccba8a52c54727c2e49433d6d31577027.
 Branch `codex/v3.2-amplifier-frequency`; release authorized only after acceptance.
