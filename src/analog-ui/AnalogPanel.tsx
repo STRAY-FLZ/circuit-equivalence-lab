@@ -52,7 +52,7 @@ export function AnalogPanel({ project, sheetId, onCommit, onCapture }: { readonl
   const stale = !!capture && (capture.project.revision !== project.revision || resultSettings !== settingsRevision)
   const changed = () => { setSettingsRevision(n => n + 1); setGain(null); setSweep([]) }
   async function run() {
-    setBusy(true); setError(''); setGain(null); setSweep([])
+    setBusy(true); setStatus('正在求解实际工作点…'); setError(''); setGain(null); setSweep([])
     const controller = new AbortController(); abort.current = controller
     const snapshot = project, settings = settingsRevision
     try {
@@ -66,7 +66,7 @@ export function AnalogPanel({ project, sheetId, onCommit, onCapture }: { readonl
   }
   async function scan() {
     if (!result || stale) return
-    setBusy(true); setError(''); const controller = new AbortController(); abort.current = controller
+    setBusy(true); setStatus('正在逐点求解准静态工作点…'); setSweep([]); setError(''); const controller = new AbortController(); abort.current = controller
     try { const points = await quasiStaticSweep(result.circuit, sourceId, output, range.start, range.end, range.count, controller.signal); if (mounted.current) { setSweep(points); setStatus(`已实际求解 ${points.length} 个准静态工作点；横轴为输入电压，不是时间。`) } } catch (e) { if (mounted.current) { setSweep([]); setError(msg(e)) } } finally { if (mounted.current) setBusy(false) }
   }
   function localGain() { if (!result || stale) return; try { setGain(smallSignal(result, sourceId, output, amplitude)); setError('') } catch (e) { setGain(null); setError(msg(e)) } }

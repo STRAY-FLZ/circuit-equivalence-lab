@@ -1,5 +1,9 @@
 # Production deployment
 
+V3.1.0 analog candidate is undergoing final acceptance on2026-10-28; publication
+is authorized after all gates. [Actual status/identity/compatibility/rollback](v3/V3_1_0_RELEASE.md).
+Until public verification completes, the confirmed production version below remains V3.0.0.
+
 Current application release: **V3.0.0**, publicly verified2026-10-26.
 Official application/tag `v3.0.0`: `a77a22112c9c2de6beeba5bf51ec7b9f1df3c624`,
 [build/deploy40331268904](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40331268904) success,

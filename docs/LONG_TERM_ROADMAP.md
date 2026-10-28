@@ -324,8 +324,12 @@ hardware acquisition or full nonlinear/MCU/RF simulation. V2.5 is complete; V3.0
 V3.0.0 linear transient laboratory is Released10/10, with numerical/data/public
 acceptance and immutable application tag verified. See [actual release state](v3/V3_0_0_RELEASE.md). It covers
 explicit RLC/independent-source dynamics, initial/event conditions, first/second-order
-teaching and portable simulated data. Later analog/nonlinear/amplification/power
-modules remain planned. Stop before V3.1; no automatic next phase.
+teaching and portable simulated data. V3.1 introductory analog implementation is
+complete and under final release acceptance: Shockley/NPN/nMOS operating regions,
+same-model local gains, ideal negative-feedback op-amps and12 editable templates.
+See [actual V3.1 release state](v3/V3_1_0_RELEASE.md). Higher-fidelity/dynamic
+analog, power and later modules remain planned. Stop before V3.2/V4;
+no automatic next phase.
 
 ### V4.x — Digital Electronics, Embedded Systems and Control
 

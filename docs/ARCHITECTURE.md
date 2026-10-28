@@ -1,5 +1,17 @@
 # Architecture
 
+## V3.1 introductory analog extension
+
+Pinned engineering device definitions and terminal maps feed independent
+`src/analog` nonlinear-DC and ideal negative-feedback op-amp providers.
+`src/analog-ui` composes original-unit residuals, model regions, I–V/loadline,
+static sweeps and same-Jacobian local gains in the existing editor. Twelve Atlas
+recipes use that same project model. Small records stay in a versioned namespace;
+competition captures original inputs/digests/results using its existing artifact
+path. No nonlinear transient or time-domain Signal data is fabricated from static
+voltage sweeps. Existing numerical engines remain unchanged; only the DC linear
+algebra is reused. See [models, MNA and compatibility](v3/ANALOG_IMPLEMENTATION.md).
+
 ## V3.0 linear transient extension
 
 `src/transient` owns the independent provider, true dynamic MNA, step-doubling BE,

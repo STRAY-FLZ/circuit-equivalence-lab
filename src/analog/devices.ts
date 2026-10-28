@@ -6,7 +6,9 @@ export function shockley(volts: number, is: number, n: number, temperature: numb
   if (![volts, is, n, temperature].every(Number.isFinite) || is <= 0 || n <= 0 || temperature < 200 || temperature > 500) throw new AnalogError('ANALOG_PARAMETER', 'IS、n 必须为正；本模型温度范围为 200–500 K。')
   const vt = n * thermalVoltage(temperature), exponent = volts / vt
   if (exponent > 650) throw new AnalogError('ANALOG_OVERFLOW', '结电压超出有限指数计算范围。', 'numerical')
-  return { current: is * Math.expm1(exponent), gd: is * Math.exp(exponent) / vt }
+  const current = is * Math.expm1(exponent), gd = is * Math.exp(exponent) / vt
+  if (!Number.isFinite(current) || !Number.isFinite(gd)) throw new AnalogError('ANALOG_OVERFLOW', '结电流或微分电导超出有限数值范围。', 'numerical')
+  return { current, gd }
 }
 /** Signed VDS extension is for Newton iterates only; final reverse VDS is rejected. */
 export function mosPoint(vgs: number, vds: number, threshold: number, k: number) {

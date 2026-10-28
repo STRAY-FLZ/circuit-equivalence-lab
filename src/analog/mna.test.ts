@@ -21,6 +21,11 @@ describe('independent analog device and original-unit MNA fixtures', () => {
     expect(d.gd).toBeCloseTo((shockley(.600001, 1e-12, 1, 300).current - shockley(.599999, 1e-12, 1, 300).current) / .000002, 7)
     expect(() => shockley(.1, 0, 1, 300)).toThrow()
     expect(() => shockley(100, 1e-12, 1, 300)).toThrow()
+    expect(() => shockley(.5, 1e308, 1, 300)).toThrow(/有限/)
+  })
+  it('does not accept overflowed local rpi as a finite verified result', () => {
+    const q = { ...npn(), parameters: { ...npn().parameters, saturationCurrent: 1e-320 } }
+    expect(() => solveAnalog(circuit([v('V', 'c', 5), v('B', 'b', .1), q]))).toThrow(/有限/)
   })
   it('solves series diode loadline against independent bisection', () => {
     const c = circuit([v('V', 'in', 5), r('R', 'in', 'd', 1000), diode()]), s = solveAnalog(c)

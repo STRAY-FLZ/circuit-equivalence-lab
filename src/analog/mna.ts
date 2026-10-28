@@ -59,6 +59,7 @@ export function assemble(circuit: AnalogCircuit, x: readonly number[], region: N
       const io = constraint(e, c, circuit.referenceKey, 0, a, b)
       terminalAmps = [0, 0, io]; name = 'ideal-negative-feedback'
     }
+    if ([...terminalAmps, ...volts, ...Object.values(detail).filter((v): v is number => typeof v === 'number')].some(v => !Number.isFinite(v))) throw new AnalogError('ANALOG_RANGE', '器件电流、电压或局部导数超出有限范围。', 'numerical')
     devices.push({ componentId: e.id, reference: e.reference, kind: e.kind, region: name, terminalAmps, terminalVolts: volts, ...detail })
   }
   if (residual.some(v => !Number.isFinite(v)) || jacobian.some(row => row.some(v => !Number.isFinite(v)))) throw new AnalogError('ANALOG_RANGE', '残差或雅可比超出有限范围。', 'numerical')
@@ -69,12 +70,12 @@ function measure(residual: readonly number[], nodeCount: number) {
 }
 function newton(circuit: AnalogCircuit, region: NpnRegion, signal?: AbortSignal, maxIterations = 300) {
   const l = layout(circuit, region)
-  let x = Array<number>(l.size).fill(0), lastStep = Infinity
+  let x = Array<number>(l.size).fill(0), lastVoltageStep = Infinity, lastCurrentStep = Infinity
   const merit = (r: readonly number[]) => Math.max(0, ...r.map((f, i) => Math.abs(f) / (i < l.nodes.length ? 1e-3 : 1)))
   for (let iteration = 0; iteration < maxIterations; iteration++) {
     if (signal?.aborted) throw new AnalogError('ANALOG_CANCELLED', '分析已取消。', 'resource')
     const state = assemble(circuit, x, region), checks = measure(state.residual, state.nodeCount)
-    if (checks.maxKclAmps <= 1e-11 && checks.maxConstraintVolts <= 1e-9 && lastStep <= 1e-7) return { x, state, checks, iterations: iteration }
+    if (checks.maxKclAmps <= 1e-11 && checks.maxConstraintVolts <= 1e-9 && lastVoltageStep <= 1e-7 && lastCurrentStep <= 1e-10) return { x, state, checks, iterations: iteration }
     const delta = solveLinear(state.jacobian, state.residual.map(v => -v)).values
     let alpha = Math.min(1, 1 / Math.max(1, ...delta.slice(0, l.nodes.length).map(Math.abs)))
     for (const e of circuit.elements.filter(e => e.kind === 'diode' || e.kind === 'npn')) {
@@ -90,7 +91,9 @@ function newton(circuit: AnalogCircuit, region: NpnRegion, signal?: AbortSignal,
       alpha *= .5
     }
     if (!accepted) throw new AnalogError('ANALOG_LINE_SEARCH', '牛顿阻尼步无法降低原始残差；未返回最后一次迭代。', 'numerical')
-    lastStep = Math.max(0, ...next.map((v, i) => Math.abs(v - x[i]!))); x = next
+    lastVoltageStep = Math.max(0, ...next.slice(0, l.nodes.length).map((v, i) => Math.abs(v - x[i]!)))
+    lastCurrentStep = Math.max(0, ...next.slice(l.nodes.length).map((v, i) => Math.abs(v - x[l.nodes.length + i]!)))
+    x = next
   }
   throw new AnalogError('ANALOG_NONCONVERGENCE', '达到迭代上限，工作点未通过残差与步长收敛检查。', 'numerical')
 }
