@@ -1,7 +1,7 @@
 # V3.1.0 — Analog fundamentals release record
 
-2026-10-28. Local candidate **Verified9/10**, not yet published. A01–A09 Verified;
-A10 production release In Progress. Baseline main41564c9 / immutable
+2026-10-28. **Implementation Complete → Verified → Released10/10**. A01–A09 Verified;
+A10 Released. Baseline main41564c9 / immutable
 v3.0.0 application a77a221 and handoff workflow40334349933 confirmed via GitHub;
 actual public Chrome returned v3.0.0 before this implementation.
 Focused branch `codex/v3.1-analog-fundamentals`, core checkpoint4f67be4.
@@ -19,7 +19,7 @@ Focused branch `codex/v3.1-analog-fundamentals`, core checkpoint4f67be4.
 | A07 | Actual negative-feedback ideal-opamp MNA, five topologies | Verified |
 | A08 | Editor,12 Atlas templates, files and competition | Verified |
 | A09 | Full checks and built Chrome acceptance | Verified |
-| A10 | Version/docs/integration/deploy/public acceptance/tag/Release | In Progress |
+| A10 | Version/docs/integration/deploy/public acceptance/tag/Release | Released |
 
 Methods, exact acceptance tolerances and compatibility are in
 [ANALOG_IMPLEMENTATION.md](ANALOG_IMPLEMENTATION.md). No V1/D05/DC/AC/transient
@@ -63,9 +63,28 @@ Nonfinite diode derivatives/rpi reject explicitly; original V/A tolerances are s
 
 ## Production identity and publication
 
-Pending final candidate SHA, successful build/deploy workflow, real public replay,
-immutable v3.1.0 annotated tag and published GitHub Release. Do not call this
-Released from local checks or a successful push alone.
+Official application/tag **v3.1.0**, production SHA
+**0bd1b11ccba8a52c54727c2e49433d6d31577027**.
+[Build and Pages deployment40627152400](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40627152400)
+completed successfully, both jobs passed. Annotated tag points to that commit.
+[GitHub Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.1.0)
+id426236213 published2026-10-28T03:37:42Z; target/draft=false/latest readback checked.
+
+Real public Chrome155 repeated all8 analog and5 scoped existing journeys above,
+including native files/reopen and actual current-project competition evidence.
+Public files separately passed128-point/1037-check independent verification.
+Zero app errors or failed resources. Initial ordinary entry retained old cached
+HTML after Actions success; a query-bypassed entry loaded the verified new assets.
+Then the canonical no-query endpoint returned200/current resources, and an entirely
+new Chrome session at the canonical URL showed v3.1.0 and computed U1 output−1V.
+The cache-bypassed full replay is documented transparently; deployment success
+alone was not accepted as proof of a working new public application.
+
+Public JS index-CKwkNEom.js and CSS index-8iEHP9Pq.css match final local build.
+This post-release documentation-only main handoff leaves those assets/tag unchanged;
+its final SHA and successful workflow are recorded in the canonical Release to
+avoid a self-referential commit hash. Branch codex/v3.1-analog-fundamentals retains
+its verified application checkpoint. No V3.2/V4 work was started.
 
 ## History-preserving rollback
 

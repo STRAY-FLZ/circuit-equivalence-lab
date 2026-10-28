@@ -1,6 +1,6 @@
 # V3.1 Analog fundamentals — implementation contract
 
-Started 2026-10-28; Implementation Complete. Baseline main41564c9 / immutable
+Released 2026-10-28; A01–A10:10/10. Baseline main41564c9 / immutable
 application v3.0.0 a77a221. Branch `codex/v3.1-analog-fundamentals`.
 Current owner authorization covers V3.1 implementation and release
 after numerical, compatibility, built-browser and actual production acceptance.

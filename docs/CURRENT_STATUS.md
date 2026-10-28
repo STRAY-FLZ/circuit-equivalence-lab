@@ -1,27 +1,50 @@
 # Current Development Status
 
 Updated **2026-10-28**. **V3.1.0 — Analog electronics fundamentals**.
-**Implementation Complete → Verified / A01–A09: 9/10**. A10 production
-release In Progress. Local acceptance complete; not yet published.
-Baseline main41564c9 / v3.0.0 a77a221 verified locally/remotely/publicly.
-Branch `codex/v3.1-analog-fundamentals`; recoverable core checkpoint4f67be4.
-Owner authorizes publication after all gates; stop before V3.2/V4.
+**Implementation Complete → Verified → Released / A01–A10: 10/10**.
 
-Independent Shockley/NPN/long-channel nMOS nonlinear MNA and negative-feedback
-ideal-opamp providers. Original-unit residuals, exact model derivatives, CE/CS,
-quasi-static scans,12 actual editable Atlas templates, editor/files and competition
-capture. Schema1; new canonical A/V^2 unit. Existing V1/D05/DC/AC/transient
-numerics and personal website unchanged. No dependency added.
+Official application/tag `v3.1.0`: **`0bd1b11ccba8a52c54727c2e49433d6d31577027`**;
+[build/deploy40627152400](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40627152400)
+succeeded. [Published Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.1.0)
+id426236213 targets that verified production commit; annotated tag readback checked.
+This subsequent documentation-only main handoff preserves the tagged application;
+its exact final SHA/workflow is recorded in the canonical Release.
+Baseline main41564c9 / v3.0.0 a77a221; branch `codex/v3.1-analog-fundamentals`,
+core checkpoint4f67be4. Stop before V3.2/V4; no blocker.
 
-733 tests/46 files and lint passed;32 focused numerical/provider/competition cases
-also passed after separating Newton voltage/current iterate tolerances.
-Built Chrome155 accepted8 analog journeys and5 existing integration journeys.
-Five actual downloads:128 operating points /1037 independent electrical checks.
-Final candidate typecheck/lint/733 tests/build,8 Chrome journeys and128-point
-independent download checks passed. Assets index-CKwkNEom.js / index-8iEHP9Pq.css.
-Production deployment/acceptance/tag/Release pending; no blocker.
-[Models, methods and limits](v3/ANALOG_IMPLEMENTATION.md).
-[Release and rollback record](v3/V3_1_0_RELEASE.md).
+Independent Shockley/NPN/long-channel nMOS nonlinear MNA and validated-negative-
+feedback ideal-opamp providers. Exact model derivatives, original-unit residuals,
+actual CE/CS gains, I–V/loadline and quasi-static experiments;12 editable Atlas
+recipes, existing editor/files and competition source-bound numerical evidence.
+733 tests/46 files, typecheck/lint/build and production CI passed. Built/public
+Chrome155 accepted8 analog and5 existing integration journeys,1440/390 light/dark,
+keyboard, file reopen and invalid models/feedback. Zero app console/resource errors.
+Each environment downloaded5 real files:128 actual operating points and1037
+independent electrical checks passed. Canonical entry without query confirmed
+v3.1.0 and actual inverting output−1V; resources index-CKwkNEom.js / index-8iEHP9Pq.css.
+
+Schema1, writer3.1.0; k uses A/V^2 (older readers may reject the new unit).
+Saved original analog records/settings persist; explicit rerun verifies new current
+results after reopening. No new dependency; V1/D05/DC/AC/transient numerical code
+and personal website unchanged. Teaching models only; no general SPICE/nonlinear
+transient, complete semiconductor/thermal/high-frequency physics or op-amp rails.
+[Methods/limits/compatibility](v3/ANALOG_IMPLEMENTATION.md);
+[acceptance/production/rollback](v3/V3_1_0_RELEASE.md).
+Next recommendation: separately scope V3.2 practical amplifier frequency response
+with declared dynamic models; **not started**.
+
+| ID | Deliverable | Status |
+| --- | --- | --- |
+| A01 | Pinned models, independent typed providers and snapshots | Verified |
+| A02 | Shockley/NR/MNA/Jacobian and failure diagnostics | Verified |
+| A03 | Actual diode bias/loadline/quasi-static experiments | Verified |
+| A04 | Simplified NPN bias, three regions and terminal KCL | Verified |
+| A05 | Long-channel nMOS square-law regions and boundaries | Verified |
+| A06 | Same-model derivatives and real CE/CS local gains | Verified |
+| A07 | Validated negative-feedback ideal-opamp MNA | Verified |
+| A08 | Existing editor,12 Atlas recipes, files and competition | Verified |
+| A09 | Numerical, built/public Chrome and downloaded-data acceptance | Verified |
+| A10 | Documentation/version/integration/deploy/tag/Release | Released |
 
 ---
 
