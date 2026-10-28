@@ -1,0 +1,8 @@
+.amplifier-panel { border-block: 1px solid var(--line); padding: 1.5rem 0; margin-block: 1rem; }
+.amplifier-panel fieldset { min-width: 0; margin-block: 1rem; }
+.amplifier-controls { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; margin-block: .75rem; }
+.amplifier-controls label { display: grid; gap: .35rem; max-width: 100%; }
+.amplifier-controls input, .amplifier-controls select { max-width: 100%; min-height: 2.4rem; }
+.amplifier-panel table { min-width: 480px; font-size: .88rem; }
+.amplifier-warning { font-weight: 600; }
+@media (max-width: 600px) { .amplifier-controls > label { flex: 1 1 130px; } }

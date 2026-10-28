@@ -1,5 +1,22 @@
 # Development Progress
 
+Updated **2026-10-28**. Active module **V3.2.0 — Amplifier frequency response**.
+**In Progress / B01–B10: 7/10 verified**. Baseline local/remote main e29fa05,
+released v3.1.0 application/tag0bd1b11 confirmed. Branch
+`codex/v3.2-amplifier-frequency`. Owner authorizes implementation and production
+release only after full numerical, compatibility, browser and live acceptance.
+
+B01 architecture, B02 DC-to-Jacobian, B03 hybrid-π, B04 nMOS, B05 capacitor
+network, B06 complex MNA/sweep and B07 conservative bandwidth: Verified. B08
+editor/Atlas integration In Progress; B09/B10 Planned. Twenty focused numerical
+fixtures pass, including eight real recipes, separate V/A residual checks,
+independent scalar DC bias, fixed-gm and isolated RC references. Original nonlinear solver remains unchanged; the new
+provider verifies an independent correction fallback for a near-zero-row case. [Working contract](v3/AMPLIFIER_FREQUENCY_IMPLEMENTATION.md).
+Next: complete editor/Atlas integration and built/public Chrome acceptance. No blocker. Not published.
+Stop before V3.3/V4; do not change the personal website.
+
+---
+
 Updated **2026-10-28**. **V3.1.0 — Analog electronics fundamentals**.
 **Implementation Complete → Verified → Released / A01–A10: 10/10**.
 

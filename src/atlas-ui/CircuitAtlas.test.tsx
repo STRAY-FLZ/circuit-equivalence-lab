@@ -13,7 +13,8 @@ beforeEach(() => {
 })
 afterEach(() => vi.unstubAllGlobals())
 const button = (name: string | RegExp) => screen.getByRole('button', { name })
-describe('atlas navigation and existing workspaces', () => {
+// The expanded real catalog makes role-based DOM queries heavier on CI runners.
+describe('atlas navigation and existing workspaces', { timeout: 15000 }, () => {
   it('maintains independent category/family expansion and inert collapsed panels with matching accessible IDs', () => {
     render(<CircuitAtlas onOpen={() => true} />)
     const first = button(/电源与电阻网络.*14 个模板/), controlled = button(/受控源与运算放大器电路/)

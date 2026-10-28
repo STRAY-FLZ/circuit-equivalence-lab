@@ -3,6 +3,7 @@ import type { Position } from '../engineering'
 import { PALETTE } from '../editing'
 import type { PaletteKind } from '../editing'
 import { analogTemplates } from './analog-templates'
+import { amplifierTemplates } from './amplifier-templates'
 
 export interface TemplatePart { readonly reference: string; readonly kind: PaletteKind; readonly value: number; readonly nodes: readonly string[]; readonly position: Position; readonly rotationDegrees: 0 | 90 | 270 }
 export interface CircuitRecipe { readonly nodes: Readonly<Record<string, Position>>; readonly parts: readonly TemplatePart[]; readonly ports: Readonly<Record<string, string>> }
@@ -12,6 +13,7 @@ export interface CircuitTemplate {
   readonly status: 'implemented'; readonly capabilities: { readonly schematic: true; readonly editable: true; readonly numerical: boolean; readonly dc: boolean; readonly ac: boolean; readonly experiment: boolean }
   readonly acExperiment?: { readonly inputPorts: readonly [string, string]; readonly outputPorts: readonly [string, string]; readonly passband: 'low' | 'high' | 'peak' }
   readonly analog?: 'diode' | 'npn' | 'nmos' | 'ideal-opamp'
+  readonly amplifier?: true
   readonly actions: readonly ['view', 'edit', 'export']; readonly note: string; readonly recipe: CircuitRecipe
 }
 const at = (x: number, y: number): Position => ({ x, y })
@@ -51,6 +53,7 @@ function template(id: string, familyId: string, name: string, description: strin
 }
 
 export const circuitTemplates: readonly CircuitTemplate[] = freezeSnapshot([
+  ...amplifierTemplates,
   ...analogTemplates,
   template('resistor-series', 'resistive.series-parallel', '电阻串联电路', '两个电阻串联，观察内部节点与保留的外部端口。', series, [2], ['等效变换', 'KVL']),
   template('resistor-parallel', 'resistive.series-parallel', '电阻并联电路', '两个支路共享一对节点，比较阻值与连接。', parallel, [2], ['等效变换', 'KCL']),
