@@ -1,5 +1,5 @@
 import type { EngineeringProject } from '../engineering'
-import { buildEditorView } from './view'
+import { buildEditorView, componentValueText } from './view'
 import { SymbolBody } from './SymbolBody'
 
 /** Read-only projection of the same engineering graph, geometry and symbols as the editor. */
@@ -12,7 +12,7 @@ export function SchematicPreview({ project }: { readonly project: EngineeringPro
     {view.components.map(({ component, definition, placement }) => <g className="editor-component" key={component.id}>
       <g transform={`translate(${placement.origin.x} ${placement.origin.y}) rotate(${placement.rotationDegrees})`}><SymbolBody kind={definition.kind} /></g>
       <text x={placement.origin.x + (placement.rotationDegrees ? 36 : 0)} y={placement.origin.y - 30} textAnchor={placement.rotationDegrees ? 'start' : 'middle'}>{component.reference}</text>
-      <text className="component-value" x={placement.origin.x + (placement.rotationDegrees ? 36 : 0)} y={placement.origin.y + 36} textAnchor={placement.rotationDegrees ? 'start' : 'middle'}>{Object.values(component.parameters).map(p => p.kind === 'quantity' ? `${p.quantity.value} ${p.quantity.unit === 'ohm' ? 'Ω' : p.quantity.unit}` : '').join(' ')}</text>
+      <text className="component-value" x={placement.origin.x + (placement.rotationDegrees ? 36 : 0)} y={placement.origin.y + 36} textAnchor={placement.rotationDegrees ? 'start' : 'middle'}>{componentValueText(component, definition.kind)}</text>
     </g>)}
     {view.sheet.anchors.map(a => { const p = view.positions[a.id]!; return <circle key={a.id} cx={p.x} cy={p.y} r={view.sheet.connections.filter(c => c.endpoints.includes(a.id)).length > 2 ? 5 : 3} fill="var(--ink)" /> })}
     {view.sheet.ports.map(port => { const p = view.positions[port.anchorId]!; return <text className="atlas-port" key={port.id} x={p.x + 10} y={p.y - 14}>{port.label}</text> })}

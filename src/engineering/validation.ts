@@ -37,7 +37,7 @@ const digest: Rule = (v, p) => { if (typeof v !== 'string' || !/^[\da-f]{64}$/i.
 const utc: Rule = (v, p) => {
   if (typeof v !== 'string' || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z$/.test(v) || !Number.isFinite(Date.parse(v))) fail(p, 'timestamp', 'Expected an ISO 8601 UTC timestamp ending in Z.')
 }
-export const CANONICAL_UNITS: readonly string[] = Object.freeze(['1', 'ohm', 'V', 'A', 's', 'Hz', 'F', 'H', 'rad', 'W', 'J', 'S', 'C', 'm', 'K', 'V/Hz', 'A/Hz', 'V^2/Hz', 'A^2/Hz'])
+export const CANONICAL_UNITS: readonly string[] = Object.freeze(['1', 'ohm', 'V', 'A', 's', 'Hz', 'F', 'H', 'rad', 'W', 'J', 'S', 'C', 'm', 'K', 'V/Hz', 'A/Hz', 'V^2/Hz', 'A^2/Hz', 'A/V^2'])
 const unit: Rule = (v, p) => { if (typeof v !== 'string' || !CANONICAL_UNITS.includes(v)) fail(p, 'unit', 'Unsupported canonical unit.') }
 const mediaType: Rule = (v, p) => { if (typeof v !== 'string' || !/^[a-zA-Z0-9!#$&^_.+-]+\/[a-zA-Z0-9!#$&^_.+-]+$/.test(v)) fail(p, 'media-type', 'Expected an explicit media type/subtype without parameters.') }
 const choice = (...values: readonly unknown[]): Rule => (v, p) => { if (!values.includes(v)) fail(p, 'enum', `Expected one of ${values.join(', ')}.`) }

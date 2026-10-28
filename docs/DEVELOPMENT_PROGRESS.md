@@ -1,5 +1,22 @@
 # Development Progress
 
+Updated **2026-10-28**. Active module **V3.1.0 — Analog fundamentals**.
+**In Progress / A01–A10: 6/10 verified**. Owner authorizes implementation and
+release after numerical, compatibility, browser and production acceptance.
+Baseline main41564c9 (remote verified); latest v3.0.0 application a77a221 and
+successful documentation workflow40334349933 confirmed. Focused branch
+`codex/v3.1-analog-fundamentals`. No blocker; not published.
+
+A01 architecture, A02 diode/NR, A04 NPN, A05 nMOS, A06 small signal,
+A07 ideal op-amp: Verified (30 independent/provider tests; integrated scoped
+run105 tests passed). A03 diode experiment UI and A08 integration: In Progress.
+A09 browser acceptance, A10 release: Planned. Twelve analog templates solve
+and retain stable model/pin identities through schema1 roundtrips.
+See [model and solver contract](v3/ANALOG_IMPLEMENTATION.md).
+Next: independent fixtures and editor/Atlas integration. Stop before V3.2/V4.
+
+---
+
 Updated **2026-10-26**. **V3.0.0 — Linear circuit transient and dynamic response**.
 **Implementation Complete → Verified → Released / T01–T10: 10/10**.
 

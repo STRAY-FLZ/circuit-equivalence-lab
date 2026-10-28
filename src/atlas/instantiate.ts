@@ -13,7 +13,7 @@ export function instantiateTemplate(id: string): EngineeringProject {
   for (const item of template.recipe.parts) {
     project = applyEdit(project, sheetId, { type: 'add', kind: item.kind, position: item.position })
     const component = project.sheets[0]!.components.at(-1)!, config = PALETTE[item.kind]
-    project = applyEdit(project, sheetId, { type: 'properties', id: component.id, reference: item.reference, parameters: { [config.parameter]: { kind: 'quantity', quantity: { value: item.value, unit: config.unit } } } })
+    project = applyEdit(project, sheetId, { type: 'properties', id: component.id, reference: item.reference, parameters: { ...component.parameters, [config.parameter]: { kind: 'quantity', quantity: { value: item.value, unit: config.unit } } } })
     for (let angle = 0; angle < item.rotationDegrees; angle += 90) project = applyEdit(project, sheetId, { type: 'rotate', id: component.id })
   }
   const sheet = project.sheets[0]!, nodeIds = Object.fromEntries(Object.keys(template.recipe.nodes).map(key => [key, createId()]))

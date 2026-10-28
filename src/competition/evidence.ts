@@ -52,7 +52,13 @@ export async function receiveToolTransfer(document: ProjectDocumentV1, experimen
       analysisId = configuration.id; resultId = createId(); inputDigest = result.provenance.inputDigest
       analyses = union(analyses, [configuration]); acquisition = '实际软件分析；不代表硬件测量'; method = `${result.provenance.engine.id} / ${result.provenance.engine.version}`; title = configuration.analysisType.includes('ac.') ? '交流分析结果' : '直流分析结果'; artifactValue = result
       const value = result.outcome.value
-      if ('operatingPoint' in value) {
+      if ('devices' in value) {
+        title = '模拟电子工作点'; method += '；声明的入门模型；不支持非线性暂态或真实器件精度保证'
+        for (const d of value.devices) {
+          d.terminalVolts.forEach((volts, i) => add(`${d.componentId}:voltage:${i}`, `${d.reference}端子${i + 1}对参考电压（${d.region}）`, volts, 'V'))
+          d.terminalAmps.forEach((amps, i) => add(`${d.componentId}:current:${i}`, `${d.reference}流入端子${i + 1}电流（${d.region}）`, amps, 'A'))
+        }
+      } else if ('operatingPoint' in value) {
         for (const b of value.operatingPoint.branches) { add(`${b.id}:voltage`, `${b.reference}电压 RMS`, b.voltage.magnitudeRms, 'V'); add(`${b.id}:current`, `${b.reference}电流 RMS`, b.current.magnitudeRms, 'A'); add(`${b.id}:power`, `${b.reference}有功功率`, b.power.realWatts, 'W') }
         const sweep = value.sweep
         if (sweep) { sweep.features.halfPowerCrossingsHz.forEach((f, i) => add(`sweep:crossing:${i}`, `扫描半功率交点估计 ${i + 1}`, f, 'Hz')); if (sweep.features.sampledPeak) add('sweep:peak', '实际采样峰频率（未精确定位）', sweep.features.sampledPeak.frequencyHz, 'Hz'); if (sweep.features.estimatedBandwidthHz !== null) add('sweep:bandwidth', '扫描带宽估计', sweep.features.estimatedBandwidthHz, 'Hz'); for (const [i, point] of sweep.points.entries()) if (point.kind === 'available') { add(`sweep:gain:${i}`, `${point.frequencyHz} Hz幅值比`, point.magnitude, '1'); if (point.gainDb !== null) add(`sweep:db:${i}`, `${point.frequencyHz} Hz增益`, point.gainDb, 'dB') } }

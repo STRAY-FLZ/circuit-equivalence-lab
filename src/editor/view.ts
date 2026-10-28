@@ -1,5 +1,6 @@
 import { deriveElectricalNets } from '../engineering'
-import type { EngineeringProject, Id, Position } from '../engineering'
+import { ANALOG_DEVICES } from '../engineering'
+import type { AnalogKind, ComponentInstance, EngineeringProject, Id, Position } from '../engineering'
 import { connectionRoute, pinPosition, wireRoute } from '../editing'
 
 export function buildEditorView(project: EngineeringProject, sheetId: Id, drag?: { readonly id: Id; readonly origin: Position }) {
@@ -25,3 +26,9 @@ export function nearestAnchor(positions: Readonly<Record<Id, Position>>, point: 
   return Object.entries(positions).map(([id, p]) => ({ id, distance: Math.hypot(point.x - p.x, point.y - p.y) })).filter(p => p.distance <= radius).sort((a, b) => a.distance - b.distance)[0]?.id
 }
 export function netInspection(project: EngineeringProject) { return deriveElectricalNets(project) }
+
+/** Keep full parameters in properties; multi-parameter device labels stay readable. */
+export function componentValueText(component: ComponentInstance, kind: string): string {
+  const parameters = kind in ANALOG_DEVICES ? [component.parameters[ANALOG_DEVICES[kind as AnalogKind].parameter]] : Object.values(component.parameters)
+  return parameters.filter(p => p?.kind === 'quantity').map(p => p?.kind === 'quantity' ? `${p.quantity.value} ${p.quantity.unit === 'ohm' ? 'Ω' : p.quantity.unit}` : '').join(' / ')
+}

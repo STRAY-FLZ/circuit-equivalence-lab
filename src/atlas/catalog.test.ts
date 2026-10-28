@@ -6,9 +6,9 @@ import { createProjectDocument, deserializeProject, serializeProject } from '../
 import { discoverForProject, previewTransformation } from '../integration'
 
 describe('circuit atlas catalog and real project recipes', () => {
-  it('represents all twelve categories and every requested family with translation-independent unique keys', () => {
-    expect(circuitCategories).toHaveLength(12)
-    expect(circuitCategories.map(c => c.families.length)).toEqual([8, 9, 7, 7, 6, 8, 7, 8, 6, 8, 7, 8])
+  it('preserves twelve circuit categories and adds four analog families with unique keys', () => {
+    expect(circuitCategories).toHaveLength(13)
+    expect(circuitCategories.map(c => c.families.length)).toEqual([4, 8, 9, 7, 7, 6, 8, 7, 8, 6, 8, 7, 8])
     const ids = [...circuitCategories.map(c => c.id), ...circuitCategories.flatMap(c => c.families.map(f => f.id)), ...circuitTemplates.map(t => t.id)]
     expect(new Set(ids).size).toBe(ids.length)
     expect(ids.every(id => /^[a-z][a-z0-9.-]+$/.test(id))).toBe(true)

@@ -1,0 +1,14 @@
+.analog-panel { border-block: 1px solid var(--line); padding: 1.5rem 0; margin-block: 1rem; }
+.analog-form { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; margin-block: .75rem; }
+.analog-panel label { display: grid; gap: .35rem; max-width: 100%; }
+.analog-panel input, .analog-panel select { max-width: 100%; min-height: 2.4rem; }
+.analog-panel fieldset { min-width: 0; margin-block: 1rem; }
+.analog-panel svg { display: block; width: 100%; max-width: 760px; color: var(--ink); }
+.analog-panel svg text { fill: currentColor; font-size: 13px; }
+.analog-axis { fill: none; stroke: var(--muted); }
+.analog-trace { fill: none; stroke: var(--accent); stroke-width: 2; }
+.analog-loadline { fill: none; stroke: var(--blue); stroke-width: 2; stroke-dasharray: 6 4; }
+.analog-warning { font-weight: 600; }
+.analog-record { max-height: 20rem; overflow: auto; font-size: .75rem; }
+.analog-panel table { font-size: .88rem; }
+@media (max-width: 600px) { .analog-panel figure { margin-inline: 0; } .analog-form > label { flex: 1 1 130px; } }

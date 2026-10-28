@@ -6,6 +6,7 @@ const category = (id: string, name: string, families: readonly (readonly [string
 
 /** IDs are stable catalog keys, independent of UI translations and project UUIDs. */
 export const circuitCategories = freezeSnapshot([
+  category('analog', '模拟电子技术基础', [['diode', '二极管与准静态实验'], ['npn', 'NPN 偏置与共射'], ['nmos', 'nMOS 偏置与共源'], ['ideal-opamp', '理想运放负反馈']]),
   category('resistive', '电源与电阻网络', [
     ['basic', '基础电阻电路'], ['sources', '独立电源电路'], ['series-parallel', '串联与并联网络'], ['mixed', '混合电阻网络'], ['bridge', '桥式电路'], ['star-delta', '星形与三角形网络'], ['multi-loop', '多电源与多回路网络'], ['equivalent-source', '等效电源网络'],
   ]),

@@ -2,14 +2,16 @@ import { freezeSnapshot } from '../engineering'
 import type { Position } from '../engineering'
 import { PALETTE } from '../editing'
 import type { PaletteKind } from '../editing'
+import { analogTemplates } from './analog-templates'
 
-export interface TemplatePart { readonly reference: string; readonly kind: PaletteKind; readonly value: number; readonly nodes: readonly [string, string]; readonly position: Position; readonly rotationDegrees: 0 | 90 | 270 }
+export interface TemplatePart { readonly reference: string; readonly kind: PaletteKind; readonly value: number; readonly nodes: readonly string[]; readonly position: Position; readonly rotationDegrees: 0 | 90 | 270 }
 export interface CircuitRecipe { readonly nodes: Readonly<Record<string, Position>>; readonly parts: readonly TemplatePart[]; readonly ports: Readonly<Record<string, string>> }
 export interface CircuitTemplate {
   readonly id: string; readonly categoryId: string; readonly familyId: string; readonly name: string; readonly description: string
   readonly difficulty: '入门' | '进阶'; readonly components: readonly string[]; readonly topics: readonly string[]; readonly methods: readonly string[]; readonly chapters: readonly number[]
   readonly status: 'implemented'; readonly capabilities: { readonly schematic: true; readonly editable: true; readonly numerical: boolean; readonly dc: boolean; readonly ac: boolean; readonly experiment: boolean }
   readonly acExperiment?: { readonly inputPorts: readonly [string, string]; readonly outputPorts: readonly [string, string]; readonly passband: 'low' | 'high' | 'peak' }
+  readonly analog?: 'diode' | 'npn' | 'nmos' | 'ideal-opamp'
   readonly actions: readonly ['view', 'edit', 'export']; readonly note: string; readonly recipe: CircuitRecipe
 }
 const at = (x: number, y: number): Position => ({ x, y })
@@ -49,6 +51,7 @@ function template(id: string, familyId: string, name: string, description: strin
 }
 
 export const circuitTemplates: readonly CircuitTemplate[] = freezeSnapshot([
+  ...analogTemplates,
   template('resistor-series', 'resistive.series-parallel', '电阻串联电路', '两个电阻串联，观察内部节点与保留的外部端口。', series, [2], ['等效变换', 'KVL']),
   template('resistor-parallel', 'resistive.series-parallel', '电阻并联电路', '两个支路共享一对节点，比较阻值与连接。', parallel, [2], ['等效变换', 'KCL']),
   template('resistor-mixed', 'resistive.mixed', '串并联混合电路', '串联一个双支路并联网络，支持分步化简。', mixed, [2], ['等效变换', 'KCL', 'KVL']),

@@ -9,14 +9,16 @@ import type { InlineAsset, ProjectDocumentV1 } from '../project-format'
 import type { AnalysisCapture } from '../analysis'
 import type { DcSolution } from '../dc'
 import type { AcResult } from '../ac'
+import type { AnalogSolution } from '../analog'
 import packageText from '../../package.json?raw'
-import { buildEditorView, nearestAnchor, netInspection } from './view'
+import { buildEditorView, componentValueText, nearestAnchor, netInspection } from './view'
 import { SymbolBody } from './SymbolBody'
 import { ComponentProperties } from './Properties'
 import { TransformationPanel } from './TransformationPanel'
 import { writebackTransformation } from '../integration'
 import type { TransformationHighlight, TransformationPreview } from '../integration'
 import { TransientPanel } from '../transient-ui/TransientPanel'
+import { AnalogPanel } from '../analog-ui/AnalogPanel'
 import { AcAnalysisPanel } from '../ac-ui/AcAnalysisPanel'
 import { DcAnalysisPanel } from '../dc-ui/DcAnalysisPanel'
 import type { DcHighlight } from '../dc-ui/DcAnalysisPanel'
@@ -52,13 +54,14 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : '操作失败，工程保持不变。'
 }
 
-export interface SchematicEditorHandle { openDocument: (document: ProjectDocumentV1, mode?: 'dc' | 'ac' | 'transient') => boolean; openTemplate: (project: EngineeringProject, mode?: 'dc' | 'ac' | 'transient') => boolean }
-export function SchematicEditor({ ref, onCapture, onSync, onSourceRevision, onOpenSignal, onWaveformCapture }: { readonly ref?: Ref<SchematicEditorHandle>; readonly onOpenSignal?: ((document: ProjectDocumentV1) => Promise<boolean>) | undefined; readonly onWaveformCapture?: ((document: ProjectDocumentV1, datasetId: string, channelId: string) => Promise<boolean>) | undefined; readonly onCapture?: ((document: ProjectDocumentV1, capture: AnalysisCapture<DcSolution> | AnalysisCapture<AcResult>) => Promise<boolean>) | undefined; readonly onSync?: ((document: ProjectDocumentV1) => Promise<boolean>) | undefined; readonly onSourceRevision?: (projectId: string, revision: string) => void }) {
+export interface SchematicEditorHandle { openDocument: (document: ProjectDocumentV1, mode?: 'dc' | 'ac' | 'transient' | 'analog') => boolean; openTemplate: (project: EngineeringProject, mode?: 'dc' | 'ac' | 'transient' | 'analog') => boolean }
+export function SchematicEditor({ ref, onCapture, onSync, onSourceRevision, onOpenSignal, onWaveformCapture }: { readonly ref?: Ref<SchematicEditorHandle>; readonly onOpenSignal?: ((document: ProjectDocumentV1) => Promise<boolean>) | undefined; readonly onWaveformCapture?: ((document: ProjectDocumentV1, datasetId: string, channelId: string) => Promise<boolean>) | undefined; readonly onCapture?: ((document: ProjectDocumentV1, capture: AnalysisCapture<DcSolution> | AnalysisCapture<AcResult> | AnalysisCapture<AnalogSolution>) => Promise<boolean>) | undefined; readonly onSync?: ((document: ProjectDocumentV1) => Promise<boolean>) | undefined; readonly onSourceRevision?: (projectId: string, revision: string) => void }) {
   const [history, setHistory] = useState(() => createHistory(newEditorProject()))
   const [transformHighlight, setTransformHighlight] = useState<TransformationHighlight | null>(null)
   const [documentGeneration, setDocumentGeneration] = useState(0)
   const [transientOpen, setTransientOpen] = useState(false), [transientDirty, setTransientDirty] = useState(false)
   const [acOpen, setAcOpen] = useState(false)
+  const [analogOpen, setAnalogOpen] = useState(false)
   const [dcOpen, setDcOpen] = useState(false), [dcReference, setDcReference] = useState('')
   const [dcHighlight, setDcHighlight] = useState<DcHighlight | null>(null)
   const project = history.present
@@ -216,11 +219,11 @@ export function SchematicEditor({ ref, onCapture, onSync, onSourceRevision, onOp
   const mayReplace = () => project.revision === savedRevision && !transientDirty || window.confirm('当前工程有未导出的修改，继续将替换当前工程。是否继续？')
   useImperativeHandle(ref, () => ({ openDocument(document, mode) {
     if (busy || !mayReplace()) return false
-    cancelGesture(); setTransformHighlight(null); setWireStart(null); reset(document.project, document.inlineAssets, true); setTransientOpen(mode === 'transient'); setAcOpen(mode === 'ac'); setDcOpen(mode === 'dc'); setDcReference(mode === 'dc' ? document.project.sheets[0]?.ports.find(p => ['COM', 'B'].includes(p.label))?.anchorId ?? '' : ''); setViewport(fittedViewport(document.project.sheets[0]!.geometry.anchorPositions)); announce('已载入电赛工程；运行后可关联真实结果，或回传编辑后的工程。'); return true
+    cancelGesture(); setTransformHighlight(null); setWireStart(null); reset(document.project, document.inlineAssets, true); setAnalogOpen(mode === 'analog'); setTransientOpen(mode === 'transient'); setAcOpen(mode === 'ac'); setDcOpen(mode === 'dc'); setDcReference(mode === 'dc' ? document.project.sheets[0]?.ports.find(p => ['COM', 'B'].includes(p.label))?.anchorId ?? '' : ''); setViewport(fittedViewport(document.project.sheets[0]!.geometry.anchorPositions)); announce('已载入电赛工程；运行后可关联真实结果，或回传编辑后的工程。'); return true
   }, openTemplate(next, mode) {
     if (busy || !mayReplace()) return false
     cancelGesture(); setTransformHighlight(null); setWireStart(null)
-    reset(next, [], false); setTransientOpen(mode === 'transient'); setAcOpen(mode === 'ac'); setDcOpen(mode === 'dc'); setDcReference(mode === 'dc' ? next.sheets[0]?.ports.find(p => ['COM', 'B'].includes(p.label))?.anchorId ?? '' : ''); setDcHighlight(null); setViewport(fittedViewport(next.sheets[0]!.geometry.anchorPositions))
+    reset(next, [], false); setAnalogOpen(mode === 'analog'); setTransientOpen(mode === 'transient'); setAcOpen(mode === 'ac'); setDcOpen(mode === 'dc'); setDcReference(mode === 'dc' ? next.sheets[0]?.ports.find(p => ['COM', 'B'].includes(p.label))?.anchorId ?? '' : ''); setDcHighlight(null); setViewport(fittedViewport(next.sheets[0]!.geometry.anchorPositions))
     announce('已打开独立模板工程，可编辑、撤销并导出保存。')
     return true
   } }))
@@ -235,10 +238,10 @@ export function SchematicEditor({ ref, onCapture, onSync, onSourceRevision, onOp
     } catch { announce('读取文件失败，当前工程保持不变。', true) } finally { setBusy(false) }
   }
   const sheet = view.sheet
-  const valueText = (id: string) => { const c = sheet.components.find(c => c.id === id); if (!c) return ''; return Object.values(c.parameters).filter(p => p.kind === 'quantity').map(p => p.kind === 'quantity' ? `${p.quantity.value} ${p.quantity.unit === 'ohm' ? 'Ω' : p.quantity.unit}` : '').join(' / ') }
+  const valueText = (id: string) => { const c = sheet.components.find(c => c.id === id); return c ? componentValueText(c, project.definitions.find(d => d.id === c.definitionId)!.kind) : '' }
   return <section className="schematic-editor" aria-label="原理图编辑工作区" aria-busy={busy} onKeyDown={event => {
     const target = event.target as HTMLElement
-    if (target.closest('input,select,textarea,[contenteditable=true],.transient-panel')) return
+    if (target.closest('input,select,textarea,[contenteditable=true],.transient-panel,.analog-panel')) return
     const modified = event.ctrlKey || event.metaKey, key = event.key.toLowerCase()
     if (modified && key === 's') { event.preventDefault(); void save(); return }
     if (modified && key === 'o') { event.preventDefault(); fileInput.current?.click(); return }
@@ -255,7 +258,7 @@ export function SchematicEditor({ ref, onCapture, onSync, onSourceRevision, onOp
     </div>
     <div className="editor-project-row"><form key={`title-${project.revision}`} onSubmit={event => { event.preventDefault(); const title = new FormData(event.currentTarget).get('title'); if (typeof title === 'string') edit({ type: 'title', title }) }}><label>工程名称<input name="title" aria-label="工程名称" defaultValue={project.title} /></label><button disabled={busy}>更新名称</button></form><span>{project.revision === savedRevision ? '已导出或未修改' : '有未导出的修改'}</span><label>当前图纸<select aria-label="当前图纸" value={sheetId} onChange={event => { cancelGesture(); setActiveSheet(event.target.value); setSelection(null); setWireStart(null) }}>{project.sheets.map(s => <option key={s.id} value={s.id}>{s.title || '未命名图纸'}</option>)}</select></label></div>
     {onSync && <button disabled={busy} onClick={() => { setBusy(true); void createProjectDocument(project, writer, activeAssets).then(onSync).then(ok => { if (!ok) announce('回传未完成，当前工程保留，请检查电赛工作台。', true) }).catch(e => announce(errorMessage(e), true)).finally(() => setBusy(false)) }}>回传当前工程到电赛</button>}
-    <div className="editor-toolbar" aria-label="编辑工具"><button disabled={!history.past.length || busy} onClick={undo}>撤销</button><button disabled={!history.future.length || busy} onClick={redo}>重做</button><span className="editor-divider" />{tools.map(([key, name]) => <button key={key} disabled={busy} aria-pressed={tool === key} onClick={() => chooseTool(key)}>{name}</button>)}<span className="editor-divider" /><button onClick={() => zoom(1.25)} aria-label="放大画布">＋</button><button onClick={() => zoom(0.8)} aria-label="缩小画布">−</button><button onClick={fit}>适合视图</button><button onClick={() => setViewport(INITIAL_VIEW)}>重置视图</button><span>{Math.round(viewport.zoom * 100)}%</span><button aria-pressed={dcOpen} onClick={() => { setDcOpen(!dcOpen); setDcHighlight(null) }}>直流分析</button><button aria-pressed={acOpen} onClick={() => { setAcOpen(!acOpen); setDcHighlight(null) }}>交流分析与滤波</button><button aria-pressed={transientOpen} onClick={() => { if (transientOpen && transientDirty && !window.confirm('暂态设置或模拟结果尚未保存到工程，关闭将丢失这些修改。继续？')) return; setTransientDirty(false); setTransientOpen(!transientOpen); setDcHighlight(null) }}>暂态分析</button></div>
+    <div className="editor-toolbar" aria-label="编辑工具"><button disabled={!history.past.length || busy} onClick={undo}>撤销</button><button disabled={!history.future.length || busy} onClick={redo}>重做</button><span className="editor-divider" />{tools.map(([key, name]) => <button key={key} disabled={busy} aria-pressed={tool === key} onClick={() => chooseTool(key)}>{name}</button>)}<span className="editor-divider" /><button onClick={() => zoom(1.25)} aria-label="放大画布">＋</button><button onClick={() => zoom(0.8)} aria-label="缩小画布">−</button><button onClick={fit}>适合视图</button><button onClick={() => setViewport(INITIAL_VIEW)}>重置视图</button><span>{Math.round(viewport.zoom * 100)}%</span><button aria-pressed={analogOpen} onClick={() => setAnalogOpen(!analogOpen)}>模拟电子</button><button aria-pressed={dcOpen} onClick={() => { setDcOpen(!dcOpen); setDcHighlight(null) }}>直流分析</button><button aria-pressed={acOpen} onClick={() => { setAcOpen(!acOpen); setDcHighlight(null) }}>交流分析与滤波</button><button aria-pressed={transientOpen} onClick={() => { if (transientOpen && transientDirty && !window.confirm('暂态设置或模拟结果尚未保存到工程，关闭将丢失这些修改。继续？')) return; setTransientDirty(false); setTransientOpen(!transientOpen); setDcHighlight(null) }}>暂态分析</button></div>
     {(tool === 'label' || tool === 'port') && <div className="editor-marker-options"><label>标注名称<input aria-label="标注名称" value={label} onChange={e => setLabel(e.target.value)} /></label>{tool === 'label' && <label>标签作用域<select value={labelScope} onChange={e => setLabelScope(e.target.value as 'sheet' | 'project')}><option value="sheet">当前图纸</option><option value="project">整个工程</option></select></label>}</div>}
     <p role={error ? 'alert' : 'status'} className={`editor-message ${error ? 'error' : ''}`}>{message}</p>
     <div className="editor-layout"><aside className="editor-palette" aria-label="元件库"><h2>01 / 元件</h2>{(Object.keys(PALETTE) as PaletteKind[]).map(key => <button key={key} aria-pressed={tool === 'place' && kind === key} disabled={busy} onClick={() => { setKind(key); chooseTool('place'); announce(`点击画布放置${PALETTE[key].title}；Esc 返回选择。`) }}>{PALETTE[key].title} {PALETTE[key].prefix}</button>)}<p className="muted">先选元件，再点画布。拖动元件本体移动；拖动引脚接线；R 旋转；Delete 删除。</p><p className="muted">GND 建立显式地网连接；求解参考只标记零电位，不连接网络。</p></aside>
@@ -281,6 +284,7 @@ export function SchematicEditor({ ref, onCapture, onSync, onSourceRevision, onOp
         <details className="editor-shortcuts"><summary>操作提示与快捷键</summary><p>V 选择，W 接线，J 结点，R 旋转，方向键微移，Delete 删除。Ctrl / ⌘ Z 撤销，Shift Z 或 Y 重做，S 导出，O 打开。</p><p>结点工具会显式连接点击处经过的导线。平移、缩放、选中和拖动预览不改变工程修订。</p></details>
       </aside>
     </div>
+    {analogOpen && <AnalogPanel key={`analog:${project.id}:${sheetId}:${documentGeneration}`} project={project} sheetId={sheetId} onCapture={onCapture ? async capture => onCapture(await createProjectDocument(capture.project, writer, activeAssets), capture) : undefined} onCommit={(next, expected) => { const current = latest.current.history; if (current.present.revision !== expected) return false; setHistory(commitSnapshot(current, expected, next)); onSourceRevision?.(next.id, next.revision); return true }} />}
     {transientOpen && <TransientPanel key={`transient:${project.id}:${sheetId}:${documentGeneration}`} project={project} sheetId={sheetId} assets={activeAssets} writer={writer} onDirty={setTransientDirty} onOpenSignal={onOpenSignal} onCapture={onWaveformCapture} onPreset={(next, expected) => { const current = latest.current.history; if (current.present.revision !== expected) return false; setHistory(commitSnapshot(current, expected, next)); onSourceRevision?.(next.id, next.revision); return true }} onCommit={(document, expected) => { const current = latest.current; if (current.history.present.revision !== expected) return false; setHistory(commitSnapshot(current.history, expected, document.project)); setAssets([...current.assets, ...document.inlineAssets.filter(a => !current.assets.some(old => old.assetId === a.assetId))]); onSourceRevision?.(document.project.id, document.project.revision); announce('暂态数据已作为完整事务写入工程，可撤销/重做；请导出文件保存。'); return true }} />}
     {acOpen && <AcAnalysisPanel key={`ac:${project.id}:${sheetId}`} project={project} sheetId={sheetId} onHighlight={setDcHighlight} onCapture={onCapture ? async capture => onCapture(await createProjectDocument(capture.project, writer, activeAssets), capture) : undefined} onSave={settings => { const stored = project.extensions['org.stray.ac']; const sheets = stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {}; const next = reviseProject(project, project.revision, { extensions: { ...project.extensions, 'org.stray.ac': { ...sheets, [sheetId]: { ...settings } } } }); setHistory(commitSnapshot(history, project.revision, next)); onSourceRevision?.(next.id, next.revision); setDcHighlight(null); announce('交流配置已保存到当前工程；请导出工程文件以保留。') }} />}
     {dcOpen && <DcAnalysisPanel key={`dc:${project.id}:${sheetId}`} project={project} sheetId={sheetId} initialReference={dcReference} onHighlight={setDcHighlight} onCapture={onCapture ? async capture => onCapture(await createProjectDocument(capture.project, writer, activeAssets), capture) : undefined} />}

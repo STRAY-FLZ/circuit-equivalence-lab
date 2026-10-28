@@ -3,6 +3,7 @@ import type { ProjectDocumentV1 } from '../project-format'
 import type { AnalysisResult } from '../analysis'
 import type { DcSolution } from '../dc'
 import type { AcResult } from '../ac'
+import type { AnalogSolution } from '../analog'
 
 export type Criterion =
   | { readonly kind: 'exact'; readonly expected: number; readonly absoluteTolerance: number; readonly relativeTolerance: number }
@@ -56,7 +57,7 @@ export interface WorkspaceState {
   readonly evidence: readonly Evidence[]; readonly attempts: readonly Attempt[]
 }
 export type Judgment = { readonly kind: 'pass' | 'fail'; readonly actual: number; readonly absoluteError: number | null; readonly relativeError: number | null; readonly detail: string } | { readonly kind: 'indeterminate'; readonly detail: string }
-export type ToolKind = 'signal' | 'dc' | 'ac' | 'transient' | 'atlas'
-export interface AnalysisTransfer { readonly project: EngineeringProject; readonly configuration: AnalysisConfiguration; readonly result: AnalysisResult<DcSolution> | AnalysisResult<AcResult> }
+export type ToolKind = 'signal' | 'dc' | 'ac' | 'transient' | 'atlas' | 'analog'
+export interface AnalysisTransfer { readonly project: EngineeringProject; readonly configuration: AnalysisConfiguration; readonly result: AnalysisResult<DcSolution> | AnalysisResult<AcResult> | AnalysisResult<AnalogSolution> }
 export type ToolTransfer = { readonly kind: 'analysis'; readonly document: ProjectDocumentV1; readonly analysis: AnalysisTransfer } | { readonly kind: 'signal'; readonly document: ProjectDocumentV1; readonly datasetId: string; readonly channelId: string } | { readonly kind: 'snapshot'; readonly document: ProjectDocumentV1 }
 export const WORKSPACE_EXTENSION = 'org.stray.competition.workspace'
