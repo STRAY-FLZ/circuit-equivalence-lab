@@ -1,7 +1,7 @@
 import type { ComponentDefinition, ComponentInstance, ParameterValue } from '../engineering'
 import type { EditOperation } from '../editing'
 
-const parameterNames: Readonly<Record<string, string>> = { resistance: '电阻', capacitance: '电容', inductance: '电感', voltage: '电压', current: '电流', gain: '增益', controlBranchId: '控制电流支路', saturationCurrent: '饱和电流 IS', ideality: '理想因子 n', temperature: '结温', reverseLimit: '反向有效电压上限', beta: '正向电流增益 β', saturationVoltage: '饱和压降 VCEsat', threshold: '阈值 Vth', transconductance: '平方律系数 k', modelVersion: '模型版本' }
+const parameterNames: Readonly<Record<string, string>> = { resistance: '电阻', capacitance: '电容', inductance: '电感', voltage: '电压', current: '电流', gain: '增益', openLoopGain: '开环直流增益 A0', poleHz: '主极点频率', controlBranchId: '控制电流支路', saturationCurrent: '饱和电流 IS', ideality: '理想因子 n', temperature: '结温', reverseLimit: '反向有效电压上限', beta: '正向电流增益 β', saturationVoltage: '饱和压降 VCEsat', threshold: '阈值 Vth', transconductance: '平方律系数 k', modelVersion: '模型版本' }
 const unitNames: Readonly<Record<string, string>> = { ohm: 'Ω', F: 'F', H: 'H', V: 'V', A: 'A' }
 export function ComponentProperties({ component, definition, controllers = [], onEdit }: { readonly component: ComponentInstance; readonly definition: ComponentDefinition; readonly controllers?: readonly ComponentInstance[]; readonly onEdit: (op: EditOperation) => void }) {
   return <form onSubmit={event => {

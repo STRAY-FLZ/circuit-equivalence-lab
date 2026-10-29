@@ -23,11 +23,11 @@ describe('engineering editing transactions', () => {
     expect(initial.sheets[0]!.components).toHaveLength(0)
     expect(p.id).toBe(initial.id); expect(p.revision).not.toBe(initial.revision)
     expect(p.definitions[0]!.resource.version).toBe('1')
-    const pinCount = kind === 'vcvs' || kind === 'vccs' ? 4 : ['npn', 'nmos', 'ideal-opamp'].includes(kind) ? 3 : 2
+    const pinCount = kind === 'vcvs' || kind === 'vccs' ? 4 : ['npn', 'nmos', 'ideal-opamp', 'dynamic-opamp'].includes(kind) ? 3 : 2
     expect(c.pins).toHaveLength(pinCount); expect(new Set(c.pins.map(pin => pin.anchorId)).size).toBe(pinCount)
     if (pinCount === 4) expect(s.geometry.anchorPositions[c.pins[2]!.anchorId]).toEqual({ x: 160, y: 260 })
     expect(s.geometry.placements[0]!.origin).toEqual({ x: 200, y: 200 })
-    expect(s.geometry.anchorPositions[c.pins[0]!.anchorId]).toEqual({ x: 160, y: kind === 'ideal-opamp' ? 180 : 200 })
+    expect(s.geometry.anchorPositions[c.pins[0]!.anchorId]).toEqual({ x: 160, y: kind === 'ideal-opamp' || kind === 'dynamic-opamp' ? 180 : 200 })
   })
   it('connects explicit pins, moves and rotates without changing graph or identities', () => {
     let { p } = pair(); const [a, b] = p.sheets[0]!.components

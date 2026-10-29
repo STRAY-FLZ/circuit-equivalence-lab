@@ -1,10 +1,11 @@
-import { ANALOG_DEVICES, analogDefaults, createAnalogDefinition, DC_SOURCES, createDcSourceDefinition, createEmptyProject, createEngineeringProject, createId, createResistorDefinition, instantiateComponent, reviseProject } from '../engineering'
+import { ANALOG_DEVICES, analogDefaults, createAnalogDefinition, DYNAMIC_OPAMP, dynamicOpampDefaults, createDynamicOpampDefinition, DC_SOURCES, createDcSourceDefinition, createEmptyProject, createEngineeringProject, createId, createResistorDefinition, instantiateComponent, reviseProject } from '../engineering'
 import type { AnalogKind } from '../engineering'
 import type { ComponentDefinition, EngineeringProject, Id, ParameterValue, Position, SchematicSheet, SymbolDefinition } from '../engineering'
 
-export type PaletteKind = 'resistor' | 'capacitor' | 'inductor' | 'voltage-source' | 'current-source' | 'vcvs' | 'vccs' | 'ccvs' | 'cccs' | AnalogKind
+export type PaletteKind = 'resistor' | 'capacitor' | 'inductor' | 'voltage-source' | 'current-source' | 'vcvs' | 'vccs' | 'ccvs' | 'cccs' | 'dynamic-opamp' | AnalogKind
 export const PALETTE = {
   ...ANALOG_DEVICES,
+  'dynamic-opamp': DYNAMIC_OPAMP,
   resistor: { title: '电阻', prefix: 'R', parameter: 'resistance', unit: 'ohm', value: 100 },
   capacitor: { title: '电容', prefix: 'C', parameter: 'capacitance', unit: 'F', value: 0.000001 },
   inductor: { title: '电感', prefix: 'L', parameter: 'inductance', unit: 'H', value: 0.001 },
@@ -68,7 +69,7 @@ function getSheet(project: EngineeringProject, id: Id): SchematicSheet {
 function symbolFor(def: ComponentDefinition, project: EngineeringProject): SymbolDefinition {
   const existing = project.symbols.find(s => s.id === def.defaultSymbolId) ?? project.symbols.find(s => s.resource.id === `org.stray.symbol.${def.kind}` && s.resource.version === '1' && def.pins.every(p => Object.hasOwn(s.pinPositions, p.key)))
   if (existing) return existing
-  const positions = Object.fromEntries(def.pins.map((p, i) => [p.key, def.kind === 'npn' || def.kind === 'nmos' ? [{ x: -40, y: 0 }, { x: 40, y: -40 }, { x: 40, y: 40 }][i]! : def.kind === 'ideal-opamp' ? [{ x: -40, y: -20 }, { x: -40, y: 20 }, { x: 40, y: 0 }][i]! : (def.kind === 'vcvs' || def.kind === 'vccs') ? { x: i % 2 === 0 ? -40 : 40, y: i < 2 ? 0 : 60 } : def.pins.length === 2 ? { x: i === 0 ? -40 : 40, y: 0 } : { x: i % 2 === 0 ? -60 : 60, y: Math.floor(i / 2) * 20 - 20 }]))
+  const positions = Object.fromEntries(def.pins.map((p, i) => [p.key, def.kind === 'npn' || def.kind === 'nmos' ? [{ x: -40, y: 0 }, { x: 40, y: -40 }, { x: 40, y: 40 }][i]! : def.kind === 'ideal-opamp' || def.kind === 'dynamic-opamp' ? [{ x: -40, y: -20 }, { x: -40, y: 20 }, { x: 40, y: 0 }][i]! : (def.kind === 'vcvs' || def.kind === 'vccs') ? { x: i % 2 === 0 ? -40 : 40, y: i < 2 ? 0 : 60 } : def.pins.length === 2 ? { x: i === 0 ? -40 : 40, y: 0 } : { x: i % 2 === 0 ? -60 : 60, y: Math.floor(i / 2) * 20 - 20 }]))
   return { id: createId(), resource: { id: `org.stray.symbol.${def.kind}`, version: '1' }, pinPositions: positions }
 }
 /** Updates supplied geometry only; pin IDs, edges and their endpoints are retained. */
@@ -116,10 +117,10 @@ export function applyEdit(project: EngineeringProject, sheetId: Id, operation: E
     case 'add': {
       const config = PALETTE[operation.kind]
       let def = definitions.find(d => d.resource.id === `org.stray.component.${operation.kind}` && d.resource.version === '1')
-      if (!def) { def = operation.kind in ANALOG_DEVICES ? createAnalogDefinition(operation.kind as AnalogKind) : operation.kind === 'resistor' ? createResistorDefinition() : operation.kind in DC_SOURCES ? createDcSourceDefinition(operation.kind as keyof typeof DC_SOURCES) : { id: createId(), resource: { id: `org.stray.component.${operation.kind}`, version: '1' }, kind: operation.kind, pins: [{ key: '1', name: '1', electricalRole: 'passive' }, { key: '2', name: '2', electricalRole: 'passive' }], parameters: [{ key: config.parameter, kind: 'quantity', unit: config.unit, required: true }], modelBindings: [] }; definitions = [...definitions, def] }
+      if (!def) { def = operation.kind === 'dynamic-opamp' ? createDynamicOpampDefinition() : operation.kind in ANALOG_DEVICES ? createAnalogDefinition(operation.kind as AnalogKind) : operation.kind === 'resistor' ? createResistorDefinition() : operation.kind in DC_SOURCES ? createDcSourceDefinition(operation.kind as keyof typeof DC_SOURCES) : { id: createId(), resource: { id: `org.stray.component.${operation.kind}`, version: '1' }, kind: operation.kind, pins: [{ key: '1', name: '1', electricalRole: 'passive' }, { key: '2', name: '2', electricalRole: 'passive' }], parameters: [{ key: config.parameter, kind: 'quantity', unit: config.unit, required: true }], modelBindings: [] }; definitions = [...definitions, def] }
       let serial = 1
       while (project.sheets.some(s => s.components.some(c => c.reference === `${config.prefix}${serial}`))) serial++
-      const added = instantiateComponent(def, `${config.prefix}${serial}`, { ...(operation.kind in ANALOG_DEVICES ? analogDefaults(operation.kind as AnalogKind) : {}), [config.parameter]: { kind: 'quantity', quantity: { value: config.value, unit: config.unit } }, ...((operation.kind === 'ccvs' || operation.kind === 'cccs') ? { controlBranchId: { kind: 'text' as const, value: '' } } : {}) })
+      const added = instantiateComponent(def, `${config.prefix}${serial}`, { ...(operation.kind === 'dynamic-opamp' ? dynamicOpampDefaults() : operation.kind in ANALOG_DEVICES ? analogDefaults(operation.kind as AnalogKind) : {}), [config.parameter]: { kind: 'quantity', quantity: { value: config.value, unit: config.unit } }, ...((operation.kind === 'ccvs' || operation.kind === 'cccs') ? { controlBranchId: { kind: 'text' as const, value: '' } } : {}) })
       sheet = { ...sheet, components: [...sheet.components, added.component], anchors: [...sheet.anchors, ...added.anchors] }
       const placed = positionComponent({ ...project, definitions }, sheet, added.component.id, operation.position)
       sheet = placed.sheet; if (!symbols.some(s => s.id === placed.symbol.id)) symbols = [...symbols, placed.symbol]

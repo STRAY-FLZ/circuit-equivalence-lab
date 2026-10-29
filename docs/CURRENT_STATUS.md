@@ -1,5 +1,15 @@
 # Current Development Status
 
+**2026-10-29 — V3.3.0 operational-amplifier frequency response: In Progress, O01–O10 1/10.**
+The owner authorized implementation and production release after full acceptance.
+Public V3.2.0 and remote/main `69c7f04` were verified; the focused branch is
+`codex/v3.3-opamp-frequency`. O02 is verified; actual finite DC/complex MNA and
+six Atlas recipes have initial focused numerical tests, but integration and broader
+acceptance are unfinished. No V3.3 release exists.
+See [implementation checkpoint](v3/OPAMP_FREQUENCY_IMPLEMENTATION.md). No blocker.
+
+---
+
 Updated **2026-10-29**. **V3.2.0 — Amplifier frequency response**.
 **Implementation Complete → Verified → Released / B01–B10: 10/10**.
 
