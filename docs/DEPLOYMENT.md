@@ -1,5 +1,14 @@
 # Production deployment
 
+Current production **V3.4.0**, Released10/10 on 2026-10-30 (Asia/Shanghai);
+application/tag `abd02a855df8d50f4b5b70c5ed7781e384f652cb`,
+[workflow40917917332](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40917917332)
+and actual public workflows/downloads passed. Published Release428166303 and
+annotated tag were read back. [Release/compatibility/rollback](v3/V3_4_0_RELEASE.md);
+[canonical Release and acceptance-only final handoff](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.4.0).
+The defined V3 product plan is closed; V4 is not started. The entries below retain
+historical deployment evidence.
+
 Current production **V3.3.0**, Released10/10 on 2026-10-29 (Asia/Shanghai);
 application/tag `322b9ee`, [workflow40887805390](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40887805390)
 and actual public interactions/downloads passed. [Release/compatibility/rollback](v3/V3_3_0_RELEASE.md);

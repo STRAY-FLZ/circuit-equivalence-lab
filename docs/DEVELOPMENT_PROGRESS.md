@@ -1,14 +1,28 @@
 # Development Progress
 
-**2026-10-30 — V3.4.0: locally Verified / Z01–Z10 9/10.**
-Baseline main e96d831, public v3.3.0/322b9ee; branch
-`codex/v3.4-integrated-capstones`. Z01–Z07 verified by source inventory/publisher
-contents, 12 actual-provider orchestration/persistence/evidence tests and one UI
-integration test. Z08 targeted reliability and Z09 local acceptance passed:
-800 tests/51 files, typecheck/lint/build, real built Chrome and eight downloaded
-files/7369 independent checks. Z10 integration, public acceptance and release are
-pending. See [implementation](v3/INTEGRATED_CAPSTONES.md).
-No blocker. Do not close V3 before public acceptance; do not start V4.
+**2026-10-30 — V3.4.0: Implementation Complete → Verified → Released / 10/10.
+V3 Series — Planned Milestone Complete / Closed.**
+Baseline main e96d831/public v3.3.0/322b9ee; branch
+`codex/v3.4-integrated-capstones`, core checkpoint8444b31. Application/tag
+`abd02a855df8d50f4b5b70c5ed7781e384f652cb`, successful Pages workflow40917917332
+and published Release428166303 were read back. 800 tests/51 files, standard checks,
+built/public Chrome and essential compatibility passed. Local/public independent
+download checks7369/6967; public partial-RLC AC refusal and invalid bias are retained.
+[Acceptance and limitations](v3/V3_4_0_RELEASE.md). No release blocker. The defined
+V3 product plan is closed; broader topics stay deferred. V4 is not started.
+
+| ID | Deliverable | Status |
+| --- | --- | --- |
+| Z01 | Source/evidence capability inventory | Verified |
+| Z02 | Actual RC/RLC coordinated transient and AC | Verified |
+| Z03 | Fresh-bias CE/CS frequency capstones | Verified |
+| Z04 | Ideal/finite/open/closed/loop op-amp comparison | Verified |
+| Z05 | Bounded actual parameter scenarios and comparison | Verified |
+| Z06 | Raw evidence, Signal/competition, portable JSON/HTML | Verified |
+| Z07 | Honest navigable topics and checked 18-chapter map | Verified |
+| Z08 | Affected UI, staleness, keyboard, narrow/themes | Verified |
+| Z09 | Numerical, compatibility, built/public acceptance | Verified |
+| Z10 | Production Release, history, rollback and V3 closure | Released |
 
 ---
 

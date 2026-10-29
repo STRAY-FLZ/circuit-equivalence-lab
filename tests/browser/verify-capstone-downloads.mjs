@@ -4,7 +4,7 @@ import { strict as assert } from 'node:assert'
 
 const prefix = process.argv[2]
 if (!['capstone-local', 'capstone-live'].includes(prefix)) throw Error('Select capstone-local or capstone-live')
-let checks = 0, scenarios = 0, frequencySamples = 0, timeSamples = 0, failed = 0
+let checks = 0, scenarios = 0, frequencySamples = 0, timeSamples = 0, failed = 0, partial = 0, failedCaptures = 0
 const close = (actual, expected, tolerance, label) => { assert.ok(Number.isFinite(actual) && Math.abs(actual - expected) <= tolerance, `${label}: ${actual} != ${expected}`); checks++ }
 function complex(actual, re, im, label) { close(actual.real, re, 2e-8 * Math.max(1, Math.hypot(re, im)), label + ' real'); close(actual.imaginary, im, 2e-8 * Math.max(1, Math.hypot(re, im)), label + ' imaginary') }
 const metric = (s, label) => s.metrics.find(m => m.label === label)?.value
@@ -19,10 +19,20 @@ for (const suffix of ['rc', 'rlc', 'ce', 'cs-invalid', 'follower', 'opamp-rc', '
   for (const s of study.scenarios) {
     scenarios++; assert.ok(!ids.has(s.id)); ids.add(s.id); assert.equal(s.project.id, study.source.id)
     assert.ok(!revisions.has(s.project.revision)); revisions.add(s.project.revision)
-    if (s.status !== 'success') { failed++; assert.equal(s.curves.length, 0); assert.ok(s.messages.length > 0); continue }
+    const successes = s.captures.filter(c => c.result.outcome.kind === 'success').length
+    if (s.status === 'partial') { partial++; assert.ok(successes > 0 && successes < s.captures.length); assert.equal(study.kind, 'rlc'); assert.ok(s.curves.every(c => c.xUnit === 's')); assert.ok(!s.metrics.some(m => m.label.includes('采样半功率') || m.label.includes('采样最大值'))) }
+    else if (s.status !== 'success') { failed++; assert.equal(successes, 0); assert.equal(s.curves.length, 0); assert.ok(s.messages.length > 0) }
+    else assert.equal(successes, s.captures.length)
     for (const capture of s.captures) {
       assert.equal(capture.input.project.revision, s.project.revision); assert.equal(capture.result.provenance.inputDigest, capture.input.inputDigest); assert.match(capture.input.inputDigest, /^[a-f0-9]{64}$/)
-      const outcome = capture.result.outcome; assert.equal(outcome.kind, 'success'); const result = outcome.value
+      const outcome = capture.result.outcome
+      if (outcome.kind !== 'success') {
+        failedCaptures++; assert.ok(outcome.diagnostics.length > 0); assert.equal(outcome.value, undefined)
+        if (study.kind === 'cs') { assert.equal(outcome.kind, 'unsupported'); assert.ok(outcome.diagnostics.some(d => d.code === 'AMP_BIAS_REGION')); assert.equal(value(s.project, 'V2', 'voltage'), 0) }
+        else { assert.equal(study.kind, 'rlc'); assert.equal(value(s.project, 'R1', 'resistance'), 400); assert.equal(capture.input.configuration.analysisType, 'ac.sweep'); assert.equal(outcome.kind, 'failure'); assert.ok(outcome.diagnostics.some(d => d.code === 'AC_RESIDUAL')); assert.ok(!s.curves.some(c => c.xUnit === 'Hz')) }
+        continue
+      }
+      const result = outcome.value
       if (capture.input.configuration.analysisType === 'transient.linear') {
         const p = s.project, r = value(p, 'R1', 'resistance'), cap = result.circuit.elements.find(e => e.kind === 'capacitor'), c = cap.value, voltage = result.series.find(a => a.entityId === cap.id && a.quantity === 'branch-voltage'), drive = result.settings.sources[0].final
         for (let i = 0; i < voltage.values.length; i++) {
@@ -61,4 +71,5 @@ for (const suffix of ['rc', 'rlc', 'ce', 'cs-invalid', 'follower', 'opamp-rc', '
 }
 const html = readFileSync(`output/playwright/${prefix}-report.html`, 'utf8'), embedded = JSON.parse(/<script type="application\/json" id="stray-project">([\s\S]*?)<\/script>/.exec(html)[1])
 assert.deepEqual(embedded, JSON.parse(readFileSync(`output/playwright/${prefix}-rc.json`, 'utf8'))); assert.ok(html.includes('<svg') && html.includes('用户填写的结论'))
-console.log(JSON.stringify({ status: 'passed', prefix, files: 8, scenarios, frequencySamples, timeSamples, failedScenarios: failed, independentChecks: checks }))
+assert.equal(failed, 1); assert.ok(partial <= 1); assert.equal(failedCaptures, failed + partial); assert.equal(timeSamples, 3105); assert.equal(frequencySamples, 2412 - partial * 201)
+console.log(JSON.stringify({ status: 'passed', prefix, files: 8, scenarios, frequencySamples, timeSamples, failedScenarios: failed, partialScenarios: partial, failedCaptures, independentChecks: checks }))

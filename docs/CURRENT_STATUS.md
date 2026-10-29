@@ -1,19 +1,27 @@
 # Current Development Status
 
-**2026-10-30 — V3.4.0 integrated capstones: locally Verified, Z01–Z10 9/10.**
-Owner authorized implementation and release after all gates. Local/remote main
-e96d831 and published v3.3.0/322b9ee were confirmed; worktree was clean. Branch
-`codex/v3.4-integrated-capstones`. Implement bounded scenario orchestration over
-existing providers, portable evidence/reporting and an honest learning map.
-Z01–Z07 have focused checks: 12 actual orchestration/roundtrip/evidence tests and
-one real-provider UI test passed. RC/RLC, CE/CS, four op-amp capstones, bounded
-scenario isolation, full raw JSON/float64 assets, portable HTML and learning map
-are implemented. Existing competition snapshot handoff preserves additional
-experiment records. Z08 affected UI reliability and Z09 final checks passed:
-800 tests/51 files, typecheck, lint, build and real production-preview Chrome.
-Eight downloads/13 scenarios/7369 independent checks passed. Z10 safe integration,
-production deployment, actual public acceptance and Release remain. Public version
-is still V3.3.0; V3 is not yet closed. No new solver or V4 work. No blocker.
+**2026-10-30 — V3.4.0: Implementation Complete → Verified → Released;
+Z01–Z10 10/10. V3 Series — Planned Milestone Complete / Closed.**
+Application/annotated tag `v3.4.0` targets
+`abd02a855df8d50f4b5b70c5ed7781e384f652cb` on main. Pages workflow
+[40917917332](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40917917332)
+succeeded; [Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.4.0)
+id428166303 was published and read back after actual public acceptance.
+RC/RLC, CE/CS and four op-amp capstones compose existing providers; bounded
+scenario isolation, raw assets, Signal/competition handoff, portable reports and
+an honest learning map are delivered. 800 tests/51 files and standard checks
+passed. Built/public Chrome and essential previous-module workflows passed.
+Each environment exported eight files/13 scenarios/3105 time samples. Independent
+checks: local7369/2412 frequency samples; public6967/2211 valid frequency samples.
+Public critical-RLC AC was refused by existing AC_RESIDUAL; its transient remains
+valid and the scenario is partial. Invalid nMOS bias remains unsupported. No
+numerical threshold or original engine changed. Schema1, no new dependencies.
+[Release/compatibility/rollback](v3/V3_4_0_RELEASE.md);
+[V3 closure and V4 prerequisites](v3/V3_SERIES_CLOSURE.md).
+Closure covers the approved product plan, not all textbook/analog topics. V4 and
+automatic V3.5 are not started. No release blocker. The following acceptance-only
+documentation handoff preserves the tagged application; its exact SHA/workflow
+are recorded in the canonical Release.
 
 ---
 

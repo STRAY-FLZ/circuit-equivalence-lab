@@ -333,8 +333,10 @@ single-stage amplifier frequency response is Released10/10 with verified public 
 operational-amplifier frequency response and bounded feedback inspection are
 Released10/10 after public acceptance; [V3.3 release state](v3/V3_3_0_RELEASE.md).
 V3.4 coordinated capstones, bounded parameter studies, portable evidence and the
-honest learning map are locally Verified (Z01–Z09); public release/closure remain
-pending. [V3.4 acceptance](v3/V3_4_0_RELEASE.md),
+honest learning map are Released10/10 after public acceptance and Release readback.
+**V3 Series — Planned Milestone Complete / Closed** means the authorized V3.0–V3.4
+product plan is delivered, not complete circuit-theory/analog coverage.
+[V3.4 acceptance](v3/V3_4_0_RELEASE.md),
 [defined V3 milestone and V4 prerequisites](v3/V3_SERIES_CLOSURE.md).
 Higher-fidelity analog, power and remaining textbook topics stay planned.
 Do not start V4 or an automatic V3.5.

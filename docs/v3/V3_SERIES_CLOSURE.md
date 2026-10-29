@@ -1,8 +1,10 @@
-# V3 planned product milestone — closure pending public V3.4 acceptance
+# V3 Series — Planned Milestone Complete / Closed
 
-This document closes only the owner-authorized V3.0–V3.4 delivery plan after
-V3.4's actual production release. It does not close the broader textbook/analog
-scope. Current state: V3.4 local candidate, not yet Released/Closed. No V4 work.
+2026-10-30: this closes only the owner-authorized V3.0–V3.4 delivery plan after
+V3.4's verified production release. It does not close the broader textbook/analog
+scope. State: Implementation Complete → Verified → Released → V3 Series Closed.
+V3.4 Pages40917917332 and published Release428166303 were verified against the
+application below. [Acceptance/rollback](V3_4_0_RELEASE.md). No V4 work.
 
 | Release | Actual application commit | Delivered contract |
 | --- | --- | --- |
@@ -10,7 +12,7 @@ scope. Current state: V3.4 local candidate, not yet Released/Closed. No V4 work.
 | v3.1.0 | 0bd1b11ccba8a52c54727c2e49433d6d31577027 | Shockley/NPN/nMOS DC, region checks/derivatives, ideal negative-feedback op-amp |
 | v3.2.0 | b2a851f7f623761e32e27cb82559bfd58e6a19c6 | Fresh-bias transistor incremental frequency response, explicit teaching capacitors, real Bode |
 | v3.3.0 | 322b9ee2c15db3a781447bdf28cbb0015e61dde5 | Finite-gain single-pole op-amp, actual closed-loop MNA and bounded return-network inspection |
-| v3.4.0 | Candidate; production identity pending | Existing-provider capstones, parameter scenarios, raw evidence/measurement/report handoff and learning map |
+| v3.4.0 | abd02a855df8d50f4b5b70c5ed7781e384f652cb | Existing-provider capstones, parameter scenarios, raw evidence/measurement/report handoff and learning map |
 
 ## Supported learning and engineering workflows
 
@@ -42,7 +44,12 @@ Local V3.4 independent download evidence currently covers 8 files, 13 scenarios,
 2412 frequency samples and 3105 time samples, with 7369 checks including RC/RLC
 closed forms, op-amp complex response, transistor derivatives, source identity and
 asset integrity. Final regression passed 800 tests/51 files, typecheck/lint/build;
-built Chrome and download checks passed. Public acceptance is still pending.
+built/public Chrome and essential previous-module compatibility passed. Public
+downloads retain 13 scenarios/3105 time samples/2211 valid primary frequency
+samples, passing6967 checks. A critical-RLC AC_RESIDUAL refusal is preserved as
+partial with valid transient data; one nMOS bias is unsupported. No fabricated
+success and no numerical threshold change. JSON/HTML reopen, provenance, assets
+and historical validity were verified in both environments.
 
 ## Coverage and deferred work
 
