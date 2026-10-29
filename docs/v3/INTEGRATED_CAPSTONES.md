@@ -1,6 +1,6 @@
-# V3.4 integrated capstones — working checkpoint
+# V3.4 integrated capstones
 
-2026-10-30; baseline e96d831 / v3.3.0 322b9ee. Z01–Z10 7/10, in progress.
+2026-10-30; baseline e96d831 / v3.3.0 322b9ee. Z01–Z09 locally Verified, 9/10.
 The owner authorized this implementation and release after complete acceptance.
 
 Compose existing typed AC, transient, amplifier and op-amp providers. The source
@@ -27,4 +27,7 @@ explicitly associated to the same competition experiment; snapshot handoff keeps
 new capstone experiment records without converting them to official scoring.
 Saved files and HTML embed the same schema-1 project; imports are historical until
 rerun. The publisher's 18 chapter themes were checked, not marked fully covered.
-See [inventory](V3_CAPABILITY_INVENTORY.md). Z08–Z10 remain unfinished.
+See [inventory](V3_CAPABILITY_INVENTORY.md). Z08 affected UI passed keyboard,
+390px/1440px light/dark, scrolling and stale/import checks. Z09 passed 800 tests
+across 51 files, typecheck/lint/build and real built Chrome. Downloads passed 7369
+independent checks. [Release evidence](V3_4_0_RELEASE.md) tracks remaining Z10.

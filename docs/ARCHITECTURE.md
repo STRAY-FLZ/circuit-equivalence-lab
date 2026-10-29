@@ -1,5 +1,15 @@
 # Architecture
 
+## V3.4 integrated capstone composition
+
+`src/capstone` orchestrates existing typed providers over immutable one-parameter
+scenarios, retaining source identity, revisions, digests and complete raw captures.
+`src/capstone-ui` separates actual numerical curves from analytical references and
+invalidates edited/imported evidence until rerun. Existing schema-1 analysis,
+experiment and asset records preserve portable JSON/HTML and Signal/competition
+handoffs. No existing numerical algorithm or D05 policy is changed.
+[Bounded methods and limits](v3/INTEGRATED_CAPSTONES.md).
+
 ## V3.3 single-pole operational-amplifier extension
 
 `src/opamp` is an independent versioned provider using stable graph anchors,

@@ -332,8 +332,12 @@ single-stage amplifier frequency response is Released10/10 with verified public 
 [V3.2 actual release state](v3/V3_2_0_RELEASE.md). V3.3 single-pole finite-gain
 operational-amplifier frequency response and bounded feedback inspection are
 Released10/10 after public acceptance; [V3.3 release state](v3/V3_3_0_RELEASE.md).
-Higher-fidelity analog, power and later modules remain planned. Stop before V3.4/V4;
-no automatic next phase.
+V3.4 coordinated capstones, bounded parameter studies, portable evidence and the
+honest learning map are locally Verified (Z01–Z09); public release/closure remain
+pending. [V3.4 acceptance](v3/V3_4_0_RELEASE.md),
+[defined V3 milestone and V4 prerequisites](v3/V3_SERIES_CLOSURE.md).
+Higher-fidelity analog, power and remaining textbook topics stay planned.
+Do not start V4 or an automatic V3.5.
 
 ### V4.x — Digital Electronics, Embedded Systems and Control
 

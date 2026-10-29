@@ -1,11 +1,13 @@
 # Development Progress
 
-**2026-10-30 — V3.4.0: In Progress / Z01–Z10 7/10.**
+**2026-10-30 — V3.4.0: locally Verified / Z01–Z10 9/10.**
 Baseline main e96d831, public v3.3.0/322b9ee; branch
 `codex/v3.4-integrated-capstones`. Z01–Z07 verified by source inventory/publisher
 contents, 12 actual-provider orchestration/persistence/evidence tests and one UI
-integration test. Z08 targeted reliability and Z09 acceptance are in progress;
-Z10 release is planned. See [implementation](v3/INTEGRATED_CAPSTONES.md).
+integration test. Z08 targeted reliability and Z09 local acceptance passed:
+800 tests/51 files, typecheck/lint/build, real built Chrome and eight downloaded
+files/7369 independent checks. Z10 integration, public acceptance and release are
+pending. See [implementation](v3/INTEGRATED_CAPSTONES.md).
 No blocker. Do not close V3 before public acceptance; do not start V4.
 
 ---

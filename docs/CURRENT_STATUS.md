@@ -1,6 +1,6 @@
 # Current Development Status
 
-**2026-10-30 — V3.4.0 integrated capstones: In Progress, Z01–Z10 7/10.**
+**2026-10-30 — V3.4.0 integrated capstones: locally Verified, Z01–Z10 9/10.**
 Owner authorized implementation and release after all gates. Local/remote main
 e96d831 and published v3.3.0/322b9ee were confirmed; worktree was clean. Branch
 `codex/v3.4-integrated-capstones`. Implement bounded scenario orchestration over
@@ -9,8 +9,11 @@ Z01–Z07 have focused checks: 12 actual orchestration/roundtrip/evidence tests 
 one real-provider UI test passed. RC/RLC, CE/CS, four op-amp capstones, bounded
 scenario isolation, full raw JSON/float64 assets, portable HTML and learning map
 are implemented. Existing competition snapshot handoff preserves additional
-experiment records. Z08 real UI reliability, Z09 final checks/browsers and Z10
-release remain. No new numerical solver or V4 work. No implementation blocker.
+experiment records. Z08 affected UI reliability and Z09 final checks passed:
+800 tests/51 files, typecheck, lint, build and real production-preview Chrome.
+Eight downloads/13 scenarios/7369 independent checks passed. Z10 safe integration,
+production deployment, actual public acceptance and Release remain. Public version
+is still V3.3.0; V3 is not yet closed. No new solver or V4 work. No blocker.
 
 ---
 
