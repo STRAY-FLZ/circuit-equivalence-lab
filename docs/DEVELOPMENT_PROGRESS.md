@@ -1,7 +1,7 @@
 # Development Progress
 
 Updated **2026-10-29**. **V3.3.0 — Operational-amplifier dynamics and feedback**.
-**In Progress / O01–O10: 7/10.** Verified V3.2.0 production baseline and clean
+**Locally Verified / O01–O10: 9/10.** Verified V3.2.0 production baseline and clean
 remote/main `69c7f04`; working branch `codex/v3.3-opamp-frequency`. The existing
 ideal op-amp remains unchanged. Work is scoped to the explicitly versioned single-
 pole model, actual MNA, bounded passive feedback and the owner's acceptance.
@@ -16,9 +16,9 @@ See [checkpoint](v3/OPAMP_FREQUENCY_IMPLEMENTATION.md). No blocker.
 | O05 | Validated amplifier circuit families | Verified |
 | O06 | Bode and gain-bandwidth measurements | Verified |
 | O07 | Defined loop gain and phase margin | Verified |
-| O08 | Atlas, editor, persistence and education | In Progress |
-| O09 | Numerical and real-browser acceptance | In Progress |
-| O10 | Documentation, release and public verification | Planned |
+| O08 | Atlas, editor, persistence and education | Verified |
+| O09 | Numerical and local real-browser acceptance | Verified |
+| O10 | Documentation, release and public verification | In Progress |
 
 ---
 

@@ -50,6 +50,17 @@ describe('atlas navigation and existing workspaces', { timeout: 15000 }, () => {
     expect(button(/串联与并联网络/)).toHaveAttribute('aria-expanded', 'true')
     expect(screen.getByRole('heading', { name: 'RC 低通连接拓扑' })).toBeInTheDocument()
   })
+  it('offers the finite-gain op-amp laboratory without claiming the generic DC engine supports it', () => {
+    const onOpen = vi.fn().mockReturnValue(true)
+    render(<CircuitAtlas onOpen={onOpen} />)
+    fireEvent.change(screen.getByLabelText('搜索电路图谱'), { target: { value: '运算放大器频率特性' } })
+    fireEvent.click(button('有限增益运放 · 电压跟随'))
+    const capability = within(screen.getByRole('region', { name: '模板能力' }))
+    expect(capability.getByText('有限增益运放专用直流分析')).toBeInTheDocument()
+    expect(capability.getByText('运放专用复数 MNA 与实际 Bode')).toBeInTheDocument()
+    fireEvent.click(button('运算放大器频率特性实验'))
+    expect(onOpen).toHaveBeenCalledWith(expect.objectContaining({ title: '有限增益运放 · 电压跟随' }), 'opamp')
+  })
   it('protects dirty editor state on cancel; confirmed open is independent and supports normal history', () => {
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
     render(<App />); fireEvent.click(button('原理图编辑器')); fireEvent.click(button('电阻 R')); fireEvent.click(screen.getByRole('application', { name: '原理图编辑画布' }), { clientX: 200, clientY: 200 })

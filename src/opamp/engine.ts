@@ -70,10 +70,16 @@ export const opampEngine: AnalysisEngine<OpampResult> = {
       if (host.signal.aborted) return result({ kind: 'cancelled' })
       const first = points[0], last = points.at(-1), threshold = prepared.dcTransfer === 0 ? null : 20 * Math.log10(Math.abs(prepared.dcTransfer)) - 10 * Math.log10(2)
       const bandwidth = threshold !== null && first?.kind === 'available' && last?.kind === 'available' && first.gainDb !== null && last.gainDb !== null && first.gainDb > threshold && last.gainDb < threshold ? crossing(points, threshold, settings.spacing) : null
-      const firstLoop = loop[0], lastLoop = loop.at(-1), loopCrossing = firstLoop?.kind === 'available' && lastLoop?.kind === 'available' && firstLoop.magnitude > 1 && lastLoop.magnitude < 1 ? crossing(loop, 0, settings.spacing) : null
+      // With resistors only, the independently injected passive return is a
+      // frequency-independent positive β and Aβ is strictly monotone. General
+      // RC networks can hide additional crossings/phase wraps between samples;
+      // show their calculated loop response but do not certify a margin.
+      const constantReturn = prepared.passive.elements.every(e => e.kind !== 'capacitor')
+      const firstLoop = loop[0], lastLoop = loop.at(-1), loopCrossing = constantReturn && firstLoop?.kind === 'available' && lastLoop?.kind === 'available' && firstLoop.magnitude > 1 && lastLoop.magnitude < 1 ? crossing(loop, 0, settings.spacing) : null
       const pm = phaseMargin(loop, loopCrossing), a = prepared.model.gain, fp = prepared.model.poleHz
       const notes = ['闭环截止为相对实际直流增量传递比的 −3.0103 dB 采样插值；缺失、多个交点或频率覆盖不足时不报告。', '环路 L=Aβ，β 为独立源置零并在运放输出注入 1 V 后求得的差分返回量；不是通用多环路稳定性证明。']
       if (!bandwidth) notes.push('未建立唯一带宽交点。')
+      if (!constantReturn) notes.push('含电容网络仅展示实际返回频响；当前版本不认证其交越或相位裕度。')
       if (pm === null) notes.push('未建立唯一有效环路交越或连续相位，相位裕度不可用。')
       return result({ kind: 'success', value: { prepared, single, points, openLoop, loop, unityHz: a > 1 ? fp * Math.sqrt(a * a - 1) : null, approximateGbwHz: a * fp, bandwidthHz: bandwidth?.frequencyHz ?? null, crossoverHz: loopCrossing?.frequencyHz ?? null, phaseMarginDegrees: pm, notes, betaAtFrequency } })
     } catch (e) {

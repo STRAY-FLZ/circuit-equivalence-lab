@@ -96,6 +96,7 @@ describe('single-pole op-amp analysis', () => {
     const beta = div(c(1, t), c(11, t))
     expect(result.betaAtFrequency!.real).toBeCloseTo(beta.real, 10)
     expect(result.betaAtFrequency!.imaginary).toBeCloseTo(beta.imaginary, 10)
+    expect(result.crossoverHz).toBeNull(); expect(result.phaseMarginDegrees).toBeNull()
     const x = settings.frequencyHz / 10
     // H = -10 A0 / [10(1+jx) + (1+jx+A0)(1+jt)].
     const expected = div(c(-1000000), c(100011 - x * t, 11 * x + 100001 * t))

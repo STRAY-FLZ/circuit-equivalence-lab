@@ -1,11 +1,12 @@
 # Current Development Status
 
-**2026-10-29 — V3.3.0 operational-amplifier frequency response: In Progress, O01–O10 7/10.**
+**2026-10-29 — V3.3.0 operational-amplifier frequency response: Verified locally, O01–O10 9/10.**
 The owner authorized implementation and production release after full acceptance.
 Public V3.2.0 and remote/main `69c7f04` were verified; the focused branch is
-`codex/v3.3-opamp-frequency`. O01–O07 have focused numerical and model checks;
-six editable Atlas recipes, UI and schema-1 persistence are integrated but final
-browser, compatibility and production acceptance are unfinished. No V3.3 release exists.
+`codex/v3.3-opamp-frequency`. O01–O09 passed local checks: 787 tests/49 files,
+typecheck, lint, build, real Chrome and prior-module integration. Three actual
+schema-1 files contain 603 points and passed 1,835 independent formula checks.
+O10 production deployment and public acceptance remain; V3.2 is still public.
 See [implementation checkpoint](v3/OPAMP_FREQUENCY_IMPLEMENTATION.md). No blocker.
 
 ---
