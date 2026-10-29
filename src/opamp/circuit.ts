@@ -52,7 +52,7 @@ export function prepareOpamp(input: AnalysisInput, signal?: AbortSignal): OpampP
     if (!['resistor', 'capacitor', 'voltage-source', 'current-source'].includes(def.kind)) throw new AcError('OPAMP_COMPONENT', `${instance.reference} 不属于当前单运放 R/C 与独立源范围。`, [instance.id], 'unsupported')
     const kind = def.kind as 'resistor' | 'capacitor' | 'voltage-source' | 'current-source'
     const expected = kind === 'resistor' ? 'org.stray.model.resistor' : `org.stray.model.dc.${kind}`
-    if (kind === 'capacitor' ? def.resource.id !== 'org.stray.component.capacitor' || def.resource.version !== '1' || def.modelBindings.length !== 0 : binding?.model.id !== expected || binding.model.version !== '1') throw new AcError('OPAMP_BINDING', `${instance.reference} 的固定模型版本不支持。`, [instance.id], 'unsupported')
+    if (kind === 'capacitor' ? def.resource.id !== 'org.stray.component.capacitor' || def.resource.version !== '1' || def.modelBindings.length !== 0 : binding?.model.id !== expected || binding.model.version !== '1' || Object.keys(binding.portMap).length !== 2) throw new AcError('OPAMP_BINDING', `${instance.reference} 的固定模型版本不支持。`, [instance.id], 'unsupported')
     const keys = kind === 'capacitor' ? ['1', '2'] : [binding!.portMap.p, binding!.portMap.n]
     const pins = keys.map(k => instance.pins.find(p => p.definitionPinKey === k))
     if (instance.pins.length !== 2 || pins.some(p => !p) || pins[0]!.id === pins[1]!.id) throw new AcError('OPAMP_PINS', `${instance.reference} 的引脚映射无效。`, [instance.id])
@@ -68,11 +68,11 @@ export function prepareOpamp(input: AnalysisInput, signal?: AbortSignal): OpampP
   if (!dc.some(e => e.id === settings.excitationSourceId && e.kind === 'voltage-source')) throw new AcError('OPAMP_SOURCE', '请选择独立电压源作为交流激励。', [], 'unsupported')
   const extra = { id: `${model.id}:output`, reference: `${model.reference} output`, p: model.output, n: referenceKey, fromPinId: model.pinIds[2], toPinId: model.pinIds[2] }
   const dcCircuit: DcCircuit = { nodes, elements: [...dc, { ...extra, kind: 'vcvs', value: model.gain, cp: model.plus, cn: model.minus }], referenceKey, referenceAnchorId: settings.referenceAnchorId }
+  if (signal?.aborted) throw new AcError('OPAMP_CANCELLED', '分析已取消。', [], 'resource')
+  const dcSolution = solveDc(dcCircuit)
   const betaCircuit: DcCircuit = { ...dcCircuit, elements: [...dc.map(e => e.kind === 'voltage-source' || e.kind === 'current-source' ? { ...e, value: 0 } : e), { ...extra, kind: 'voltage-source', value: 1 }] }
   const probe = solveDc(betaCircuit), betaDc = valueAt(betaCircuit, probe, model.minus) - valueAt(betaCircuit, probe, model.plus)
   if (!Number.isFinite(betaDc) || betaDc <= 1e-12) throw new AcError('OPAMP_FEEDBACK', '源置零后未建立有效直流负反馈；不将开环或正反馈作为已验证闭环。', [model.id], 'unsupported')
-  if (signal?.aborted) throw new AcError('OPAMP_CANCELLED', '分析已取消。', [], 'resource')
-  const dcSolution = solveDc(dcCircuit)
   const small = solveDc({ ...dcCircuit, elements: dcCircuit.elements.map(e => e.kind === 'voltage-source' || e.kind === 'current-source' ? { ...e, value: e.id === settings.excitationSourceId ? 1 : 0 } : e) })
   const difference = (pair: readonly [string, string]) => valueAt(dcCircuit, small, net(pair[0])) - valueAt(dcCircuit, small, net(pair[1]))
   const inputVoltage = difference(settings.input), dcTransfer = difference(settings.output) / inputVoltage

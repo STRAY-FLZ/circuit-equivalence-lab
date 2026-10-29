@@ -20,12 +20,23 @@ multiloop stability analysis. Proposed design is not acceptance evidence.
 
 ## Checkpoint
 
-O02 verified: fixed model evaluates the exact complex gain and unity crossing;
-independent pole/high-frequency fixtures and invalid gain/pole/frequency checks
-passed. Initial O01/O03/O04/O05 code and six real Atlas recipes are present. Eight
-focused tests passed, including independent follower, non-inverting and inverting
-DC/complex gain and cutoff references, actual source suppression in the summing
-network, schema-1 identity, cancellation, stale digest and ideal-model rejection.
-Editor/Atlas integration, further boundary tests, final checks and release remain.
-O01–O10 **1/10**, no current blocker. Preserve prior engines and D05, schema 1,
+O01–O07 verified by focused model, numerical and UI checks. The finite DC relation
+uses the selected reference network as the explicit output-voltage and output-current
+return; it does not join graph nets. DC-open capacitors, actual source/load currents,
+polarity, ideal-model separation, input digests and bounded cancellation are checked.
+Source-suppressed 1 V output injection solves the passive return network; its
+`β=Vminus−Vplus` defines `L=Aβ`. A unique sampled 0 dB crossing and a continuous
+phase branch are required for an interpolated phase margin; this is not a general
+multi-loop stability proof. A -3.0103 dB cutoff is relative to the separately solved
+DC incremental transfer; ambiguous/missing crossings remain unavailable.
+
+Seventeen focused tests passed: follower, non-inverting, inverting, summing,
+differential and frequency-dependent RC feedback; exact independent DC/complex
+references and cutoff checks; invalid gain/pole/ports, open/positive feedback,
+floating and contradictory networks, no crossing, ambiguity, cancellation,
+schema-1 roundtrip and stale digest. Real development Chrome verified a follower
+and exported/reopened its 201 closed-loop and 201 loop samples. A development-only
+theme asset path returned 404; final acceptance must use the production build.
+O08/O09 integration, full built-browser/old-module checks and O10 release remain.
+O01–O10 **7/10**, no current blocker. Preserve prior engines and D05, schema 1,
 working tree and release history. Do not start V3.4 or V4.

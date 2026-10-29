@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { SweepResult } from '../ac'
 import { fmt } from './format'
-export function BodeChart({ sweep }: { readonly sweep: SweepResult }) {
+export function BodeChart({ sweep, ratio = 'Vout/Vin', heading = '实际频扫 / Bode' }: { readonly sweep: SweepResult; readonly ratio?: string; readonly heading?: string }) {
   const svg = useRef<SVGSVGElement>(null), [width, setWidth] = useState(800), [cursor, setCursor] = useState(0)
   useEffect(() => { if (!svg.current || typeof ResizeObserver === 'undefined') return; const observer = new ResizeObserver(entries => { const w = entries[0]?.contentRect.width; if (w) setWidth(Math.max(240, Math.round(w))) }); observer.observe(svg.current); return () => observer.disconnect() }, [])
   const { points, options, features } = sweep, current = points[Math.min(cursor, points.length - 1)]!, left = 52, right = width - 18
@@ -14,7 +14,7 @@ export function BodeChart({ sweep }: { readonly sweep: SweepResult }) {
     return points.map(p => { const v = p.kind === 'available' ? phase ? p.phaseDegrees : p.gainDb : null; if (v === null) { connected = false; previous = null; return '' } const command = connected && !(phase && previous !== null && Math.abs(v - previous) > 180) ? 'L' : 'M'; connected = true; previous = v; return `${command}${x(p.frequencyHz)},${y(v, phase)}` }).join(' ')
   }
   return <section className="ac-bode" aria-label="Bode 频率响应">
-    <h3>实际频扫 / Bode</h3><p>横轴为对数频率；幅频 20 log₁₀|Vout/Vin|，相位采用 −180°…180° 主值。空点及相位跳变不连线。</p>
+    <h3>{heading}</h3><p>横轴为对数频率；幅频 20 log₁₀|{ratio}|，相位采用 −180°…180° 主值。空点及相位跳变不连线。</p>
     <svg ref={svg} viewBox={`0 0 ${width} 410`} role="img" aria-label="实际 Bode 幅频与相频曲线" onPointerMove={e => { const box = e.currentTarget.getBoundingClientRect(), position = (e.clientX - box.left) / box.width * width; let best = 0; for (let i = 1; i < points.length; i++) if (Math.abs(x(points[i]!.frequencyHz) - position) < Math.abs(x(points[best]!.frequencyHz) - position)) best = i; setCursor(best) }}>
       <text x={left} y={17}>增益 / dB</text><text x={left} y={231}>相位 / °</text>
       {[0, .5, 1].map(t => <g key={t}><line className="ac-grid" x1={left} x2={right} y1={30 + 140 * t} y2={30 + 140 * t} /><text x={left - 6} y={34 + 140 * t} textAnchor="end">{Number((hi - (hi - lo) * t).toPrecision(3))}</text><line className="ac-grid" x1={left} x2={right} y1={246 + 130 * t} y2={246 + 130 * t} /><text x={left - 6} y={250 + 130 * t} textAnchor="end">{180 - 360 * t}</text></g>)}

@@ -14,7 +14,7 @@ function Disclosure({ title, open, onToggle, children, marker, className = '' }:
   </div>
 }
 
-export function CircuitAtlas({ onOpen }: { readonly onOpen: (project: EngineeringProject, mode?: 'dc' | 'ac' | 'transient' | 'analog' | 'amplifier') => boolean }) {
+export function CircuitAtlas({ onOpen }: { readonly onOpen: (project: EngineeringProject, mode?: 'dc' | 'ac' | 'transient' | 'analog' | 'amplifier' | 'opamp') => boolean }) {
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set(['resistive', 'resistive.series-parallel']))
   const [selectedId, setSelectedId] = useState('resistor-series'), [query, setQuery] = useState(''), [libraryOpen, setLibraryOpen] = useState(false), [message, setMessage] = useState('')
   const detailHeading = useRef<HTMLHeadingElement>(null)
@@ -43,6 +43,7 @@ export function CircuitAtlas({ onOpen }: { readonly onOpen: (project: Engineerin
       </aside>
       <article className="atlas-detail" aria-label="所选电路详情">
         <div className="atlas-detail-heading"><div><p className="eyebrow">{circuitCategories.find(c => c.id === selected.categoryId)!.name} / {selected.difficulty}</p><h2 ref={detailHeading} tabIndex={-1}>{selected.name}</h2></div><button className="primary-button" onClick={() => { const opened = onOpen(instantiateTemplate(selected.id)); setMessage(opened ? '已在编辑器中打开独立工程。' : '已保留原工程；可先返回编辑器导出，再打开模板。') }}>在编辑器中打开</button>{selected.amplifier && <button onClick={() => { const opened = onOpen(instantiateTemplate(selected.id), 'amplifier'); setMessage(opened ? '已打开放大器频率响应，先验证直流偏置。' : '已保留原工程。') }}>放大器频率响应实验</button>}{selected.analog && !selected.amplifier && <button onClick={() => { const opened = onOpen(instantiateTemplate(selected.id), 'analog'); setMessage(opened ? '已打开模拟电子，请运行真实工作点并检查区域。' : '已保留原工程。') }}>模拟电子实验</button>}{selected.capabilities.dc && <button onClick={() => { const opened = onOpen(instantiateTemplate(selected.id), 'dc'); setMessage(opened ? '已打开直流分析，请确认参考节点并运行。' : '已保留原工程。') }}>使用直流分析</button>}{selected.capabilities.ac && <button onClick={() => { const opened = onOpen(instantiateTemplate(selected.id), 'ac'); setMessage(opened ? '已打开交流实验，激励与输入输出端口已明确，可运行并修改参数。' : '已保留原工程。') }}>交流分析与滤波</button>}{transientTemplateIds.some(id => id === selected.id) && <button onClick={() => { const base = instantiateTemplate(selected.id), source = base.sheets[0]!.components.some(c => base.definitions.find(d => d.id === c.definitionId)!.kind === 'voltage-source'); const next = configureTransientExperiment(base, base.sheets[0]!.id, source ? 'zero-state' : 'zero-input'); const opened = onOpen(next, 'transient'); setMessage(opened ? '已打开暂态教学实验；明确配置激励、初值并运行真实积分。' : '已保留原工程。') }}>暂态教学实验</button>}</div>
+        {selected.opampFrequency && <button onClick={() => { const opened = onOpen(instantiateTemplate(selected.id), 'opamp'); setMessage(opened ? '已打开单极点运放频率实验。' : '已保留原工程。') }}>运算放大器频率特性实验</button>}
         <p>{selected.description}</p><p className="atlas-note">预览不会替换当前工程。打开时会创建独立副本；已有未导出的修改会先询问。</p>
         <div className="atlas-preview-scroll" tabIndex={0} role="region" aria-label="原理图预览滚动区"><SchematicPreview project={preview} /></div>
         <p className="atlas-note">窄屏可横向滚动查看完整标注；修改元件请在编辑器中打开。</p>
