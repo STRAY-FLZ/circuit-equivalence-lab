@@ -1,13 +1,20 @@
 # Current Development Status
 
-**2026-10-29 — V3.3.0 operational-amplifier frequency response: Verified locally, O01–O10 9/10.**
-The owner authorized implementation and production release after full acceptance.
-Public V3.2.0 and remote/main `69c7f04` were verified; the focused branch is
-`codex/v3.3-opamp-frequency`. O01–O09 passed local checks: 787 tests/49 files,
-typecheck, lint, build, real Chrome and prior-module integration. Three actual
-schema-1 files contain 603 points and passed 1,835 independent formula checks.
-O10 production deployment and public acceptance remain; V3.2 is still public.
-See [implementation checkpoint](v3/OPAMP_FREQUENCY_IMPLEMENTATION.md). No blocker.
+**2026-10-29 — V3.3.0: Implementation Complete → Verified → Released, O01–O10 10/10.**
+Official application and annotated tag `v3.3.0` target
+`322b9ee2c15db3a781447bdf28cbb0015e61dde5`; workflow
+[40887805390](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40887805390)
+succeeded. [Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.3.0)
+id427950413 was published after actual public acceptance. Branch
+`codex/v3.3-opamp-frequency`, baseline main69c7f04; 787 tests/49 files and all
+standard checks passed. Public Chrome confirmed op-amp parameter edits, actual
+finite DC/Bode/loop values, feedback refusal, schema-1 reopens, themes/keyboard,
+and prior-module integration. Three actual public files/603 points passed 1,835
+independent checks, matching the separately verified local downloads.
+This documentation-only handoff preserves the tagged application; final main SHA
+and workflow are recorded in the canonical Release. No blocker. V3.4/V4 not started.
+See [implementation](v3/OPAMP_FREQUENCY_IMPLEMENTATION.md) and
+[release/rollback](v3/V3_3_0_RELEASE.md).
 
 ---
 

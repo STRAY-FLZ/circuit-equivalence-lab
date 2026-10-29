@@ -1,10 +1,14 @@
-# V3.3 operational-amplifier dynamics — implementation in progress
+# V3.3 operational-amplifier dynamics — verified implementation
+
+Released 2026-10-29 (Asia/Shanghai); O01–O10 10/10. Official app/tag
+`322b9ee2c15db3a781447bdf28cbb0015e61dde5`, workflow40887805390 success,
+Release427950413. [Production evidence and rollback](V3_3_0_RELEASE.md).
 
 Owner-authorized scope: finite-gain, single-pole op-amp, passive R/C feedback,
 one flat sheet and one explicitly selected AC source. V3.2.0 public baseline and
 remote main `69c7f044729b80287334e26810b9ec092da108de` were checked on 2026-10-29;
 production served the V3.2 application assets. Branch `codex/v3.3-opamp-frequency`.
-No release is authorized until numerical, integration, browser and public acceptance.
+The authorized release followed numerical, integration, browser and public acceptance.
 
 ## Model and numerical approach
 
@@ -63,6 +67,7 @@ projects contained 603 points, with 1,835 independent scalar checks passed. V1,
 DC, AC, transient, Signal, V3.1 analog, V3.2 amplifier, Atlas and competition
 integration journeys passed. A development-only theme asset path returned 404;
 the production preview's actual theme/JS/CSS resources all returned 200.
-O01–O09 verified; O10 production deployment and public acceptance remain.
-O01–O10 **9/10**, no current blocker. Preserve prior engines and D05, schema 1,
-working tree and release history. Do not start V3.4 or V4.
+O01–O10 **10/10**: the production workflow, actual public Chrome, three public
+downloads/603 points/1,835 independent checks and prior-module public integration
+passed before the annotated tag and Release were published. No current blocker.
+Prior engines and D05, schema 1 and history are preserved. V3.4/V4 not started.

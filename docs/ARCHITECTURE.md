@@ -1,5 +1,17 @@
 # Architecture
 
+## V3.3 single-pole operational-amplifier extension
+
+`src/opamp` is an independent versioned provider using stable graph anchors,
+snapshot/digest/revision and existing real/complex MNA cores. A separate pinned
+finite-gain component preserves the earlier ideal model. Temporary internal
+R/C/controlled-source branches implement the exact declared single pole; source-
+suppressed output injection solves the return network. Only all-resistive external
+networks qualify for phase-margin estimates; R/C return samples remain visible
+without a certified margin. `src/opamp-ui` composes actual results with the existing
+editor and Bode chart. Six Atlas recipes and schema-1 captured provenance integrate
+the module. [Contract and limits](v3/OPAMP_FREQUENCY_IMPLEMENTATION.md).
+
 ## V3.2 amplifier frequency extension
 
 `src/amplifier` is a distinct typed provider: it resolves the authoritative

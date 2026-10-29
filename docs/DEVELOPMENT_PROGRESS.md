@@ -1,11 +1,17 @@
 # Development Progress
 
 Updated **2026-10-29**. **V3.3.0 — Operational-amplifier dynamics and feedback**.
-**Locally Verified / O01–O10: 9/10.** Verified V3.2.0 production baseline and clean
+**Implementation Complete → Verified → Released / O01–O10: 10/10.** Verified V3.2.0 production baseline and clean
 remote/main `69c7f04`; working branch `codex/v3.3-opamp-frequency`. The existing
 ideal op-amp remains unchanged. Work is scoped to the explicitly versioned single-
 pole model, actual MNA, bounded passive feedback and the owner's acceptance.
-See [checkpoint](v3/OPAMP_FREQUENCY_IMPLEMENTATION.md). No blocker.
+Official app/tag `v3.3.0`: `322b9ee2c15db3a781447bdf28cbb0015e61dde5`;
+[workflow40887805390](https://github.com/STRAY-FLZ/circuit-equivalence-lab/actions/runs/40887805390)
+succeeded. [Release](https://github.com/STRAY-FLZ/circuit-equivalence-lab/releases/tag/v3.3.0)
+id427950413 was published after public Chrome and actual-download verification.
+Public and local each: 3 projects/603 points/1,835 independent checks. Existing
+DC/AC/transient/Signal/V1/analog/V3.2/competition integration passed publicly.
+See [release and rollback](v3/V3_3_0_RELEASE.md). No blocker. Stop before V3.4/V4.
 
 | ID | Deliverable | Status |
 | --- | --- | --- |
@@ -18,7 +24,7 @@ See [checkpoint](v3/OPAMP_FREQUENCY_IMPLEMENTATION.md). No blocker.
 | O07 | Defined loop gain and phase margin | Verified |
 | O08 | Atlas, editor, persistence and education | Verified |
 | O09 | Numerical and local real-browser acceptance | Verified |
-| O10 | Documentation, release and public verification | In Progress |
+| O10 | Documentation, release and public verification | Released |
 
 ---
 
