@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
-const layers = ['domain', 'topology', 'solver', 'transforms', 'visualization', 'education', 'components', 'engineering', 'project-format', 'compatibility', 'analysis', 'editing', 'integration', 'editor', 'signal', 'signal-ui', 'atlas', 'atlas-ui', 'dc', 'dc-ui', 'ac', 'ac-ui', 'competition', 'competition-ui', 'transient', 'transient-ui', 'analog', 'analog-ui', 'amplifier', 'amplifier-ui', 'opamp', 'opamp-ui']
+const layers = ['domain', 'topology', 'solver', 'transforms', 'visualization', 'education', 'components', 'engineering', 'project-format', 'compatibility', 'analysis', 'editing', 'integration', 'editor', 'signal', 'signal-ui', 'atlas', 'atlas-ui', 'dc', 'dc-ui', 'ac', 'ac-ui', 'competition', 'competition-ui', 'transient', 'transient-ui', 'analog', 'analog-ui', 'amplifier', 'amplifier-ui', 'opamp', 'opamp-ui', 'capstone', 'capstone-ui']
 const allowedDependencies = {
   domain: [],
   topology: ['domain'],
@@ -22,6 +22,8 @@ const allowedDependencies = {
   integration: ['engineering', 'compatibility', 'transforms', 'education', 'topology', 'editing'],
   amplifier: ['engineering', 'analysis', 'analog', 'ac', 'dc'],
   'amplifier-ui': ['amplifier', 'engineering', 'analysis', 'ac', 'ac-ui'],
+  capstone: ['engineering', 'analysis', 'editing', 'atlas', 'ac', 'transient', 'amplifier', 'opamp', 'project-format', 'competition', 'signal'],
+  'capstone-ui': ['capstone', 'project-format', 'competition', 'editing', 'atlas', 'editor'],
   opamp: ['engineering', 'analysis', 'analog', 'ac', 'dc'],
   'opamp-ui': ['opamp', 'engineering', 'editing', 'analysis', 'ac', 'ac-ui', 'amplifier-ui'],
   analog: ['engineering', 'analysis', 'dc'],
@@ -68,7 +70,7 @@ export default defineConfig([
               .flatMap((other) => [`**/${other}`, `**/${other}/**`]),
             message: '此依赖违反模块方向；请通过 domain 类型或在 App 中组合模块。',
           },
-          ...(['components', 'visualization', 'editor', 'signal-ui', 'atlas-ui', 'dc-ui', 'ac-ui', 'competition-ui', 'transient-ui', 'analog-ui', 'amplifier-ui', 'opamp-ui'].includes(layer) ? [] : [{
+          ...(['components', 'visualization', 'editor', 'signal-ui', 'atlas-ui', 'dc-ui', 'ac-ui', 'competition-ui', 'transient-ui', 'analog-ui', 'amplifier-ui', 'opamp-ui', 'capstone-ui'].includes(layer) ? [] : [{
             group: ['react', 'react/*', 'react-dom', 'react-dom/*'],
             message: '计算与教学契约不依赖 React。',
           }]),

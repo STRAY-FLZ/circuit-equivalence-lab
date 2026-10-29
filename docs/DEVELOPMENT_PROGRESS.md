@@ -1,5 +1,15 @@
 # Development Progress
 
+**2026-10-30 — V3.4.0: In Progress / Z01–Z10 7/10.**
+Baseline main e96d831, public v3.3.0/322b9ee; branch
+`codex/v3.4-integrated-capstones`. Z01–Z07 verified by source inventory/publisher
+contents, 12 actual-provider orchestration/persistence/evidence tests and one UI
+integration test. Z08 targeted reliability and Z09 acceptance are in progress;
+Z10 release is planned. See [implementation](v3/INTEGRATED_CAPSTONES.md).
+No blocker. Do not close V3 before public acceptance; do not start V4.
+
+---
+
 Updated **2026-10-29**. **V3.3.0 — Operational-amplifier dynamics and feedback**.
 **Implementation Complete → Verified → Released / O01–O10: 10/10.** Verified V3.2.0 production baseline and clean
 remote/main `69c7f04`; working branch `codex/v3.3-opamp-frequency`. The existing
